@@ -7,29 +7,7 @@ import AuthTokenContext from "@/store/authtoken-context";
 export default function HomePage() {
   const router = useRouter();
   const { setAuthToken } = useContext(AuthTokenContext);
-
-  // * Fetch oauth token on homepage initialisation, store in context
-  useEffect(() => {
-    const auth_headers = {
-      "Content-Type": "application/x-www-form-urlencoded",
-      Accept: "application/json",
-    };
-
-    async function fetchData() {
-      const auth_data = await fetch("/oauth/token", {
-        method: "POST",
-        headers: auth_headers,
-        body: `client_id=${process.env.NEXT_PUBLIC_CLIENT_ID}&client_secret=${process.env.NEXT_PUBLIC_CLIENT_SECRET}&grant_type=client_credentials&scope=public`,
-      })
-        .then((response) => response.json())
-        .catch((err) => console.log("error getting auth token: " + err));
-
-      setAuthToken(auth_data.access_token);
-      // console.log("fetch auth token success");
-    }
-    fetchData();
-  }, []);
-
+  
   function userPageRedirectHandler(username) {
     router.push(`/${username}`);
   }
