@@ -1,9 +1,8 @@
 import { useRouter } from "next/router";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import UserDetails from "@/components/UserDetails";
 import ScoresList from "@/components/ScoresList";
 import axios from "axios";
-
 
 export default function UserProfilePage() {
   const router = useRouter();
@@ -20,10 +19,15 @@ export default function UserProfilePage() {
   const [recentScoresData, setRecentScoresData] = useState({});
   const [isRecentScoresDataSet, setIsRecentScoresDataSet] = useState(false);
 
-  // * Fetch oauth token on homepage initialisation, store in context
-  useEffect(() => {
-    async function fetchAuthToken() {
-      try {
+  // * Fetch oauth token on homepage initialisation (runs upon new page reload)
+  async function fetchAuthToken() {
+    try {
+      // * check if authToken already exists in sessionStorage, if yes, do not query for a new one
+      if (!!sessionStorage.getItem("authToken")) {
+        console.log("using cached authToken")
+        setAuthToken(sessionStorage.getItem("authToken"));
+      } else {
+        // * get a new authToken based off our client id and secrets in environmental variables
         const auth_data = (await axios.post("/oauth/token", {
           client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
           client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
@@ -32,22 +36,20 @@ export default function UserProfilePage() {
         })).data;
 
         setAuthToken(auth_data.access_token);
+
+        // * save a copy of authToken in sessionStorage
+        sessionStorage.setItem("authToken", auth_data.access_token);
         // console.log("fetch auth token success");
-      } catch (error) {
-        console.log("error fetching auth token: " + error);
-        setAuthToken(null);
       }
+    } catch (error) {
+      console.log("error fetching auth token: " + error);
+      setAuthToken(null);
     }
+  }
+
+  useEffect(() => {
     fetchAuthToken();
   }, []);
-
-  // * Fetch user data upon user page initialisation
-  useEffect(() => {
-    if (router.isReady && !!authToken) {
-      // wait for router to obtain username before querying user data, as well as waiting for a authToken to be present
-      fetchUserDataHandler(router.query.username);
-    }
-  }, [router.isReady, authToken]);
 
   // ? Is there a way to refactor this somewhere else so this file isn't 150+ lines long
   // ? Currently uses router.query.username to get username --> user must submit username from homepage, i.e. cannot directly go to /[username]. Fixable? 
@@ -66,7 +68,11 @@ export default function UserProfilePage() {
         setIsUserDataSet(true);
         setDoesUserExist(true);
       } catch (error) {
-        if (error.response.status === 404) {
+        if (error.response.status === 401) {
+          // authToken is invalid now, request new authToken (since authToken expires in a day)
+          fetchAuthToken();
+        }
+        else if (error.response.status === 404) {
           console.log("user does not exist!");
         } else {
           // probably a 500 internal server error
@@ -76,6 +82,14 @@ export default function UserProfilePage() {
       }
     }
   }
+  // * Fetch user data upon user page initialisation
+  useEffect(() => {
+    if (router.isReady && !!authToken) {
+      // wait for router to obtain username before querying user data, as well as waiting for a authToken to be present
+      fetchUserDataHandler(router.query.username);
+    }
+  }, [router.isReady, authToken]);
+
 
   // ? Is there a way to refactor this somewhere else so this file isn't 150+ lines long
   async function fetchBestScoresDataHandler() {
