@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import styles from "./UsernameForm.module.css";
 
-function UsernameForm(props) {
+export default function UsernameForm(props) {
   const usernameInputRef = useRef();
 
   function submitHandler(event) {
@@ -17,5 +17,3 @@ function UsernameForm(props) {
     </form>
   );
 }
-
-export default UsernameForm;
