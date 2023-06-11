@@ -3,6 +3,7 @@ import { useState, useEffect, useContext } from "react";
 import UserDetails from "@/components/UserDetails";
 import AuthTokenContext from "@/store/authtoken-context";
 import ScoresList from "@/components/ScoresList";
+import axios from "axios";
 
 export default function UserProfilePage() {
   const router = useRouter();
@@ -18,81 +19,65 @@ export default function UserProfilePage() {
   const [recentScoresData, setRecentScoresData] = useState({});
   const [isRecentScoresDataSet, setIsRecentScoresDataSet] = useState(false);
 
-  const fetch_headers = {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-    Authorization: "Bearer " + authToken,
+  const axios_config = {
+    headers: { Authorization: `Bearer ${authToken}` }
   };
 
   // ? Is there a way to refactor this somewhere else so this file isn't 150+ lines long
   // ? Currently uses router.query.username to get username --> user must submit username from homepage, i.e. cannot directly go to /[username]. Fixable? 
-  async function fetchUserDataHandler() {
-    if (authToken !== "") {
-      // console.log(router);
-      // console.log(authToken);
-      const user_data = await fetch(
-        `api/v2/users/${router.query.username}?key=username`,
-        {
-          method: "GET",
-          headers: fetch_headers,
-        }
-      )
-        .then((response) => response.json())
-        .catch((err) => console.log("error fetching player data: " + err)); // TODO: throw error?
-      if (typeof user_data.error === "undefined") {
-        // console.log('fetch user data success');
-        // console.log(user_data);
+  async function fetchUserDataHandler(username) {
+    // console.log('calling user data')
+    // console.log(router.query.username)
+
+    if (!!authToken) {
+      try {
+        const user_data = (await axios.get(`/api/v2/users/${username}`, axios_config)).data;
+
         setUserData(user_data);
         setIsUserDataSet(true);
         setDoesUserExist(true);
-      } else {
+      } catch (error) {
+        if (error.response.status === 404) {
+          console.log("user does not exist!");
+        } else {
+          // probably a 500 internal server error
+          console.log("error fetching user data");
+        }
         setDoesUserExist(false);
       }
-    } else {
-      console.log("auth token not updated"); // TODO: should not happen, maybe can assert()
     }
   }
 
   // ? Is there a way to refactor this somewhere else so this file isn't 150+ lines long
-  async function fetchBestScoresDataHandler(event) {
-    event.preventDefault();
+  async function fetchBestScoresDataHandler() {
+    try {
+      const score_data = (await axios.get(`/api/v2/users/${userData.id}/scores/best?limit=${userData.scores_best_count}&offset=1`, axios_config)).data;
 
-    const score_data = await fetch(
-      `api/v2/users/${userData.id}/scores/best?limit=${userData.scores_best_count}&offset=1`,
-      {
-        method: "GET",
-        headers: fetch_headers,
-      }
-    )
-      .then((response) => response.json())
-      .catch((err) => console.log("error fetching score data: " + err));
+      setBestScoresData(score_data);
+      setIsBestScoresDataSet(true);
 
-    // console.log("fetch best scores success");
-    // console.log(score_data);
-
-    setBestScoresData(score_data);
-    setIsBestScoresDataSet(true);
+      // console.log("fetch best scores success");
+      // console.log(score_data);
+    } catch (error) {
+      console.log("error fetching best scores: " + error);
+      setBestScoresData({});
+      setIsBestScoresDataSet(false);
+    }
   }
 
   // ? Is there a way to refactor this somewhere else so this file isn't 150+ lines long
-  async function fetchRecentScoresDataHandler(event) {
-    event.preventDefault();
+  async function fetchRecentScoresDataHandler() {
+    try {
+      const score_data = (await axios.get(`/api/v2/users/${userData.id}/scores/recent?include_fails=1&limit=100&offset=1`, axios_config)).data;
 
-    const score_data = await fetch(
-      `api/v2/users/${userData.id}/scores/recent?include_fails=1&limit=100&offset=1`,
-      {
-        method: "GET",
-        headers: fetch_headers,
-      }
-    )
-      .then((response) => response.json())
-      .catch((err) => console.log("error fetching score data: " + err));
-
-    // console.log("fetch recent scores success");
-    // console.log(score_data);
-
-    setRecentScoresData(score_data);
+      setRecentScoresData(score_data);
     setIsRecentScoresDataSet(true);
+    } catch (error) {
+      console.log("error fetching score data: " + error);
+
+      setRecentScoresData({});
+      setIsRecentScoresDataSet(false);
+    }
   }
 
   function homeRedirectHandler() {
@@ -101,8 +86,21 @@ export default function UserProfilePage() {
 
   // * Fetch user data upon user page initialisation
   useEffect(() => {
-    fetchUserDataHandler();
-  }, []);
+    if (router.isReady) {
+      // wait for router to obtain username before querying user data
+      fetchUserDataHandler(router.query.username);
+    }
+  }, [router.isReady]);
+
+  const fetchBestScoresButtonHandler = (event) => {
+    event.preventDefault();
+    fetchBestScoresDataHandler();
+  }
+
+  const fetchRecentScoresButtonHandler = (event) => {
+    event.preventDefault();
+    fetchRecentScoresDataHandler();
+  }
 
   return (
     <>
@@ -117,7 +115,7 @@ export default function UserProfilePage() {
       )}
 
       {isUserDataSet && !isBestScoresDataSet && (
-        <button onClick={fetchBestScoresDataHandler}>best scores</button>
+        <button onClick={fetchBestScoresButtonHandler}>best scores</button>
       )}
 
       {isBestScoresDataSet && (
@@ -129,7 +127,7 @@ export default function UserProfilePage() {
       )}
 
       {isUserDataSet && !isRecentScoresDataSet && (
-        <button onClick={fetchRecentScoresDataHandler}>recent scores</button>
+        <button onClick={fetchRecentScoresButtonHandler}>recent scores</button>
       )}
 
       {isRecentScoresDataSet && (
