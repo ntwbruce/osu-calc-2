@@ -20,7 +20,7 @@ function Score({ idx, scoreData }) {
   return (
     <>
       <h3>
-        {idx} {artist} - {title} [{diff_name}] ({mapper} | {sr}
+        {idx + 1} {artist} - {title} [{diff_name}] ({mapper} | {sr}
         {isDT ? "+" : ""}*) {mods} {acc}% {rank} | {pp}pp
       </h3>
     </>

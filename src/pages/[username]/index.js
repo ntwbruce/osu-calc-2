@@ -94,7 +94,7 @@ export default function UserProfilePage() {
   // ? Is there a way to refactor this somewhere else so this file isn't 150+ lines long
   async function fetchBestScoresDataHandler() {
     try {
-      const score_data = (await axios.get(`/api/v2/users/${userData.id}/scores/best?limit=${userData.scores_best_count}&offset=1`, {
+      const score_data = (await axios.get(`/api/v2/users/${userData.id}/scores/best?limit=${userData.scores_best_count}`, {
         headers: { Authorization: `Bearer ${authToken}` }
       })).data;
 
@@ -113,7 +113,7 @@ export default function UserProfilePage() {
   // ? Is there a way to refactor this somewhere else so this file isn't 150+ lines long
   async function fetchRecentScoresDataHandler() {
     try {
-      const score_data = (await axios.get(`/api/v2/users/${userData.id}/scores/recent?include_fails=1&limit=100&offset=1`, {
+      const score_data = (await axios.get(`/api/v2/users/${userData.id}/scores/recent?include_fails=1&limit=100`, {
         headers: { Authorization: `Bearer ${authToken}` }
       })).data;
 
