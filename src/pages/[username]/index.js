@@ -1,13 +1,14 @@
 import { useRouter } from "next/router";
 import { useState, useEffect, useContext } from "react";
 import UserDetails from "@/components/UserDetails";
-import AuthTokenContext from "@/store/authtoken-context";
 import ScoresList from "@/components/ScoresList";
 import axios from "axios";
 
+
 export default function UserProfilePage() {
   const router = useRouter();
-  const { authToken } = useContext(AuthTokenContext);
+
+  const [authToken, setAuthToken] = useState(null);
 
   const [userData, setUserData] = useState({});
   const [doesUserExist, setDoesUserExist] = useState(true);
@@ -19,19 +20,47 @@ export default function UserProfilePage() {
   const [recentScoresData, setRecentScoresData] = useState({});
   const [isRecentScoresDataSet, setIsRecentScoresDataSet] = useState(false);
 
-  const axios_config = {
-    headers: { Authorization: `Bearer ${authToken}` }
-  };
+  // * Fetch oauth token on homepage initialisation, store in context
+  useEffect(() => {
+    async function fetchAuthToken() {
+      try {
+        const auth_data = (await axios.post("/oauth/token", {
+          client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
+          client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
+          grant_type: "client_credentials",
+          scope: "public"
+        })).data;
+
+        setAuthToken(auth_data.access_token);
+        // console.log("fetch auth token success");
+      } catch (error) {
+        console.log("error fetching auth token: " + error);
+        setAuthToken(null);
+      }
+    }
+    fetchAuthToken();
+  }, []);
+
+  // * Fetch user data upon user page initialisation
+  useEffect(() => {
+    if (router.isReady && !!authToken) {
+      // wait for router to obtain username before querying user data, as well as waiting for a authToken to be present
+      fetchUserDataHandler(router.query.username);
+    }
+  }, [router.isReady, authToken]);
 
   // ? Is there a way to refactor this somewhere else so this file isn't 150+ lines long
   // ? Currently uses router.query.username to get username --> user must submit username from homepage, i.e. cannot directly go to /[username]. Fixable? 
+  // * fixed by moving auth token into this page, since the index page is merely a search, there is no reason to query for authtoken so early
   async function fetchUserDataHandler(username) {
     // console.log('calling user data')
     // console.log(router.query.username)
 
     if (!!authToken) {
       try {
-        const user_data = (await axios.get(`/api/v2/users/${username}`, axios_config)).data;
+        const user_data = (await axios.get(`/api/v2/users/${username}`, {
+          headers: { Authorization: `Bearer ${authToken}` }
+        })).data;
 
         setUserData(user_data);
         setIsUserDataSet(true);
@@ -51,7 +80,9 @@ export default function UserProfilePage() {
   // ? Is there a way to refactor this somewhere else so this file isn't 150+ lines long
   async function fetchBestScoresDataHandler() {
     try {
-      const score_data = (await axios.get(`/api/v2/users/${userData.id}/scores/best?limit=${userData.scores_best_count}&offset=1`, axios_config)).data;
+      const score_data = (await axios.get(`/api/v2/users/${userData.id}/scores/best?limit=${userData.scores_best_count}&offset=1`, {
+        headers: { Authorization: `Bearer ${authToken}` }
+      })).data;
 
       setBestScoresData(score_data);
       setIsBestScoresDataSet(true);
@@ -68,10 +99,12 @@ export default function UserProfilePage() {
   // ? Is there a way to refactor this somewhere else so this file isn't 150+ lines long
   async function fetchRecentScoresDataHandler() {
     try {
-      const score_data = (await axios.get(`/api/v2/users/${userData.id}/scores/recent?include_fails=1&limit=100&offset=1`, axios_config)).data;
+      const score_data = (await axios.get(`/api/v2/users/${userData.id}/scores/recent?include_fails=1&limit=100&offset=1`, {
+        headers: { Authorization: `Bearer ${authToken}` }
+      })).data;
 
       setRecentScoresData(score_data);
-    setIsRecentScoresDataSet(true);
+      setIsRecentScoresDataSet(true);
     } catch (error) {
       console.log("error fetching score data: " + error);
 
@@ -83,14 +116,6 @@ export default function UserProfilePage() {
   function homeRedirectHandler() {
     router.push("/");
   }
-
-  // * Fetch user data upon user page initialisation
-  useEffect(() => {
-    if (router.isReady) {
-      // wait for router to obtain username before querying user data
-      fetchUserDataHandler(router.query.username);
-    }
-  }, [router.isReady]);
 
   const fetchBestScoresButtonHandler = (event) => {
     event.preventDefault();
@@ -104,10 +129,10 @@ export default function UserProfilePage() {
 
   return (
     <>
-      <button onClick={homeRedirectHandler}>reset</button>
-
-      {isUserDataSet && (
+      {!!authToken && isUserDataSet && (
         <>
+          <button onClick={homeRedirectHandler}>reset</button>
+
           <hr />
           <UserDetails userData={userData} />
           <hr />
