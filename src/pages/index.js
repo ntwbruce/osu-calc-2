@@ -1,12 +1,9 @@
 import UsernameForm from "@/components/UsernameForm";
 import Head from "next/head";
-import { useContext, useEffect } from "react";
 import { useRouter } from "next/router";
-import AuthTokenContext from "@/store/authtoken-context";
 
 export default function HomePage() {
   const router = useRouter();
-  const { setAuthToken } = useContext(AuthTokenContext);
   
   function userPageRedirectHandler(username) {
     router.push(`/${username}`);
