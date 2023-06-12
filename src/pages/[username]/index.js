@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import UserDetails from "@/components/UserDetails";
 import ScoresList from "@/components/ScoresList";
 import axios from "axios";
+import { Button } from "@mantine/core";
 
 export default function UserProfilePage() {
   const router = useRouter();
@@ -157,7 +158,7 @@ export default function UserProfilePage() {
     <>
       {!!authToken && isUserDataSet && (
         <>
-          <button onClick={homeRedirectHandler}>reset</button>
+          <Button onClick={homeRedirectHandler}>reset</Button>
 
           <hr />
           <UserDetails userData={userData} />
@@ -166,7 +167,7 @@ export default function UserProfilePage() {
       )}
 
       {isUserDataSet && !isBestScoresDataSet && (
-        <button onClick={fetchBestScoresButtonHandler}>best scores</button>
+        <Button onClick={fetchBestScoresButtonHandler}>best scores</Button>
       )}
 
       {isBestScoresDataSet && (
@@ -178,7 +179,7 @@ export default function UserProfilePage() {
       )}
 
       {isUserDataSet && !isRecentScoresDataSet && (
-        <button onClick={fetchRecentScoresButtonHandler}>recent scores</button>
+        <Button onClick={fetchRecentScoresButtonHandler}>recent scores</Button>
       )}
 
       {isRecentScoresDataSet && (
