@@ -6,191 +6,150 @@ import axios from "axios";
 import { Button } from "@mantine/core";
 
 export default function UserProfilePage() {
-  const router = useRouter();
+    const router = useRouter();
 
-  const [authToken, setAuthToken] = useState(null);
+    const [authTokenPresent, setAuthTokenPresent] = useState(false);
 
-  const [userData, setUserData] = useState({});
-  const [doesUserExist, setDoesUserExist] = useState(true);
-  const [isUserDataSet, setIsUserDataSet] = useState(false);
+    const [userData, setUserData] = useState({});
+    const [doesUserExist, setDoesUserExist] = useState(true);
+    const [isUserDataSet, setIsUserDataSet] = useState(false);
 
-  const [bestScoresData, setBestScoresData] = useState({});
-  const [isBestScoresDataSet, setIsBestScoresDataSet] = useState(false);
+    const [bestScoresData, setBestScoresData] = useState({});
+    const [isBestScoresDataSet, setIsBestScoresDataSet] = useState(false);
 
-  const [recentScoresData, setRecentScoresData] = useState({});
-  const [isRecentScoresDataSet, setIsRecentScoresDataSet] = useState(false);
+    const [recentScoresData, setRecentScoresData] = useState({});
+    const [isRecentScoresDataSet, setIsRecentScoresDataSet] = useState(false);
 
-  const fetchAuthToken = async () => {
-    try {
-      // * check if authToken already exists in sessionStorage, if yes, do not query for a new one
-      if (!!sessionStorage.getItem("authToken")) {
-        console.log("using cached authToken");
-        setAuthToken(sessionStorage.getItem("authToken"));
-      } else {
-        // * get a new authToken based off our client id and secrets in environmental variables
-        const auth_data = (
-          await axios.post("/oauth/token", {
-            client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
-            client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
-            grant_type: "client_credentials",
-            scope: "public",
-          })
-        ).data;
-
-        setAuthToken(auth_data.access_token);
-
-        // * save a copy of authToken in sessionStorage
-        sessionStorage.setItem("authToken", auth_data.access_token);
-        // console.log("fetch auth token success");
-      }
-    } catch (error) {
-      console.log("error fetching auth token: " + error);
-      setAuthToken(null);
-    }
-  };
-
-  const fetchUserDataHandler = async (username) => {
-    // console.log('calling user data')
-    // console.log(router.query.username)
-
-    if (!!authToken) {
-      try {
-        const user_data = (
-          await axios.get(`/api/v2/users/${username}`, {
-            headers: { Authorization: `Bearer ${authToken}` },
-          })
-        ).data;
-
-        setUserData(user_data);
-        setIsUserDataSet(true);
-        setDoesUserExist(true);
-      } catch (error) {
-        if (error.response.status === 401) {
-          // authToken is invalid now, request new authToken (since authToken expires in a day)
-          fetchAuthToken();
-        } else if (error.response.status === 404) {
-          console.log("user does not exist!");
-        } else {
-          // probably a 500 internal server error
-          console.log("error fetching user data");
+    // * Fetch oauth token on homepage initialisation (runs upon new page reload)
+    async function fetchAuthToken() {
+        try {
+            await axios.post("/api/accessToken");
+            setAuthTokenPresent(true);
+        } catch (error) {
+            console.log("error fetching auth token: " + error.response.data);
+            setAuthTokenPresent(false);
         }
-        setDoesUserExist(false);
-      }
     }
-  };
 
-  const fetchBestScoresDataHandler = async () => {
-    try {
-      const score_data = (
-        await axios.get(`/api/v2/users/${userData.id}/scores/best`, {
-          headers: { Authorization: `Bearer ${authToken}` },
-          params: {
-            limit: userData.scores_best_count,
-          },
-        })
-      ).data;
+    useEffect(() => {
+        fetchAuthToken();
+    }, []);
 
-      setBestScoresData(score_data);
-      setIsBestScoresDataSet(true);
+    async function fetchUserDataHandler(username) {
+        try {
+            const response = (await axios.get(`/api/users/${username}`)).data;
 
-      // console.log("fetch best scores success");
-      // console.log(score_data);
-    } catch (error) {
-      console.log("error fetching best scores: " + error);
-      setBestScoresData({});
-      setIsBestScoresDataSet(false);
+            setUserData(response.data);
+            setIsUserDataSet(true);
+            setDoesUserExist(true);
+        } catch (error) {
+            if (error.response.status === 401) {
+                // authToken is invalid now, request new authToken (since authToken expires in a day)
+                setAuthTokenPresent(false);
+                fetchAuthToken();
+                setAuthTokenPresent(true);
+            }
+            else if (error.response.status === 404) {
+                console.log("user does not exist!");
+            } else {
+                // probably a 500 internal server error
+                console.log("error fetching user data: " + error.response.data);
+            }
+            setDoesUserExist(false);
+        }
     }
-  };
 
-  const fetchBestScoresButtonHandler = (event) => {
-    event.preventDefault();
-    fetchBestScoresDataHandler();
-  };
+    // * Fetch user data upon user page initialisation
+    useEffect(() => {
+        if (router.isReady && authTokenPresent) {
+            // wait for router to obtain username before querying user data, as well as waiting for a authToken to be present
+            fetchUserDataHandler(router.query.username);
+        }
+    }, [router.isReady, authTokenPresent]);
 
-  const fetchRecentScoresDataHandler = async () => {
-    try {
-      const score_data = (
-        await axios.get(
-          `/api/v2/users/${userData.id}/scores/recent`,
-          {
-            headers: { Authorization: `Bearer ${authToken}` },
-            params: {
-              include_fails: 1,
-              limit: 100,
-            },
-          }
-        )
-      ).data;
+    async function fetchBestScoresDataHandler() {
+        try {
+            const response = (await axios.get(`/api/users/${userData.id}/scores/best?limit=${userData.scores_best_count}&offset=1`)).data;
 
-      setRecentScoresData(score_data);
-      setIsRecentScoresDataSet(true);
-    } catch (error) {
-      console.log("error fetching score data: " + error);
+            setBestScoresData(response.data);
+            setIsBestScoresDataSet(true);
 
-      setRecentScoresData({});
-      setIsRecentScoresDataSet(false);
+            // console.log("fetch best scores success");
+            // console.log(score_data);
+        } catch (error) {
+            console.log("error fetching best scores: " + error.response.data);
+            setBestScoresData([]);
+            setIsBestScoresDataSet(false);
+        }
     }
-  };
 
-  const fetchRecentScoresButtonHandler = (event) => {
-    event.preventDefault();
-    fetchRecentScoresDataHandler();
-  };
+    // ? Is there a way to refactor this somewhere else so this file isn't 150+ lines long
+    async function fetchRecentScoresDataHandler() {
+        try {
+            const response = (await axios.get(`/api/users/${userData.id}/scores/recent?include_fails=1&limit=100&offset=1`)).data;
 
-  const homeRedirectHandler = () => {
-    router.push("/");
-  };
+            console.log(response.data);
+            setRecentScoresData(response.data);
+            setIsRecentScoresDataSet(true);
+        } catch (error) {
+            console.log("error fetching score data: " + error.response.data);
 
-  // * Fetch auth token upon user page initialisation
-  useEffect(() => {
-    fetchAuthToken();
-  }, []);
-
-  // * Fetch user data upon user page initialisation
-  useEffect(() => {
-    if (router.isReady && !!authToken) {
-      // wait for router to obtain username before querying user data, as well as waiting for a authToken to be present
-      fetchUserDataHandler(router.query.username);
+            setRecentScoresData([]);
+            setIsRecentScoresDataSet(false);
+        }
     }
-  }, [router.isReady, authToken]);
 
-  return (
-    <>
-      {!!authToken && isUserDataSet && (
+    function homeRedirectHandler() {
+        router.push("/");
+    }
+
+    const fetchBestScoresButtonHandler = (event) => {
+        event.preventDefault();
+        fetchBestScoresDataHandler();
+    }
+
+    const fetchRecentScoresButtonHandler = (event) => {
+        event.preventDefault();
+        fetchRecentScoresDataHandler();
+    }
+
+    return (
         <>
-          <Button onClick={homeRedirectHandler}>reset</Button>
+            {authTokenPresent && isUserDataSet && (
+                <>
+                    <Button onClick={homeRedirectHandler}>reset</Button>
 
-          <hr />
-          <UserDetails userData={userData} />
-          <hr />
+                    <hr />
+                    <UserDetails userData={userData} />
+                    <hr />
+                </>
+            )}
+
+            {isUserDataSet && !isBestScoresDataSet && (
+                <Button onClick={fetchBestScoresButtonHandler}>best scores</Button>
+            )}
+
+            {isBestScoresDataSet && (
+                <>
+                    <h1>Best Scores</h1>
+                    <ScoresList data={bestScoresData} />
+                    <hr />
+                </>
+            )}
+
+            {isUserDataSet && !isRecentScoresDataSet && (
+                <Button onClick={fetchRecentScoresButtonHandler}>recent scores</Button>
+            )}
+
+            {isRecentScoresDataSet && (
+                <>
+                    <h1>Recent Scores</h1>
+                    <ScoresList data={recentScoresData} />
+                    <hr />
+                </>
+            )}
+
+            {!doesUserExist && <p>Profile does not exist.</p>}
         </>
-      )}
-
-      {isUserDataSet && !isBestScoresDataSet && (
-        <Button onClick={fetchBestScoresButtonHandler}>best scores</Button>
-      )}
-
-      {isBestScoresDataSet && (
-        <>
-          <h1>Best Scores</h1>
-          <ScoresList data={bestScoresData} />
-          <hr />
-        </>
-      )}
-
-      {isUserDataSet && !isRecentScoresDataSet && (
-        <Button onClick={fetchRecentScoresButtonHandler}>recent scores</Button>
-      )}
-
-      {isRecentScoresDataSet && (
-        <>
-          <h1>Recent Scores</h1>
-          <ScoresList data={recentScoresData} />
-          <hr />
-        </>
-      )}
-
-      {!doesUserExist && <p>Profile does not exist.</p>}
-    </>
-  );
+    );
 }
