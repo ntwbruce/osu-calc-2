@@ -1,22 +1,37 @@
 import UsernameForm from "@/components/UsernameForm";
+import { Flex, Title, Button } from "@mantine/core";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 export default function HomePage() {
   const router = useRouter();
-  
+
   function userPageRedirectHandler(username) {
     router.push(`/${username}`);
   }
 
+  const link1 = "https://www.youtube.com/watch?v=3d_l_Kyb5GM";
+  const link2 = "https://www.youtube.com/watch?v=NY0ffyEu6uo";
+
   return (
     <>
       <Head>
-        <title>among us</title>
+        <title>silver wolf cheese slap meme</title>
       </Head>
-
-      <h1>le osu game a la peppy</h1>
-      <UsernameForm onSubmit={userPageRedirectHandler} />
+      <Link href={Math.random() > 0.4 ? link1 : link2} target="_blank">
+        <Button type="button">I'm feeling lucky (viewer discretion)</Button>
+      </Link>
+      <Flex
+        direction={{ base: "row", sm: "column" }}
+        gap={{ base: "sm", sm: "xl" }}
+        justify={{ sm: "center" }}
+      >
+        <Title order={1} align="center">
+          le osu game a la peppy
+        </Title>
+        <UsernameForm onSubmit={userPageRedirectHandler} />
+      </Flex>
     </>
   );
 

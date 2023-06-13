@@ -9,6 +9,7 @@ import {
   Center,
   TextInput,
   rem,
+  Flex,
 } from "@mantine/core";
 import {
   IconSelector,
@@ -65,8 +66,14 @@ function Th({ children, isReverseSorted, isActiveSortingParam, onSort }) {
 }
 
 function filterData(data, search) {
-  const query = search.toLowerCase().trim();
-  return data.filter((item) => item["map"].toLowerCase().includes(query));
+  const { map, mapper } = search;
+  const mapQuery = map.toLowerCase().trim();
+  const mapperQuery = mapper.toLowerCase().trim();
+  return data.filter(
+    (item) =>
+      item["map"].toLowerCase().includes(mapQuery) &&
+      item["mapper"].toLowerCase().includes(mapperQuery)
+  );
 }
 
 function sortData(data, payload) {
@@ -100,7 +107,7 @@ function sortData(data, payload) {
             DT: 1.13,
             NC: 1.12,
             HD: 1.05,
-            FL: 1.10,
+            FL: 1.1,
             SO: 0.9,
           };
           const firstMultiplier = Array.isArray(first[sortingParam])
@@ -142,7 +149,8 @@ function sortData(data, payload) {
 }
 
 export default function SortableTable({ data }) {
-  const [search, setSearch] = useState("");
+  const [mapSearch, setMapSearch] = useState("");
+  const [mapperSearch, setMapperSearch] = useState("");
   const [sortedData, setSortedData] = useState(data);
   const [sortingParam, setSortingParam] = useState(null);
   const [isReverseSorted, setIsReverseSorted] = useState(false);
@@ -152,15 +160,35 @@ export default function SortableTable({ data }) {
     setIsReverseSorted(toReverse);
     setSortingParam(field);
     setSortedData(
-      sortData(data, { sortingParam: field, reversed: toReverse, search })
+      sortData(data, {
+        sortingParam: field,
+        reversed: toReverse,
+        search: { map: mapSearch, mapper: mapperSearch },
+      })
     );
   };
 
-  const searchChangeHandler = (event) => {
+  const mapSearchChangeHandler = (event) => {
     const { value } = event.currentTarget;
-    setSearch(value);
+    setMapSearch(value);
     setSortedData(
-      sortData(data, { sortingParam, reversed: isReverseSorted, search: value })
+      sortData(data, {
+        sortingParam,
+        reversed: isReverseSorted,
+        search: { map: value, mapper: mapperSearch },
+      })
+    );
+  };
+
+  const mapperSearchChangeHandler = (event) => {
+    const { value } = event.currentTarget;
+    setMapperSearch(value);
+    setSortedData(
+      sortData(data, {
+        sortingParam,
+        reversed: isReverseSorted,
+        search: { map: mapSearch, mapper: value },
+      })
     );
   };
 
@@ -182,13 +210,25 @@ export default function SortableTable({ data }) {
 
   return (
     <ScrollArea>
-      <TextInput
-        placeholder="Search by map name"
-        mb="md"
-        icon={<IconSearch size="0.9rem" stroke={1.5} />}
-        value={search}
-        onChange={searchChangeHandler}
-      />
+      <Flex gap={{ base: "sm", sm: "lg" }} justify={{ sm: "center" }}>
+        <TextInput
+          placeholder="Search by map name"
+          mb="md"
+          w="20rem"
+          icon={<IconSearch size="0.9rem" stroke={1.5} />}
+          value={mapSearch}
+          onChange={mapSearchChangeHandler}
+        />
+
+        <TextInput
+          placeholder="Search by mapper"
+          mb="md"
+          w="20rem"
+          icon={<IconSearch size="0.9rem" stroke={1.5} />}
+          value={mapperSearch}
+          onChange={mapperSearchChangeHandler}
+        />
+      </Flex>
       <Table
         horizontalSpacing="md"
         verticalSpacing="xs"

@@ -1,9 +1,17 @@
+import { TextInput, Checkbox, Button, Group, Box } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import Link from "next/link";
 import { useRef } from "react";
-import styles from "./UsernameForm.module.css";
-import { Button } from "@mantine/core";
 
 export default function UsernameForm(props) {
   const usernameInputRef = useRef();
+
+  const form = useForm({
+    initialValues: {
+      username: "",
+      termsOfService: false,
+    },
+  });
 
   function submitHandler(event) {
     event.preventDefault();
@@ -11,10 +19,26 @@ export default function UsernameForm(props) {
   }
 
   return (
-    <form onSubmit={submitHandler}>
-      <label htmlFor="username">Username</label>
-      <input type="text" required id="username" ref={usernameInputRef} />
-      <Button type="submit">submit</Button>
-    </form>
+    <Box maw={600} mx="auto">
+      <form onSubmit={submitHandler}>
+        <TextInput
+          label="Username"
+          placeholder="Username"
+          {...form.getInputProps("username")}
+          ref={usernameInputRef}
+          w="24rem"
+        />
+
+        <Checkbox
+          mt="md"
+          label="I agree to sell my privacy."
+          {...form.getInputProps("termsOfService", { type: "checkbox" })}
+        />
+
+        <Group position="right" mt="md">
+          <Button type="submit">Submit</Button>
+        </Group>
+      </form>
+    </Box>
   );
 }
