@@ -1,7 +1,8 @@
 import { useRef } from "react";
 import styles from "./UsernameForm.module.css";
+import { Button } from "@mantine/core";
 
-function UsernameForm(props) {
+export default function UsernameForm(props) {
   const usernameInputRef = useRef();
 
   function submitHandler(event) {
@@ -13,9 +14,7 @@ function UsernameForm(props) {
     <form onSubmit={submitHandler}>
       <label htmlFor="username">Username</label>
       <input type="text" required id="username" ref={usernameInputRef} />
-      <button type="submit">submit</button>
+      <Button type="submit">submit</Button>
     </form>
   );
 }
-
-export default UsernameForm;

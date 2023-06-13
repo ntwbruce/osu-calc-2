@@ -1,10 +1,10 @@
-import { AuthTokenProvider } from "@/store/authtoken-context";
-import "@/styles/globals.css";
+// import "@/styles/globals.css";
+import { MantineProvider } from "@mantine/core";
 
 export default function App({ Component, pageProps }) {
   return (
-    <AuthTokenProvider>
+    <MantineProvider>
       <Component {...pageProps} />
-    </AuthTokenProvider>
+    </MantineProvider>
   );
 }

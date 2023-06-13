@@ -1,6 +1,6 @@
 import styles from "./Score.module.css";
 
-function Score({ idx, scoreData }) {
+export default function Score({ idx, scoreData }) {
   const artist = scoreData.beatmapset.artist;
   const title = scoreData.beatmapset.title;
   const diff_name = scoreData.beatmap.version;
@@ -20,11 +20,9 @@ function Score({ idx, scoreData }) {
   return (
     <>
       <h3>
-        {idx} {artist} - {title} [{diff_name}] ({mapper} | {sr}
+        {idx + 1} {artist} - {title} [{diff_name}] ({mapper} | {sr}
         {isDT ? "+" : ""}*) {mods} {acc}% {rank} | {pp}pp
       </h3>
     </>
   );
 }
-
-export default Score;
