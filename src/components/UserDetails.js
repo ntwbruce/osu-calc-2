@@ -1,6 +1,6 @@
 import styles from "./UserDetails.module.css";
 
-function UserDetails({userData}) {
+export default function UserDetails({userData}) {
   const pfp = userData.avatar_url;
   const username = userData.username;
   const playmode =
@@ -35,5 +35,3 @@ function UserDetails({userData}) {
     </>
   );
 }
-
-export default UserDetails;
