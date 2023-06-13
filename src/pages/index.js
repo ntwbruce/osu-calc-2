@@ -19,7 +19,7 @@ export default function HomePage() {
       <Head>
         <title>silver wolf cheese slap meme</title>
       </Head>
-      <Link href={Math.random() > 0.4 ? link1 : link2} target="_blank">
+      <Link href={Math.random() > 0.6 ? link1 : link2} target="_blank">
         <Button type="button">I'm feeling lucky (viewer discretion)</Button>
       </Link>
       <Flex
