@@ -1,10 +1,10 @@
 import Score from "./Score";
-import TableSort from "./ScoreTable";
+import SortableTable from "./SortableTable";
 import styles from "./ScoresList.module.css";
 
 export default function ScoresList({ data }) {
   return (
-    <TableSort
+    <SortableTable
       data={data.map((score, index) => {
         return {
           index: index + 1,
@@ -18,7 +18,7 @@ export default function ScoresList({ data }) {
           score.mods.includes("EZ")
             ? "*"
             : "",
-          mods: score.mods.length >= 1 ? `${score.mods.join("")}` : "NM",
+          mods: score.mods.length >= 1 ? score.mods : "NM",
           pp: score.pp,
           acc: score.accuracy,
           rank:
