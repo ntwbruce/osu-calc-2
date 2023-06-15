@@ -11,13 +11,14 @@ export default function ScoresList({ data }) {
           map: `${score.beatmapset.artist} - ${score.beatmapset.title} [${score.beatmap.version}]`,
           mapper: score.beatmapset.creator,
           sr: score.beatmap.difficulty_rating,
-          sr_multiplier: score.mods.includes("DT") ||
-          score.mods.includes("NC") ||
-          score.mods.includes("FL") ||
-          score.mods.includes("HR") ||
-          score.mods.includes("EZ")
-            ? "*"
-            : "",
+          sr_multiplier:
+            score.mods.includes("DT") ||
+            score.mods.includes("NC") ||
+            score.mods.includes("FL") ||
+            score.mods.includes("HR") ||
+            score.mods.includes("EZ")
+              ? "*"
+              : "",
           mods: score.mods.length >= 1 ? score.mods : "NM",
           pp: score.pp,
           acc: score.accuracy,
