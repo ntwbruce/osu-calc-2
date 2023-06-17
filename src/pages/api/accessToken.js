@@ -2,6 +2,7 @@ import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "@/lib/session";
 import axios from "axios";
 
+// * this API endpoint is for getting the access token using the oauth token
 export default withIronSessionApiRoute(
     async function getAccessToken(req, res) {
         try {

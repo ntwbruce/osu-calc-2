@@ -2,6 +2,7 @@ import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "@/lib/session";
 import axios from "axios";
 
+// * this endpoint is for fetching general user data
 export default withIronSessionApiRoute(
     async function getUserData(req, res) {
         try {
@@ -14,7 +15,7 @@ export default withIronSessionApiRoute(
             // get username from query
             const username = req.query.user; // could be either ID or username, depending on context
 
-            // obtain authToken from client_id and client_secret
+            // obtain user data
             const userData = (await axios.get(`https://osu.ppy.sh/api/v2/users/${username}`, {
                 headers: { Authorization: `Bearer ${req.session.accessToken}` }
             })).data;
