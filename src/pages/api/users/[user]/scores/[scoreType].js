@@ -2,6 +2,7 @@ import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "@/lib/session";
 import axios from "axios";
 
+// * this api endpoint is for fetching user scores (recent/ best/ firsts)
 export default withIronSessionApiRoute(
     async function getScoreData(req, res) {
         try {
