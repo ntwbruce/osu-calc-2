@@ -12,13 +12,14 @@ export default withIronSessionApiRoute(
             }
 
             /*  
-                Query Parameters:
+                URL Parameters:
                 userID   integer   
                 ID of the user.
 
                 scoreType   string   
                 Score type. Must be one of these: best, firsts, recent.
 
+                Query Parameters:
                 includeFails   string  optional  
                 Only for recent scores, include scores of failed plays. Set to 1 to include them. Defaults to 0.
 
@@ -33,8 +34,8 @@ export default withIronSessionApiRoute(
             */
             const userID = req.query.user; // could be either ID or username, depending on context
             const scoreType = req.query.scoreType;
+            
             const includeFails = req.query.includeFails || 0;
-
             const mode = req.query.mode;
             const limit = req.query.limit;
             const offset = req.query.offset;
