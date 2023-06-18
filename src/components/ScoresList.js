@@ -6,8 +6,11 @@ export default function ScoresList({ data }) {
   return (
     <SortableTable
       data={data.map((score, index) => {
+        console.log(data);
         return {
           index: index + 1,
+          beatmap_id: score.beatmap.id,
+          user_id: score.user_id,
           map: `${score.beatmapset.artist} - ${score.beatmapset.title} [${score.beatmap.version}]`,
           mapper: score.beatmapset.creator,
           sr: score.beatmap.difficulty_rating,
