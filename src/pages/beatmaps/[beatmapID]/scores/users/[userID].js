@@ -1,4 +1,4 @@
-import { Button, Image } from "@mantine/core";
+import { Button, Image, Title } from "@mantine/core";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -113,18 +113,18 @@ export default function HomePage() {
                 Object.keys(beatmapData).length !== 0 && Object.keys(scoreData).length !== 0 && (
                     <>
                         {/* Get Beatmap unicode Title */}
-                        <h1>{beatmapData.beatmapset.title} [{beatmapData.version}]{scoreData.score.mods.length !== 0 ? ` +${scoreData.score.mods.join()}` : " +No Mod"} [{(Math.round(starRating * 100) / 100.0).toFixed(2)}<IconStarFilled />]</h1>
+                        <Title order={1}>{beatmapData.beatmapset.title} [{beatmapData.version}]{scoreData.score.mods.length !== 0 ? ` +${scoreData.score.mods.join()}` : " +No Mod"} [{(Math.round(starRating * 100) / 100.0).toFixed(2)}<IconStarFilled />]</Title>
                         {/* Get Beatmap cover image */}
                         <Image mx="auto" radius="md" src={beatmapData.beatmapset.covers["cover@2x"]} alt="Beatmap cover" />
 
-                        <h2>Global Score Position: #{scoreData.position}</h2>
-                        <h2>Rank: {scoreData.score.rank} (Replace with colour icon or smth)</h2>
-                        <h2>Score: {scoreData.score.score.toLocaleString("en-US")}</h2>
-                        <h2>PP: {scoreData.score.pp}PP (XXXPP for XXX FC, calculate from scoreData.score.statistics)</h2>
-                        <h2>Accuracy: {(scoreData.score.accuracy * 100).toFixed(2)}</h2>
-                        <h2>Combo: {scoreData.score.max_combo}/{beatmapData.max_combo}</h2>
+                        <Title order={2}>Global Score Position: #{scoreData.position}</Title>
+                        <Title order={2}>Rank: {scoreData.score.rank} (Replace with colour icon or smth)</Title>
+                        <Title order={2}>Score: {scoreData.score.score.toLocaleString("en-US")}</Title>
+                        <Title order={2}>PP: {scoreData.score.pp}PP (XXXPP for XXX FC, calculate from scoreData.score.statistics)</Title>
+                        <Title order={2}>Accuracy: {(scoreData.score.accuracy * 100).toFixed(2)}</Title>
+                        <Title order={2}>Combo: {scoreData.score.max_combo}/{beatmapData.max_combo}</Title>
                         {/* count of 300s, 100s, 50s and misses */}
-                        <h2>Count: [{scoreData.score.statistics.count_300}/{scoreData.score.statistics.count_100}/{scoreData.score.statistics.count_50}/{scoreData.score.statistics.count_miss}]</h2>
+                        <Title order={2}>Count: [{scoreData.score.statistics.count_300}/{scoreData.score.statistics.count_100}/{scoreData.score.statistics.count_50}/{scoreData.score.statistics.count_miss}]</Title>
                     </>
 
                 )
