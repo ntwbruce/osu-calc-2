@@ -10,11 +10,13 @@ import {
   TextInput,
   rem,
   Flex,
+  NavLink,
 } from "@mantine/core";
 import {
   IconSelector,
   IconChevronDown,
   IconChevronUp,
+  IconChevronRight,
   IconSearch,
 } from "@tabler/icons-react";
 
@@ -112,15 +114,15 @@ function sortData(data, payload) {
           };
           const firstMultiplier = Array.isArray(first[sortingParam])
             ? first[sortingParam].reduce(
-                (acc, curr) => acc * multipliers[curr],
-                1.0
-              )
+              (acc, curr) => acc * multipliers[curr],
+              1.0
+            )
             : multipliers[first[sortingParam]];
           const secondMultiplier = Array.isArray(second[sortingParam])
             ? second[sortingParam].reduce(
-                (accum, curr) => accum * multipliers[curr],
-                1.0
-              )
+              (accum, curr) => accum * multipliers[curr],
+              1.0
+            )
             : multipliers[second[sortingParam]];
           compValue = secondMultiplier - firstMultiplier;
           break;
@@ -195,7 +197,14 @@ export default function SortableTable({ data }) {
   const rows = sortedData.map((row) => (
     <tr key={row.index}>
       <td>{row.index}</td>
-      <td>{row.map}</td>
+      <td>
+        <NavLink
+          component="a"
+          href={`/beatmaps/${row.beatmap_id}/scores/users/${row.user_id}`}
+          label={row.map}
+          rightSection={<IconChevronRight size="0.8rem" stroke={1.5} />}
+        />
+      </td>
       <td>{row.mapper}</td>
       <td>{row.mods}</td>
       <td>
