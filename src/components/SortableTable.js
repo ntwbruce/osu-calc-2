@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   createStyles,
   Table,
@@ -153,33 +153,35 @@ function sortData(data, payload) {
 export default function SortableTable({ data }) {
   const [mapSearch, setMapSearch] = useState("");
   const [mapperSearch, setMapperSearch] = useState("");
-  const [sortedData, setSortedData] = useState(data.map((score, index) => {
-    return {
-      index: index + 1,
-      beatmap_id: score.beatmap.id,
-      user_id: score.user_id,
-      map: `${score.beatmapset.artist} - ${score.beatmapset.title} [${score.beatmap.version}]`,
-      mapper: score.beatmapset.creator,
-      sr: score.beatmap.difficulty_rating,
-      sr_multiplier:
-        score.mods.includes("DT") ||
-        score.mods.includes("NC") ||
-        score.mods.includes("FL") ||
-        score.mods.includes("HR") ||
-        score.mods.includes("EZ")
-          ? "*"
-          : "",
-      mods: score.mods.length >= 1 ? score.mods : "NM",
-      pp: score.pp,
-      acc: score.accuracy,
-      rank:
-        score.rank === "X" || score.rank === "XH"
-          ? "SS"
-          : score.rank === "SH"
-          ? "S"
-          : score.rank,
-    };
-  }));
+  const [sortedData, setSortedData] = useState(
+    data.map((score, index) => {
+      return {
+        index: index + 1,
+        beatmap_id: score.beatmap.id,
+        user_id: score.user_id,
+        map: `${score.beatmapset.artist} - ${score.beatmapset.title} [${score.beatmap.version}]`,
+        mapper: score.beatmapset.creator,
+        sr: score.beatmap.difficulty_rating,
+        sr_multiplier:
+          score.mods.includes("DT") ||
+          score.mods.includes("NC") ||
+          score.mods.includes("FL") ||
+          score.mods.includes("HR") ||
+          score.mods.includes("EZ")
+            ? "*"
+            : "",
+        mods: score.mods.length >= 1 ? score.mods : "NM",
+        pp: score.pp,
+        acc: score.accuracy,
+        rank:
+          score.rank === "X" || score.rank === "XH"
+            ? "SS"
+            : score.rank === "SH"
+            ? "S"
+            : score.rank,
+      };
+    })
+  );
   const [sortingParam, setSortingParam] = useState(null);
   const [isReverseSorted, setIsReverseSorted] = useState(false);
 

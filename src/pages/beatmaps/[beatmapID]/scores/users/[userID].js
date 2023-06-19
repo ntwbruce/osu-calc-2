@@ -1,15 +1,16 @@
-import { Flex, Title, Button, Image } from "@mantine/core";
-import Head from "next/head";
+import { Button, Image } from "@mantine/core";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { IconStarFilled } from "@tabler/icons-react"
+import { IconStarFilled } from "@tabler/icons-react";
+import ojsama from "ojsama";
 
 export default function HomePage() {
     const router = useRouter();
     const [beatmapData, setBeatmapData] = useState({});
+    const [beatmapFileData, setBeatmapFileData] = useState({});
     const [scoreData, setScoreData] = useState({});
+    const [starRating, setStarRating] = useState(0);
 
     useEffect(() => {
         const fetchBeatmapData = async (beatmapID) => {
@@ -32,9 +33,20 @@ export default function HomePage() {
             }
         }
 
+        const fetchBeatmapFileData = async (beatmapID) => {
+            try {
+                const response = (await axios.get(`/api/${beatmapID}`)).data; 
+
+                setBeatmapFileData(response.data);
+            } catch (error) {
+                console.log("error fetching beatmap file data: " + error);
+            }
+        }
+
         if (router.isReady) {
             fetchBeatmapData(router.query.beatmapID);
             fetchScoreData(router.query.beatmapID, router.query.userID);
+            fetchBeatmapFileData(router.query.beatmapID);
         }
     }, [router.isReady])
 
@@ -42,7 +54,8 @@ export default function HomePage() {
     useEffect(() => {
         if (Object.keys(beatmapData).length !== 0) {
             console.log('logging beatmap data');
-            console.log(beatmapData)
+            console.log(beatmapData);
+            setStarRating(beatmapData.difficulty_rating);
         }
 
     }, [beatmapData])
@@ -54,6 +67,42 @@ export default function HomePage() {
         }
     }, [scoreData])
 
+    useEffect(() => {
+        if (Object.keys(beatmapFileData).length !== 0) {
+            console.log('logging beatmap file data');
+            console.log(beatmapFileData);
+        }
+
+    }, [beatmapFileData])
+
+    useEffect(() => {
+        if (Object.keys(beatmapData).length !== 0 && Object.keys(scoreData).length !== 0 && Object.keys(beatmapFileData).length !== 0) {
+            const isDifficultyChanging = scoreData.score.mods.reduce((acc, curr) => acc || ['EZ', 'HR', 'DT', 'NC', 'FL', 'HT'].includes(curr), false);
+            if (isDifficultyChanging) {
+                const modbits = {
+                    SD: 0,
+                    PF: 0,
+                    NF: 1<<0,
+                    EZ: 1<<1,
+                    TD: 1<<2,
+                    HD: 1<<3,
+                    HR: 1<<4,
+                    DT: 1<<6,
+                    HT: 1<<8,
+                    NC: 1<<9,
+                    FL: 1<<10,
+                    SO: 1<<12,
+                };
+
+                const modValue = scoreData.score.mods.reduce((acc, curr) => acc + modbits[curr], 0);
+                const { map } = new ojsama.parser().feed(beatmapFileData);
+                const updatedStarRating = new ojsama.std_diff().calc({ map, mods: modValue }).total;
+                setStarRating(updatedStarRating);
+            }
+        }
+
+    }, [beatmapData, scoreData, beatmapFileData])
+
     return (
         <>
             <Button onClick={() => {
@@ -64,7 +113,7 @@ export default function HomePage() {
                 Object.keys(beatmapData).length !== 0 && Object.keys(scoreData).length !== 0 && (
                     <>
                         {/* Get Beatmap unicode Title */}
-                        <h1>{beatmapData.beatmapset.title} [{beatmapData.version}]{scoreData.score.mods.length !== 0 ? ` +${scoreData.score.mods.join()}` : " +No Mod"} [{beatmapData.difficulty_rating}<IconStarFilled />]</h1>
+                        <h1>{beatmapData.beatmapset.title} [{beatmapData.version}]{scoreData.score.mods.length !== 0 ? ` +${scoreData.score.mods.join()}` : " +No Mod"} [{(Math.round(starRating * 100) / 100.0).toFixed(2)}<IconStarFilled />]</h1>
                         {/* Get Beatmap cover image */}
                         <Image mx="auto" radius="md" src={beatmapData.beatmapset.covers["cover@2x"]} alt="Beatmap cover" />
 

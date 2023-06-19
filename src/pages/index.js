@@ -34,22 +34,4 @@ export default function HomePage() {
       </Flex>
     </>
   );
-
-  // import ojsama from 'ojsama';
-  // async function testMapHandler(event) {
-  //   event.preventDefault();
-
-  //   const map_text = await fetch(`osu/3963421`, {
-  //     method: "GET",
-  //     headers: fetch_headers,
-  //   })
-  //     .then((response) => response.text())
-  //     .catch((err) => console.log("error fetching map text: " + err));
-
-  //   console.log(map_text);
-  //   const { map } = new ojsama.parser().feed(map_text);
-  //   console.log(map);
-  //   const stars = new ojsama.std_diff().calc({ map, mods: 64 });
-  //   console.log(Math.ceil(stars.total * 100) / 100.0);
-  // }
 }
