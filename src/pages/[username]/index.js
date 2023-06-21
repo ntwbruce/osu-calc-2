@@ -1,10 +1,10 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import UserDetails from "@/components/UserDetails";
-import ScoresList from "@/components/ScoresList";
 import axios from "axios";
 import { Button, Title, Flex, Center, ScrollArea } from "@mantine/core";
 import Head from "next/head";
+import SortableTable from "@/components/SortableTable";
 
 export default function UserProfilePage() {
   const router = useRouter();
@@ -174,7 +174,7 @@ export default function UserProfilePage() {
             <Title order={1} align="center">
               Best Scores
             </Title>
-            <ScoresList data={bestScoresData} />
+            <SortableTable data={bestScoresData} />
           </>
         )}
 
@@ -183,7 +183,7 @@ export default function UserProfilePage() {
             <Title order={1} align="center">
               Recent Scores
             </Title>
-            <ScoresList data={recentScoresData} />
+            <SortableTable data={recentScoresData} />
           </>
         )}
 
