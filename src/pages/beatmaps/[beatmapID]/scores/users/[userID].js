@@ -76,8 +76,8 @@ export default function HomePage() {
     }, [beatmapFileData])
 
     useEffect(() => {
-        if (Object.keys(beatmapData).length !== 0 && Object.keys(scoreData).length !== 0 && Object.keys(beatmapFileData).length !== 0) {
-            const isDifficultyChanging = scoreData.score.mods.reduce((acc, curr) => acc || ['EZ', 'HR', 'DT', 'NC', 'FL', 'HT'].includes(curr), false);
+        if (Object.keys(beatmapData).length !== 0 && Object.keys(scoreData).length !== 0 && Object.keys(beatmapFileData).length !== 0) { 
+            const isDifficultyChanging = scoreData.score.mods.some(mod => ['EZ', 'HR', 'DT', 'NC', 'FL', 'HT'].includes(mod));
             if (isDifficultyChanging) {
                 const modbits = {
                     SD: 0,

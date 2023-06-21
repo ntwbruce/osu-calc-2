@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   createStyles,
   Table,
@@ -11,6 +11,7 @@ import {
   rem,
   Flex,
   NavLink,
+  Checkbox,
 } from "@mantine/core";
 import {
   IconSelector,
@@ -44,6 +45,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
+// For table header styling.
 function Th({ children, isReverseSorted, isActiveSortingParam, onSort }) {
   const { classes } = useStyles();
   const Icon = isActiveSortingParam
@@ -67,6 +69,12 @@ function Th({ children, isReverseSorted, isActiveSortingParam, onSort }) {
   );
 }
 
+/**
+ * Filters data by given search parameters object.
+ * @param {*} data to be filtered.
+ * @param {*} search object containing parameters (map name, mapper name etc) to filter by.
+ * @returns filtered data.
+ */
 function filterData(data, search) {
   const { map, mapper } = search;
   const mapQuery = map.toLowerCase().trim();
@@ -78,6 +86,12 @@ function filterData(data, search) {
   );
 }
 
+/**
+ * Sorts data by parameters given in payload object.
+ * @param {*} data to be sorted.
+ * @param {*} payload containing sorting parameter (sortingParam), boolean for sorting in reverse (reversed) and a search parameters object (search).
+ * @returns sorted data.
+ */
 function sortData(data, payload) {
   const { sortingParam, reversed, search } = payload;
 
@@ -85,6 +99,7 @@ function sortData(data, payload) {
     return filterData(data, search);
   }
 
+  // Sorted differently based on which parameter is being used
   return filterData(
     [...data].sort((first, second) => {
       if (reversed) {
@@ -151,9 +166,10 @@ function sortData(data, payload) {
 }
 
 export default function SortableTable({ rawScoresData }) {
+  // Data manipulated into a more convenient format
   const scoresData = rawScoresData.map((score, index) => {
     return {
-      index: index + 1,
+      index,
       beatmap_id: score.beatmap.id,
       user_id: score.user_id,
       map: `${score.beatmapset.artist} - ${score.beatmapset.title} [${score.beatmap.version}]`,
@@ -178,13 +194,23 @@ export default function SortableTable({ rawScoresData }) {
           : score.rank,
     }
   });
+
+  // Search states
   const [mapSearch, setMapSearch] = useState("");
   const [mapperSearch, setMapperSearch] = useState("");
-  const [sortedData, setSortedData] = useState(scoresData);
+
+  // Sorting states
   const [sortingParam, setSortingParam] = useState(null);
   const [isReverseSorted, setIsReverseSorted] = useState(false);
 
-  const changeSort = (field) => {
+  // Score state
+  const [sortedData, setSortedData] = useState(scoresData);
+
+  // Selection state
+  const [selection, setSelection] = useState(new Array(sortedData.length).fill(false));
+
+  // Handler for changing sort parameter/reverse sort
+  const sortChangeHandler = (field) => {
     const toReverse = field === sortingParam ? !isReverseSorted : false;
     setIsReverseSorted(toReverse);
     setSortingParam(field);
@@ -197,6 +223,7 @@ export default function SortableTable({ rawScoresData }) {
     );
   };
 
+  // Handler for updating map name search state
   const mapSearchChangeHandler = (event) => {
     const { value } = event.currentTarget;
     setMapSearch(value);
@@ -209,6 +236,7 @@ export default function SortableTable({ rawScoresData }) {
     );
   };
 
+  // Handler for updating mapper name search state
   const mapperSearchChangeHandler = (event) => {
     const { value } = event.currentTarget;
     setMapperSearch(value);
@@ -221,9 +249,18 @@ export default function SortableTable({ rawScoresData }) {
     );
   };
 
+  // Handler for updating selection state 
+  const rowSelectionToggleHandler = (selectedIndex) => {
+    setSelection((currSelection) => currSelection.map((curr, index) => (index === selectedIndex) ? !curr : curr));
+  };
+
+  // useEffect(() => { 
+  //   console.log(selection);
+  // }, [selection]);
+
   const rows = sortedData.map((row) => (
     <tr key={row.index}>
-      <td>{row.index}</td>
+      <td>{row.index + 1}</td>
       <td>
         <NavLink
           component="a"
@@ -241,6 +278,7 @@ export default function SortableTable({ rawScoresData }) {
       <td>{(Math.round(row.pp * 100) / 100).toFixed(2)}</td>
       <td>{(row.acc * 100).toFixed(2)}</td>
       <td>{row.rank}</td>
+      <td><Checkbox checked={selection[row.index]} onChange={() => rowSelectionToggleHandler(row.index)} transitionDuration={0} /></td>
     </tr>
   ));
 
@@ -276,59 +314,60 @@ export default function SortableTable({ rawScoresData }) {
             <Th
               isActiveSortingParam={sortingParam === "index"}
               isReverseSorted={isReverseSorted}
-              onSort={() => changeSort("index")}
+              onSort={() => sortChangeHandler("index")}
             >
               Index
             </Th>
             <Th
               isActiveSortingParam={sortingParam === "map"}
               isReverseSorted={isReverseSorted}
-              onSort={() => changeSort("map")}
+              onSort={() => sortChangeHandler("map")}
             >
               Map
             </Th>
             <Th
               isActiveSortingParam={sortingParam === "mapper"}
               isReverseSorted={isReverseSorted}
-              onSort={() => changeSort("mapper")}
+              onSort={() => sortChangeHandler("mapper")}
             >
               Mapper
             </Th>
             <Th
               isActiveSortingParam={sortingParam === "mods"}
               isReverseSorted={isReverseSorted}
-              onSort={() => changeSort("mods")}
+              onSort={() => sortChangeHandler("mods")}
             >
               Mods
             </Th>
             <Th
               isActiveSortingParam={sortingParam === "sr"}
               isReverseSorted={isReverseSorted}
-              onSort={() => changeSort("sr")}
+              onSort={() => sortChangeHandler("sr")}
             >
               Star Rating
             </Th>
             <Th
               isActiveSortingParam={sortingParam === "pp"}
               isReverseSorted={isReverseSorted}
-              onSort={() => changeSort("pp")}
+              onSort={() => sortChangeHandler("pp")}
             >
               Peformance (pp)
             </Th>
             <Th
               isActiveSortingParam={sortingParam === "acc"}
               isReverseSorted={isReverseSorted}
-              onSort={() => changeSort("acc")}
+              onSort={() => sortChangeHandler("acc")}
             >
               Accuracy (%)
             </Th>
             <Th
               isActiveSortingParam={sortingParam === "rank"}
               isReverseSorted={isReverseSorted}
-              onSort={() => changeSort("rank")}
+              onSort={() => sortChangeHandler("rank")}
             >
               Rank
             </Th>
+            <th>Select</th>
           </tr>
         </thead>
         <tbody>
