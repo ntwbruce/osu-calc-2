@@ -1,5 +1,4 @@
 import { Title, Flex, Image } from "@mantine/core";
-import styles from "./UserDetails.module.css";
 import { useContext } from "react";
 import UserStatChangesContext from "@/context/UserStatChangesContext";
 

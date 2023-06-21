@@ -1,6 +1,5 @@
 import { TextInput, Checkbox, Button, Group, Box } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import Link from "next/link";
 import { useRef } from "react";
 
 export default function UsernameForm(props) {
