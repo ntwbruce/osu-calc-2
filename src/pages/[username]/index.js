@@ -174,7 +174,7 @@ export default function UserProfilePage() {
             <Title order={1} align="center">
               Best Scores
             </Title>
-            <SortableTable data={bestScoresData} />
+            <SortableTable rawScoresData={bestScoresData} />
           </>
         )}
 
@@ -183,7 +183,7 @@ export default function UserProfilePage() {
             <Title order={1} align="center">
               Recent Scores
             </Title>
-            <SortableTable data={recentScoresData} />
+            <SortableTable rawScoresData={recentScoresData} />
           </>
         )}
 

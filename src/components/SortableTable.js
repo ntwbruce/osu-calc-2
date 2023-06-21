@@ -150,8 +150,8 @@ function sortData(data, payload) {
   );
 }
 
-export default function SortableTable({ data }) {
-  const filteredData = data.map((score, index) => {
+export default function SortableTable({ rawScoresData }) {
+  const scoresData = rawScoresData.map((score, index) => {
     return {
       index: index + 1,
       beatmap_id: score.beatmap.id,
@@ -180,7 +180,7 @@ export default function SortableTable({ data }) {
   });
   const [mapSearch, setMapSearch] = useState("");
   const [mapperSearch, setMapperSearch] = useState("");
-  const [sortedData, setSortedData] = useState(filteredData);
+  const [sortedData, setSortedData] = useState(scoresData);
   const [sortingParam, setSortingParam] = useState(null);
   const [isReverseSorted, setIsReverseSorted] = useState(false);
 
@@ -189,7 +189,7 @@ export default function SortableTable({ data }) {
     setIsReverseSorted(toReverse);
     setSortingParam(field);
     setSortedData(
-      sortData(filteredData, {
+      sortData(scoresData, {
         sortingParam: field,
         reversed: toReverse,
         search: { map: mapSearch, mapper: mapperSearch },
@@ -201,7 +201,7 @@ export default function SortableTable({ data }) {
     const { value } = event.currentTarget;
     setMapSearch(value);
     setSortedData(
-      sortData(filteredData, {
+      sortData(scoresData, {
         sortingParam,
         reversed: isReverseSorted,
         search: { map: value, mapper: mapperSearch },
@@ -213,7 +213,7 @@ export default function SortableTable({ data }) {
     const { value } = event.currentTarget;
     setMapperSearch(value);
     setSortedData(
-      sortData(filteredData, {
+      sortData(scoresData, {
         sortingParam,
         reversed: isReverseSorted,
         search: { map: mapSearch, mapper: value },
