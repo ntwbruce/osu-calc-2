@@ -114,15 +114,15 @@ function sortData(data, payload) {
           };
           const firstMultiplier = Array.isArray(first[sortingParam])
             ? first[sortingParam].reduce(
-              (acc, curr) => acc * multipliers[curr],
-              1.0
-            )
+                (acc, curr) => acc * multipliers[curr],
+                1.0
+              )
             : multipliers[first[sortingParam]];
           const secondMultiplier = Array.isArray(second[sortingParam])
             ? second[sortingParam].reduce(
-              (accum, curr) => accum * multipliers[curr],
-              1.0
-            )
+                (accum, curr) => accum * multipliers[curr],
+                1.0
+              )
             : multipliers[second[sortingParam]];
           compValue = secondMultiplier - firstMultiplier;
           break;
@@ -153,7 +153,35 @@ function sortData(data, payload) {
 export default function SortableTable({ data }) {
   const [mapSearch, setMapSearch] = useState("");
   const [mapperSearch, setMapperSearch] = useState("");
-  const [sortedData, setSortedData] = useState(data);
+  const [sortedData, setSortedData] = useState(
+    data.map((score, index) => {
+      return {
+        index: index + 1,
+        beatmap_id: score.beatmap.id,
+        user_id: score.user_id,
+        map: `${score.beatmapset.artist} - ${score.beatmapset.title} [${score.beatmap.version}]`,
+        mapper: score.beatmapset.creator,
+        sr: score.beatmap.difficulty_rating,
+        sr_multiplier:
+          score.mods.includes("DT") ||
+          score.mods.includes("NC") ||
+          score.mods.includes("FL") ||
+          score.mods.includes("HR") ||
+          score.mods.includes("EZ")
+            ? "*"
+            : "",
+        mods: score.mods.length >= 1 ? score.mods : "NM",
+        pp: score.pp,
+        acc: score.accuracy,
+        rank:
+          score.rank === "X" || score.rank === "XH"
+            ? "SS"
+            : score.rank === "SH"
+            ? "S"
+            : score.rank,
+      };
+    })
+  );
   const [sortingParam, setSortingParam] = useState(null);
   const [isReverseSorted, setIsReverseSorted] = useState(false);
 
@@ -162,7 +190,7 @@ export default function SortableTable({ data }) {
     setIsReverseSorted(toReverse);
     setSortingParam(field);
     setSortedData(
-      sortData(data, {
+      sortData(sortedData, {
         sortingParam: field,
         reversed: toReverse,
         search: { map: mapSearch, mapper: mapperSearch },
@@ -174,7 +202,7 @@ export default function SortableTable({ data }) {
     const { value } = event.currentTarget;
     setMapSearch(value);
     setSortedData(
-      sortData(data, {
+      sortData(sortedData, {
         sortingParam,
         reversed: isReverseSorted,
         search: { map: value, mapper: mapperSearch },
@@ -186,7 +214,7 @@ export default function SortableTable({ data }) {
     const { value } = event.currentTarget;
     setMapperSearch(value);
     setSortedData(
-      sortData(data, {
+      sortData(sortedData, {
         sortingParam,
         reversed: isReverseSorted,
         search: { map: mapSearch, mapper: value },
