@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   createStyles,
   Table,
@@ -20,6 +20,7 @@ import {
   IconChevronRight,
   IconSearch,
 } from "@tabler/icons-react";
+import UserStatChangesContext from "@/context/UserStatChangesContext";
 
 const useStyles = createStyles((theme) => ({
   th: {
@@ -209,6 +210,23 @@ export default function SortableTable({ rawScoresData }) {
   // Selection state
   const [selection, setSelection] = useState(new Array(sortedData.length).fill(false));
 
+  // Stat changes context
+  const { userStatChanges, setUserStatChanges } = useContext(UserStatChangesContext);
+
+  // Stuff for pp recalculation when 'deleting' scores
+  const pps = scoresData.map(score => score.pp);
+  const baseTotalRawPP = pps.reduce((acc, curr, index) => acc + curr * Math.pow(0.95, index++), 0);
+
+  const calculateRawPP = () => {
+    let count = 0;
+    return pps.reduce((acc, curr, index) => acc + (selection[index] ? 0 : curr * Math.pow(0.95, count++)), 0);
+  };
+
+  // Update stat changes context every time selection array is changed and raw pp is recalculated
+  useEffect(() => { 
+    setUserStatChanges({...userStatChanges, ppChange: calculateRawPP() - baseTotalRawPP});
+  }, [selection]);
+
   // Handler for changing sort parameter/reverse sort
   const sortChangeHandler = (field) => {
     const toReverse = field === sortingParam ? !isReverseSorted : false;
@@ -253,10 +271,6 @@ export default function SortableTable({ rawScoresData }) {
   const rowSelectionToggleHandler = (selectedIndex) => {
     setSelection((currSelection) => currSelection.map((curr, index) => (index === selectedIndex) ? !curr : curr));
   };
-
-  // useEffect(() => { 
-  //   console.log(selection);
-  // }, [selection]);
 
   const rows = sortedData.map((row) => (
     <tr key={row.index}>

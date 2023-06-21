@@ -5,6 +5,7 @@ import axios from "axios";
 import { Button, Title, Flex, Center, ScrollArea } from "@mantine/core";
 import Head from "next/head";
 import SortableTable from "@/components/SortableTable";
+import { UserStatChangesProvider } from "@/context/UserStatChangesContext";
 
 export default function UserProfilePage() {
   const router = useRouter();
@@ -133,62 +134,64 @@ export default function UserProfilePage() {
         <title>silver wolf cheese slap meme</title>
       </Head>
 
-      <Flex
-        direction={{ base: "row", sm: "column" }}
-        gap={{ base: "sm", sm: "md" }}
-        justify={{ sm: "center" }}
-      >
-        {authTokenPresent && isUserDataSet && (
-          <>
-            <Button onClick={homeRedirectHandler}>reset</Button>
-            <UserDetails userData={userData} />
-          </>
-        )}
-
+      <UserStatChangesProvider>
         <Flex
-          direction={{ base: "column", sm: "row" }}
-          gap={{ base: "sm", sm: "xl" }}
+          direction={{ base: "row", sm: "column" }}
+          gap={{ base: "sm", sm: "md" }}
           justify={{ sm: "center" }}
         >
-          {isUserDataSet && (
-            <Button
-              variant={isShowingBestScores ? "filled" : "outline"}
-              onClick={fetchBestScoresButtonHandler}
-            >
-              Best Scores
-            </Button>
+          {authTokenPresent && isUserDataSet && (
+            <>
+              <Button onClick={homeRedirectHandler}>reset</Button>
+              <UserDetails userData={userData} />
+            </>
           )}
 
-          {isUserDataSet && (
-            <Button
-              variant={isShowingRecentScores ? "filled" : "outline"}
-              onClick={fetchRecentScoresButtonHandler}
-            >
-              Recent Scores
-            </Button>
+          <Flex
+            direction={{ base: "column", sm: "row" }}
+            gap={{ base: "sm", sm: "xl" }}
+            justify={{ sm: "center" }}
+          >
+            {isUserDataSet && (
+              <Button
+                variant={isShowingBestScores ? "filled" : "outline"}
+                onClick={fetchBestScoresButtonHandler}
+              >
+                Best Scores
+              </Button>
+            )}
+
+            {isUserDataSet && (
+              <Button
+                variant={isShowingRecentScores ? "filled" : "outline"}
+                onClick={fetchRecentScoresButtonHandler}
+              >
+                Recent Scores
+              </Button>
+            )}
+          </Flex>
+
+          {isUserDataSet && isBestScoresDataSet && isShowingBestScores && (
+            <>
+              <Title order={1} align="center">
+                Best Scores
+              </Title>
+              <SortableTable rawScoresData={bestScoresData} />
+            </>
           )}
+
+          {isUserDataSet && isRecentScoresDataSet && isShowingRecentScores && (
+            <>
+              <Title order={1} align="center">
+                Recent Scores
+              </Title>
+              <SortableTable rawScoresData={recentScoresData} />
+            </>
+          )}
+
+          {!doesUserExist && <p>Profile does not exist.</p>}
         </Flex>
-
-        {isUserDataSet && isBestScoresDataSet && isShowingBestScores && (
-          <>
-            <Title order={1} align="center">
-              Best Scores
-            </Title>
-            <SortableTable rawScoresData={bestScoresData} />
-          </>
-        )}
-
-        {isUserDataSet && isRecentScoresDataSet && isShowingRecentScores && (
-          <>
-            <Title order={1} align="center">
-              Recent Scores
-            </Title>
-            <SortableTable rawScoresData={recentScoresData} />
-          </>
-        )}
-
-        {!doesUserExist && <p>Profile does not exist.</p>}
-      </Flex>
+      </UserStatChangesProvider>
     </>
   );
 }
