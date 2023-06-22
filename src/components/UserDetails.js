@@ -1,6 +1,4 @@
 import { Title, Flex, Image } from "@mantine/core";
-import { useContext } from "react";
-import UserStatChangesContext from "@/context/UserStatChangesContext";
 
 export default function UserDetails({ userData, statChangeData }) {
   const pfp = userData.avatar_url;
@@ -23,7 +21,6 @@ export default function UserDetails({ userData, statChangeData }) {
   const pp = userData.statistics.is_ranked ? userData.statistics.pp : "--";
   const acc = userData.statistics.hit_accuracy;
 
-  const { userStatChanges } = useContext(UserStatChangesContext);
   const { ppChange, accChange } = statChangeData;
 
   return (

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   createStyles,
   Table,
@@ -20,7 +20,6 @@ import {
   IconChevronRight,
   IconSearch,
 } from "@tabler/icons-react";
-import UserStatChangesContext from "@/context/UserStatChangesContext";
 
 const useStyles = createStyles((theme) => ({
   th: {
@@ -166,7 +165,7 @@ function sortData(data, payload) {
   );
 }
 
-export default function SortableTable({ rawScoresData, baseOverallAcc, setStatChanges }) {
+export default function SortableTable({ rawScoresData, setStatChanges }) {
   // Data manipulated into a more convenient format
   const scoresData = rawScoresData.map((score, index) => {
     return {
@@ -209,26 +208,6 @@ export default function SortableTable({ rawScoresData, baseOverallAcc, setStatCh
 
   // Selection state
   const [selection, setSelection] = useState(new Array(sortedData.length).fill(false));
-
-  // Stat changes context
-  const { userStatChanges, setUserStatChanges } = useContext(UserStatChangesContext);
-
-  // // Stuff for pp and acc recalculation when 'deleting' scores
-  // const pps = scoresData.map(score => score.pp);
-  // const baseTotalRawPP = pps.reduce((acc, curr, index) => acc + curr * Math.pow(0.95, index++), 0);
-
-  // const accs = scoresData.map(score => score.acc);
-
-  // const calculateRawPP = () => {
-  //   let count = 0;
-  //   return pps.reduce((acc, curr, index) => acc + (selection[index] ? 0 : curr * Math.pow(0.95, count++)), 0);
-  // };
-
-  // const calculateOverallAcc = () => {
-  //   let count = 0;
-  //   const accSum = accs.reduce((acc, curr, index) => acc + (selection[index] ? 0 : curr * Math.pow(0.95, count++)), 0);
-  //   return count === 100 ? baseOverallAcc : 100 / (20 * (1 - Math.pow(0.95, count))) * accSum;
-  // }
 
   // Recalculate stats and update stat changes context every time selection array is changed
   useEffect(() => { 

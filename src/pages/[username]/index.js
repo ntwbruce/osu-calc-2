@@ -5,7 +5,6 @@ import axios from "axios";
 import { Button, Title, Flex } from "@mantine/core";
 import Head from "next/head";
 import SortableTable from "@/components/SortableTable";
-import { UserStatChangesProvider } from "@/context/UserStatChangesContext";
 import {
   calculateTotalPP,
   calculateTotalPPNoSelection,
@@ -108,7 +107,6 @@ export default function UserProfilePage() {
     }
   }
 
-  // ? Is there a way to refactor this somewhere else so this file isn't 150+ lines long
   async function fetchRecentScoresDataHandler() {
     try {
       const response = (
@@ -117,7 +115,7 @@ export default function UserProfilePage() {
         )
       ).data;
 
-      //   console.log(response.data);
+      // console.log(response.data);
       setRecentScoresData(response.data);
       setIsRecentScoresDataSet(true);
     } catch (error) {
@@ -148,8 +146,6 @@ export default function UserProfilePage() {
 
   const statChangeHandler = (selection) => {
     if (arePPAccValuesSet) {
-      console.log(calculateOverallAcc(accValues, selection));
-      console.log(calculateOverallAcc(accValues, selection) - baseOverallAcc);
       setStatChangeData({
         ppChange: calculateTotalPP(PPValues, selection) - baseRawPPValue,
         accChange: calculateOverallAcc(accValues, selection) - baseOverallAcc,
@@ -159,15 +155,14 @@ export default function UserProfilePage() {
 
   useEffect(() => {
     if (isUserDataSet && isBestScoresDataSet) {
-      console.log(userData);
-      console.log(bestScoresData);
-      console.log(userData.statistics.hit_accuracy);
       const ppValues = bestScoresData.map((score) => score.pp);
       setPPValues(ppValues);
       setBaseRawPPValue(calculateTotalPPNoSelection(ppValues));
+
       const accValues = bestScoresData.map((score) => score.accuracy);
       setAccValues(accValues);
       setBaseOverallAcc(calculateOverallAccNoSelection(accValues));
+
       setArePPAccValuesSet(true);
     }
   }, [isUserDataSet, isBestScoresDataSet]);
@@ -178,75 +173,71 @@ export default function UserProfilePage() {
         <title>silver wolf cheese slap meme</title>
       </Head>
 
-      <UserStatChangesProvider>
+      <Flex
+        direction={{ base: "row", sm: "column" }}
+        gap={{ base: "sm", sm: "md" }}
+        justify={{ sm: "center" }}
+      >
+        {authTokenPresent && isUserDataSet && (
+          <>
+            <Button onClick={homeRedirectHandler}>reset</Button>
+            <UserDetails
+              userData={userData}
+              statChangeData={statChangeData}
+            />
+          </>
+        )}
+
         <Flex
-          direction={{ base: "row", sm: "column" }}
-          gap={{ base: "sm", sm: "md" }}
+          direction={{ base: "column", sm: "row" }}
+          gap={{ base: "sm", sm: "xl" }}
           justify={{ sm: "center" }}
         >
-          {authTokenPresent && isUserDataSet && (
-            <>
-              <Button onClick={homeRedirectHandler}>reset</Button>
-              <UserDetails
-                userData={userData}
-                statChangeData={statChangeData}
-              />
-            </>
+          {isUserDataSet && (
+            <Button
+              variant={isShowingBestScores ? "filled" : "outline"}
+              onClick={fetchBestScoresButtonHandler}
+            >
+              Best Scores
+            </Button>
           )}
 
-          <Flex
-            direction={{ base: "column", sm: "row" }}
-            gap={{ base: "sm", sm: "xl" }}
-            justify={{ sm: "center" }}
-          >
-            {isUserDataSet && (
-              <Button
-                variant={isShowingBestScores ? "filled" : "outline"}
-                onClick={fetchBestScoresButtonHandler}
-              >
-                Best Scores
-              </Button>
-            )}
-
-            {isUserDataSet && (
-              <Button
-                variant={isShowingRecentScores ? "filled" : "outline"}
-                onClick={fetchRecentScoresButtonHandler}
-              >
-                Recent Scores
-              </Button>
-            )}
-          </Flex>
-
-          {isUserDataSet && isBestScoresDataSet && isShowingBestScores && (
-            <>
-              <Title order={1} align="center">
-                Best Scores
-              </Title>
-              <SortableTable
-                rawScoresData={bestScoresData}
-                baseOverallAcc={userData.statistics.hit_accuracy}
-                setStatChanges={statChangeHandler}
-              />
-            </>
+          {isUserDataSet && (
+            <Button
+              variant={isShowingRecentScores ? "filled" : "outline"}
+              onClick={fetchRecentScoresButtonHandler}
+            >
+              Recent Scores
+            </Button>
           )}
-
-          {isUserDataSet && isRecentScoresDataSet && isShowingRecentScores && (
-            <>
-              <Title order={1} align="center">
-                Recent Scores
-              </Title>
-              <SortableTable
-                rawScoresData={recentScoresData}
-                baseOverallAcc={userData.statistics.hit_accuracy}
-                setStatChanges={statChangeHandler}
-              />
-            </>
-          )}
-
-          {!doesUserExist && <p>Profile does not exist.</p>}
         </Flex>
-      </UserStatChangesProvider>
+
+        {isUserDataSet && isBestScoresDataSet && isShowingBestScores && (
+          <>
+            <Title order={1} align="center">
+              Best Scores
+            </Title>
+            <SortableTable
+              rawScoresData={bestScoresData}
+              setStatChanges={statChangeHandler}
+            />
+          </>
+        )}
+
+        {isUserDataSet && isRecentScoresDataSet && isShowingRecentScores && (
+          <>
+            <Title order={1} align="center">
+              Recent Scores
+            </Title>
+            <SortableTable
+              rawScoresData={recentScoresData}
+              setStatChanges={statChangeHandler}
+            />
+          </>
+        )}
+
+        {!doesUserExist && <Title order={2}>Profile does not exist.</Title>}
+      </Flex>
     </>
   );
 }
