@@ -166,7 +166,7 @@ function sortData(data, payload) {
   );
 }
 
-export default function SortableTable({ rawScoresData }) {
+export default function SortableTable({ rawScoresData, baseOverallAcc }) {
   // Data manipulated into a more convenient format
   const scoresData = rawScoresData.map((score, index) => {
     return {
@@ -213,18 +213,26 @@ export default function SortableTable({ rawScoresData }) {
   // Stat changes context
   const { userStatChanges, setUserStatChanges } = useContext(UserStatChangesContext);
 
-  // Stuff for pp recalculation when 'deleting' scores
+  // Stuff for pp and acc recalculation when 'deleting' scores
   const pps = scoresData.map(score => score.pp);
   const baseTotalRawPP = pps.reduce((acc, curr, index) => acc + curr * Math.pow(0.95, index++), 0);
+
+  const accs = scoresData.map(score => score.acc);
 
   const calculateRawPP = () => {
     let count = 0;
     return pps.reduce((acc, curr, index) => acc + (selection[index] ? 0 : curr * Math.pow(0.95, count++)), 0);
   };
 
-  // Update stat changes context every time selection array is changed and raw pp is recalculated
+  const calculateOverallAcc = () => {
+    let count = 0;
+    const accSum = accs.reduce((acc, curr, index) => acc + (selection[index] ? 0 : curr * Math.pow(0.95, count++)), 0);
+    return count === 100 ? baseOverallAcc : 100 / (20 * (1 - Math.pow(0.95, count))) * accSum;
+  }
+
+  // Recalculate stats and update stat changes context every time selection array is changed
   useEffect(() => { 
-    setUserStatChanges({...userStatChanges, ppChange: calculateRawPP() - baseTotalRawPP});
+    setUserStatChanges({...userStatChanges, ppChange: calculateRawPP() - baseTotalRawPP, accChange: calculateOverallAcc() - baseOverallAcc});
   }, [selection]);
 
   // Handler for changing sort parameter/reverse sort

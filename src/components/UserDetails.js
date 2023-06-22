@@ -21,7 +21,7 @@ export default function UserDetails({ userData }) {
     ? userData.statistics.country_rank
     : "--";
   const pp = userData.statistics.is_ranked ? userData.statistics.pp : "--";
-  const acc = userData.statistics.hit_accuracy.toFixed(2);
+  const acc = userData.statistics.hit_accuracy;
 
   const { userStatChanges } = useContext(UserStatChangesContext);
 
@@ -43,10 +43,14 @@ export default function UserDetails({ userData }) {
           Rank: {global_rank} ({country_code}#{country_rank}) (0)
         </Title>
         <Title order={3}>
-          PP: {(Math.round((pp + userStatChanges.ppChange) * 100) / 100.0).toFixed(2)}pp 
+          PP:{" "}
+          {(Math.round((pp + userStatChanges.ppChange) * 100) / 100.0).toFixed(2)}pp 
           ({(Math.round(userStatChanges.ppChange * 100) / 100.0).toFixed(2)}pp)
         </Title>
-        <Title order={3}>Accuracy: {`${acc}% (0.00%)`}</Title>
+        <Title order={3}>
+          Accuracy:{" "}
+          {`${(acc + userStatChanges.accChange).toFixed(2)}% (${userStatChanges.accChange > 0 ? "+" : ""}${userStatChanges.accChange.toFixed(2)}%)`}
+        </Title>
       </Flex>
     </Flex>
   );

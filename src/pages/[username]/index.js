@@ -176,7 +176,7 @@ export default function UserProfilePage() {
               <Title order={1} align="center">
                 Best Scores
               </Title>
-              <SortableTable rawScoresData={bestScoresData} />
+              <SortableTable rawScoresData={bestScoresData} baseOverallAcc={userData.statistics.hit_accuracy}/>
             </>
           )}
 
@@ -185,7 +185,7 @@ export default function UserProfilePage() {
               <Title order={1} align="center">
                 Recent Scores
               </Title>
-              <SortableTable rawScoresData={recentScoresData} />
+              <SortableTable rawScoresData={recentScoresData} baseOverallAcc={userData.statistics.hit_accuracy}/>
             </>
           )}
 
