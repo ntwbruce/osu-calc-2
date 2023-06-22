@@ -2,10 +2,18 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import UserDetails from "@/components/UserDetails";
 import axios from "axios";
-import { Button, Title, Flex, Center, ScrollArea } from "@mantine/core";
+import { Button, Title, Flex } from "@mantine/core";
 import Head from "next/head";
 import SortableTable from "@/components/SortableTable";
 import { UserStatChangesProvider } from "@/context/UserStatChangesContext";
+import {
+  calculateTotalPP,
+  calculateTotalPPNoSelection,
+} from "@/lib/PPCalculator";
+import {
+  calculateOverallAcc,
+  calculateOverallAccNoSelection,
+} from "@/lib/AccCalculator";
 
 export default function UserProfilePage() {
   const router = useRouter();
@@ -23,6 +31,16 @@ export default function UserProfilePage() {
   const [recentScoresData, setRecentScoresData] = useState({});
   const [isRecentScoresDataSet, setIsRecentScoresDataSet] = useState(false);
   const [isShowingRecentScores, setIsShowingRecentScores] = useState(false);
+
+  const [statChangeData, setStatChangeData] = useState({
+    ppChange: 0,
+    accChange: 0,
+  });
+  const [PPValues, setPPValues] = useState([]);
+  const [baseRawPPValue, setBaseRawPPValue] = useState(0);
+  const [accValues, setAccValues] = useState([]);
+  const [baseOverallAcc, setBaseOverallAcc] = useState(0);
+  const [arePPAccValuesSet, setArePPAccValuesSet] = useState(false);
 
   // * Fetch oauth token on homepage initialisation (runs upon new page reload)
   async function fetchAuthToken() {
@@ -128,6 +146,32 @@ export default function UserProfilePage() {
     setIsShowingBestScores(false);
   };
 
+  const statChangeHandler = (selection) => {
+    if (arePPAccValuesSet) {
+      console.log(calculateOverallAcc(accValues, selection));
+      console.log(calculateOverallAcc(accValues, selection) - baseOverallAcc);
+      setStatChangeData({
+        ppChange: calculateTotalPP(PPValues, selection) - baseRawPPValue,
+        accChange: calculateOverallAcc(accValues, selection) - baseOverallAcc,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (isUserDataSet && isBestScoresDataSet) {
+      console.log(userData);
+      console.log(bestScoresData);
+      console.log(userData.statistics.hit_accuracy);
+      const ppValues = bestScoresData.map((score) => score.pp);
+      setPPValues(ppValues);
+      setBaseRawPPValue(calculateTotalPPNoSelection(ppValues));
+      const accValues = bestScoresData.map((score) => score.accuracy);
+      setAccValues(accValues);
+      setBaseOverallAcc(calculateOverallAccNoSelection(accValues));
+      setArePPAccValuesSet(true);
+    }
+  }, [isUserDataSet, isBestScoresDataSet]);
+
   return (
     <>
       <Head>
@@ -143,7 +187,10 @@ export default function UserProfilePage() {
           {authTokenPresent && isUserDataSet && (
             <>
               <Button onClick={homeRedirectHandler}>reset</Button>
-              <UserDetails userData={userData} />
+              <UserDetails
+                userData={userData}
+                statChangeData={statChangeData}
+              />
             </>
           )}
 
@@ -176,7 +223,11 @@ export default function UserProfilePage() {
               <Title order={1} align="center">
                 Best Scores
               </Title>
-              <SortableTable rawScoresData={bestScoresData} baseOverallAcc={userData.statistics.hit_accuracy}/>
+              <SortableTable
+                rawScoresData={bestScoresData}
+                baseOverallAcc={userData.statistics.hit_accuracy}
+                setStatChanges={statChangeHandler}
+              />
             </>
           )}
 
@@ -185,7 +236,11 @@ export default function UserProfilePage() {
               <Title order={1} align="center">
                 Recent Scores
               </Title>
-              <SortableTable rawScoresData={recentScoresData} baseOverallAcc={userData.statistics.hit_accuracy}/>
+              <SortableTable
+                rawScoresData={recentScoresData}
+                baseOverallAcc={userData.statistics.hit_accuracy}
+                setStatChanges={statChangeHandler}
+              />
             </>
           )}
 
