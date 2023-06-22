@@ -389,7 +389,7 @@ export default function SortableTable({ rawScoresData, baseOverallAcc }) {
             >
               Rank
             </Th>
-            <th>Select</th>
+            <th>Delete</th>
           </tr>
         </thead>
         <tbody>
