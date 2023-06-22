@@ -40,7 +40,7 @@ export default function UserDetails({ userData }) {
         <Title order={1}>{username}</Title>
         <Title order={3}>Mode: {playmode}</Title>
         <Title order={3}>
-          Rank: {global_rank} ({country_code}#{country_rank}) (0)
+          Rank: {global_rank} ({country_code}#{country_rank})
         </Title>
         <Title order={3}>
           PP:{" "}
