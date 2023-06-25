@@ -15,6 +15,7 @@ import {
   Select,
   Button,
   Title,
+  NumberInput,
 } from "@mantine/core";
 import {
   IconSelector,
@@ -81,13 +82,13 @@ function Th({ children, isReverseSorted, isActiveSortingParam, onSort }) {
  * @returns filtered data.
  */
 function filterData(data, search) {
-  const { map, mapper } = search;
-  const mapQuery = map.toLowerCase().trim();
-  const mapperQuery = mapper.toLowerCase().trim();
+  const { map, mapper, minPP, maxPP } = search;
   return data.filter(
     (item) =>
-      item["map"].toLowerCase().includes(mapQuery) &&
-      item["mapper"].toLowerCase().includes(mapperQuery)
+      item["map"].toLowerCase().includes(map.toLowerCase().trim()) &&
+      item["mapper"].toLowerCase().includes(mapper.toLowerCase().trim()) &&
+      (minPP ? item["pp"] >= minPP : item["pp"] >= 0) &&
+      (maxPP ? item["pp"] <= maxPP : item["pp"] <= Number.MAX_VALUE)
   );
 }
 
@@ -203,6 +204,8 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
   // Search states
   const [mapSearch, setMapSearch] = useState("");
   const [mapperSearch, setMapperSearch] = useState("");
+  const [minPPSearch, setMinPPSearch] = useState();
+  const [maxPPSearch, setMaxPPSearch] = useState();
 
   // Sorting states
   const [sortingParam, setSortingParam] = useState("index");
@@ -258,7 +261,12 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
       sortData(scoresData, {
         sortingParam,
         reversed: isReverseSorted,
-        search: { map: value, mapper: mapperSearch },
+        search: {
+          map: value,
+          mapper: mapperSearch,
+          minPP: minPPSearch,
+          maxPP: maxPPSearch,
+        },
       })
     );
   };
@@ -271,7 +279,46 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
       sortData(scoresData, {
         sortingParam,
         reversed: isReverseSorted,
-        search: { map: mapSearch, mapper: value },
+        search: {
+          map: mapSearch,
+          mapper: value,
+          minPP: minPPSearch,
+          maxPP: maxPPSearch,
+        },
+      })
+    );
+  };
+
+  // Handler for updating minimum pp search state
+  const minPPSearchChangeHandler = (value) => {
+    setMinPPSearch(value);
+    setSortedData(
+      sortData(scoresData, {
+        sortingParam,
+        reversed: isReverseSorted,
+        search: {
+          map: mapSearch,
+          mapper: mapperSearch,
+          minPP: value,
+          maxPP: maxPPSearch,
+        },
+      })
+    );
+  };
+
+  // Handler for updating maximum pp search state
+  const maxPPSearchChangeHandler = (value) => {
+    setMaxPPSearch(value);
+    setSortedData(
+      sortData(scoresData, {
+        sortingParam,
+        reversed: isReverseSorted,
+        search: {
+          map: mapSearch,
+          mapper: mapperSearch,
+          minPP: minPPSearch,
+          maxPP: value,
+        },
       })
     );
   };
@@ -349,6 +396,17 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
               icon={<IconSearch size="0.9rem" stroke={1.5} />}
               value={mapperSearch}
               onChange={mapperSearchChangeHandler}
+            />
+
+            <NumberInput
+              placeholder="Minimum pp"
+              value={minPPSearch}
+              onChange={minPPSearchChangeHandler}
+            />
+            <NumberInput
+              placeholder="Maximum pp"
+              value={maxPPSearch}
+              onChange={maxPPSearchChangeHandler}
             />
           </Flex>
 
