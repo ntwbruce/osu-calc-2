@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { IconStarFilled } from "@tabler/icons-react";
-import { calculateStarRating } from "@/lib/StarRatingCalculator";
+import { calculateStarRating } from "@/lib/calculators/StarRatingCalculator";
 
 export default function HomePage() {
     const router = useRouter();
