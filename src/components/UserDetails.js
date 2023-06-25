@@ -1,8 +1,6 @@
 import { Title, Flex, Image } from "@mantine/core";
-import { useContext } from "react";
-import UserStatChangesContext from "@/context/UserStatChangesContext";
 
-export default function UserDetails({ userData }) {
+export default function UserDetails({ userData, statChangeData }) {
   const pfp = userData.avatar_url;
   const username = userData.username;
   const playmode =
@@ -23,7 +21,7 @@ export default function UserDetails({ userData }) {
   const pp = userData.statistics.is_ranked ? userData.statistics.pp : "--";
   const acc = userData.statistics.hit_accuracy;
 
-  const { userStatChanges } = useContext(UserStatChangesContext);
+  const { ppChange, accChange } = statChangeData;
 
   return (
     <Flex
@@ -44,12 +42,13 @@ export default function UserDetails({ userData }) {
         </Title>
         <Title order={3}>
           PP:{" "}
-          {(Math.round((pp + userStatChanges.ppChange) * 100) / 100.0).toFixed(2)}pp 
-          ({(Math.round(userStatChanges.ppChange * 100) / 100.0).toFixed(2)}pp)
+          {(Math.round((pp + ppChange) * 100) / 100.0).toFixed(2)}pp 
+          ({(Math.round(ppChange * 100) / 100.0).toFixed(2)}pp)
         </Title>
         <Title order={3}>
           Accuracy:{" "}
-          {`${(acc + userStatChanges.accChange).toFixed(2)}% (${userStatChanges.accChange > 0 ? "+" : ""}${userStatChanges.accChange.toFixed(2)}%)`}
+          {`${(acc + Math.round(accChange * 100) / 100).toFixed(2)}% 
+          (${accChange > 0 ? "+" : ""}${accChange.toFixed(2)}%)`}
         </Title>
       </Flex>
     </Flex>
