@@ -317,135 +317,161 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
 
   return (
     <ScrollArea>
-      <Flex direction={{ base: "row", sm: "column" }} justify={{ sm: "center" }}>
-        <Flex direction={{ base: "column", sm: "row" }} gap={{ base: "sm", sm: "lg" }} justify={{ sm: "center" }}>
-        <Title order={4}>Filter</Title>
-
-          <TextInput
-            placeholder="Search by map name"
-            mb="md"
-            w="20rem"
-            icon={<IconSearch size="0.9rem" stroke={1.5} />}
-            value={mapSearch}
-            onChange={mapSearchChangeHandler}
-          />
-
-          <TextInput
-            placeholder="Search by mapper"
-            mb="md"
-            w="20rem"
-            icon={<IconSearch size="0.9rem" stroke={1.5} />}
-            value={mapperSearch}
-            onChange={mapperSearchChangeHandler}
-          />
-        </Flex>
-
-        <Flex direction={{ base: "column", sm: "row" }} gap={{ base: "sm", sm: "lg" }} justify={{ sm: "center" }} align='center'>
-          <Title order={4}>Sort</Title>
-
-          <Select
-            data={[
-              { value: "index", label: "Index" },
-              { value: "map", label: "Map" },
-              { value: "mapper", label: "Mapper" },
-              { value: "mods", label: "Mods" },
-              { value: "sr", label: "Star Rating" },
-              { value: "pp", label: "Performance Points (pp)" },
-              { value: "acc", label: "Accuracy" },
-              { value: "rank", label: "Rank" },
-            ]}
-            onChange={sortChangeHandler}
-            value={sortingParam}
-          />
-
-          <Button color="grape" onClick={reverseSortHandler}>
-            {isReverseSorted ? <IconArrowUp /> : <IconArrowDown />}
-          </Button>
-        </Flex>
-        
-      </Flex>
-      
-      <Table
-        horizontalSpacing="md"
-        verticalSpacing="xs"
-        miw={700}
-        sx={{ tableLayout: "fixed" }}
+      <Flex
+        direction={{ base: "row", sm: "column" }}
+        gap={{ base: "sm", sm: "lg" }}
+        justify={{ sm: "center" }}
       >
-        <thead>
-          <tr>
-            <Th
-              isActiveSortingParam={sortingParam === "index"}
-              isReverseSorted={isReverseSorted}
-              onSort={() => sortChangeHandler("index")}
-            >
-              Index
-            </Th>
-            <Th
-              isActiveSortingParam={sortingParam === "map"}
-              isReverseSorted={isReverseSorted}
-              onSort={() => sortChangeHandler("map")}
-            >
-              Map
-            </Th>
-            <Th
-              isActiveSortingParam={sortingParam === "mapper"}
-              isReverseSorted={isReverseSorted}
-              onSort={() => sortChangeHandler("mapper")}
-            >
-              Mapper
-            </Th>
-            <Th
-              isActiveSortingParam={sortingParam === "mods"}
-              isReverseSorted={isReverseSorted}
-              onSort={() => sortChangeHandler("mods")}
-            >
-              Mods
-            </Th>
-            <Th
-              isActiveSortingParam={sortingParam === "sr"}
-              isReverseSorted={isReverseSorted}
-              onSort={() => sortChangeHandler("sr")}
-            >
-              Star Rating
-            </Th>
-            <Th
-              isActiveSortingParam={sortingParam === "pp"}
-              isReverseSorted={isReverseSorted}
-              onSort={() => sortChangeHandler("pp")}
-            >
-              Peformance (pp)
-            </Th>
-            <Th
-              isActiveSortingParam={sortingParam === "acc"}
-              isReverseSorted={isReverseSorted}
-              onSort={() => sortChangeHandler("acc")}
-            >
-              Accuracy (%)
-            </Th>
-            <Th
-              isActiveSortingParam={sortingParam === "rank"}
-              isReverseSorted={isReverseSorted}
-              onSort={() => sortChangeHandler("rank")}
-            >
-              Rank
-            </Th>
-            <th>Delete</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.length > 0 ? (
-            rows
-          ) : (
+        <Flex
+          direction={{ base: "row", sm: "column" }}
+          justify={{ sm: "center" }}
+        >
+          <Flex
+            direction={{ base: "column", sm: "row" }}
+            gap={{ base: "sm", sm: "lg" }}
+            justify={{ sm: "center" }}
+          >
+            <Title order={4}>Filter</Title>
+
+            <TextInput
+              placeholder="Search by map name"
+              mb="md"
+              w="20rem"
+              icon={<IconSearch size="0.9rem" stroke={1.5} />}
+              value={mapSearch}
+              onChange={mapSearchChangeHandler}
+            />
+
+            <TextInput
+              placeholder="Search by mapper"
+              mb="md"
+              w="20rem"
+              icon={<IconSearch size="0.9rem" stroke={1.5} />}
+              value={mapperSearch}
+              onChange={mapperSearchChangeHandler}
+            />
+          </Flex>
+
+          <Flex
+            direction={{ base: "column", sm: "row" }}
+            gap={{ base: "sm", sm: "lg" }}
+            justify={{ sm: "center" }}
+            align="center"
+          >
+            <Title order={4}>Sort</Title>
+
+            <Select
+              data={[
+                { value: "index", label: "Index" },
+                { value: "map", label: "Map" },
+                { value: "mapper", label: "Mapper" },
+                { value: "mods", label: "Mods" },
+                { value: "sr", label: "Star Rating" },
+                { value: "pp", label: "Performance Points (pp)" },
+                { value: "acc", label: "Accuracy" },
+                { value: "rank", label: "Rank" },
+              ]}
+              onChange={sortChangeHandler}
+              value={sortingParam}
+            />
+
+            <Button color="grape" onClick={reverseSortHandler}>
+              {isReverseSorted ? <IconArrowUp /> : <IconArrowDown />}
+            </Button>
+          </Flex>
+        </Flex>
+
+        <Flex
+          direction={{ base: "column", sm: "row" }}
+          gap={{ base: "sm", sm: "lg" }}
+          justify={{ sm: "center" }}
+          align="center"
+        >
+          <Title order={3}>{sortedData.length} score(s) found!</Title>
+        </Flex>
+
+        <Table
+          horizontalSpacing="md"
+          verticalSpacing="xs"
+          miw={700}
+          sx={{ tableLayout: "fixed" }}
+        >
+          <thead>
             <tr>
-              <td colSpan={8}>
-                <Text weight={500} align="center">
-                  Nothing found
-                </Text>
-              </td>
+              <Th
+                isActiveSortingParam={sortingParam === "index"}
+                isReverseSorted={isReverseSorted}
+                onSort={() => sortChangeHandler("index")}
+              >
+                Index
+              </Th>
+              <Th
+                isActiveSortingParam={sortingParam === "map"}
+                isReverseSorted={isReverseSorted}
+                onSort={() => sortChangeHandler("map")}
+              >
+                Map
+              </Th>
+              <Th
+                isActiveSortingParam={sortingParam === "mapper"}
+                isReverseSorted={isReverseSorted}
+                onSort={() => sortChangeHandler("mapper")}
+              >
+                Mapper
+              </Th>
+              <Th
+                isActiveSortingParam={sortingParam === "mods"}
+                isReverseSorted={isReverseSorted}
+                onSort={() => sortChangeHandler("mods")}
+              >
+                Mods
+              </Th>
+              <Th
+                isActiveSortingParam={sortingParam === "sr"}
+                isReverseSorted={isReverseSorted}
+                onSort={() => sortChangeHandler("sr")}
+              >
+                Star Rating
+              </Th>
+              <Th
+                isActiveSortingParam={sortingParam === "pp"}
+                isReverseSorted={isReverseSorted}
+                onSort={() => sortChangeHandler("pp")}
+              >
+                Peformance (pp)
+              </Th>
+              <Th
+                isActiveSortingParam={sortingParam === "acc"}
+                isReverseSorted={isReverseSorted}
+                onSort={() => sortChangeHandler("acc")}
+              >
+                Accuracy (%)
+              </Th>
+              <Th
+                isActiveSortingParam={sortingParam === "rank"}
+                isReverseSorted={isReverseSorted}
+                onSort={() => sortChangeHandler("rank")}
+              >
+                Rank
+              </Th>
+              <th>Delete</th>
             </tr>
-          )}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {rows.length > 0 ? (
+              rows
+            ) : (
+              <tr>
+                <td colSpan={8}>
+                  <Text weight={500} align="center">
+                    Nothing found
+                  </Text>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </Table>
+      </Flex>
     </ScrollArea>
   );
 }
