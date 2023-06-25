@@ -12,6 +12,9 @@ import {
   Flex,
   NavLink,
   Checkbox,
+  Select,
+  Button,
+  Title,
 } from "@mantine/core";
 import {
   IconSelector,
@@ -19,6 +22,8 @@ import {
   IconChevronUp,
   IconChevronRight,
   IconSearch,
+  IconArrowUp,
+  IconArrowDown,
 } from "@tabler/icons-react";
 
 const useStyles = createStyles((theme) => ({
@@ -192,7 +197,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
           : score.rank === "SH"
           ? "S"
           : score.rank,
-    }
+    };
   });
 
   // Search states
@@ -200,29 +205,46 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
   const [mapperSearch, setMapperSearch] = useState("");
 
   // Sorting states
-  const [sortingParam, setSortingParam] = useState(null);
+  const [sortingParam, setSortingParam] = useState("index");
   const [isReverseSorted, setIsReverseSorted] = useState(false);
 
   // Score state
   const [sortedData, setSortedData] = useState(scoresData);
 
   // Selection state
-  const [selection, setSelection] = useState(new Array(sortedData.length).fill(false));
+  const [selection, setSelection] = useState(
+    new Array(sortedData.length).fill(false)
+  );
 
   // Recalculate stats and update stat changes context every time selection array is changed
-  useEffect(() => { 
+  useEffect(() => {
     setStatChanges(selection);
   }, [selection]);
 
   // Handler for changing sort parameter/reverse sort
   const sortChangeHandler = (field) => {
-    const toReverse = field === sortingParam ? !isReverseSorted : false;
-    setIsReverseSorted(toReverse);
-    setSortingParam(field);
+    if (field === sortingParam) {
+      reverseSortHandler();
+    } else {
+      setIsReverseSorted(false);
+      setSortingParam(field);
+      setSortedData(
+        sortData(scoresData, {
+          sortingParam: field,
+          reversed: false,
+          search: { map: mapSearch, mapper: mapperSearch },
+        })
+      );
+    }
+  };
+
+  // Handler for reversing sort
+  const reverseSortHandler = () => {
+    setIsReverseSorted(!isReverseSorted);
     setSortedData(
       sortData(scoresData, {
-        sortingParam: field,
-        reversed: toReverse,
+        sortingParam,
+        reversed: !isReverseSorted,
         search: { map: mapSearch, mapper: mapperSearch },
       })
     );
@@ -254,9 +276,13 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
     );
   };
 
-  // Handler for updating selection state 
+  // Handler for updating selection state
   const rowSelectionToggleHandler = (selectedIndex) => {
-    setSelection((currSelection) => currSelection.map((curr, index) => (index === selectedIndex) ? !curr : curr));
+    setSelection((currSelection) =>
+      currSelection.map((curr, index) =>
+        index === selectedIndex ? !curr : curr
+      )
+    );
   };
 
   const rows = sortedData.map((row) => (
@@ -279,31 +305,66 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
       <td>{(Math.round(row.pp * 100) / 100).toFixed(2)}</td>
       <td>{(row.acc * 100).toFixed(2)}</td>
       <td>{row.rank}</td>
-      <td><Checkbox checked={selection[row.index]} onChange={() => rowSelectionToggleHandler(row.index)} transitionDuration={0} /></td>
+      <td>
+        <Checkbox
+          checked={selection[row.index]}
+          onChange={() => rowSelectionToggleHandler(row.index)}
+          transitionDuration={0}
+        />
+      </td>
     </tr>
   ));
 
   return (
     <ScrollArea>
-      <Flex gap={{ base: "sm", sm: "lg" }} justify={{ sm: "center" }}>
-        <TextInput
-          placeholder="Search by map name"
-          mb="md"
-          w="20rem"
-          icon={<IconSearch size="0.9rem" stroke={1.5} />}
-          value={mapSearch}
-          onChange={mapSearchChangeHandler}
-        />
+      <Flex direction={{ base: "row", sm: "column" }} justify={{ sm: "center" }}>
+        <Flex direction={{ base: "column", sm: "row" }} gap={{ base: "sm", sm: "lg" }} justify={{ sm: "center" }}>
+        <Title order={4}>Filter</Title>
 
-        <TextInput
-          placeholder="Search by mapper"
-          mb="md"
-          w="20rem"
-          icon={<IconSearch size="0.9rem" stroke={1.5} />}
-          value={mapperSearch}
-          onChange={mapperSearchChangeHandler}
-        />
+          <TextInput
+            placeholder="Search by map name"
+            mb="md"
+            w="20rem"
+            icon={<IconSearch size="0.9rem" stroke={1.5} />}
+            value={mapSearch}
+            onChange={mapSearchChangeHandler}
+          />
+
+          <TextInput
+            placeholder="Search by mapper"
+            mb="md"
+            w="20rem"
+            icon={<IconSearch size="0.9rem" stroke={1.5} />}
+            value={mapperSearch}
+            onChange={mapperSearchChangeHandler}
+          />
+        </Flex>
+
+        <Flex direction={{ base: "column", sm: "row" }} gap={{ base: "sm", sm: "lg" }} justify={{ sm: "center" }} align='center'>
+          <Title order={4}>Sort</Title>
+
+          <Select
+            data={[
+              { value: "index", label: "Index" },
+              { value: "map", label: "Map" },
+              { value: "mapper", label: "Mapper" },
+              { value: "mods", label: "Mods" },
+              { value: "sr", label: "Star Rating" },
+              { value: "pp", label: "Performance Points (pp)" },
+              { value: "acc", label: "Accuracy" },
+              { value: "rank", label: "Rank" },
+            ]}
+            onChange={sortChangeHandler}
+            value={sortingParam}
+          />
+
+          <Button color="grape" onClick={reverseSortHandler}>
+            {isReverseSorted ? <IconArrowUp /> : <IconArrowDown />}
+          </Button>
+        </Flex>
+        
       </Flex>
+      
       <Table
         horizontalSpacing="md"
         verticalSpacing="xs"
