@@ -25,10 +25,6 @@ export default function UserDetails({ userData, statChangeData }) {
 
   const { ppChange, accChange } = statChangeData;
 
-  useEffect(() => {
-    console.log(userData);
-  }, []);
-
   return (
     <BackgroundImage src={cover_url} sx={{ position: "relative" }}>
       <div
