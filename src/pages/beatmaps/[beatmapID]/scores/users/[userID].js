@@ -3,8 +3,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { IconStarFilled } from "@tabler/icons-react";
-import ojsama from "ojsama";
-import { calculateModValue } from "@/lib/modValueCalculator";
+import { calculateStarRating } from "@/lib/StarRatingCalculator";
 
 export default function HomePage() {
     const router = useRouter();
@@ -80,10 +79,7 @@ export default function HomePage() {
         if (Object.keys(beatmapData).length !== 0 && Object.keys(scoreData).length !== 0 && Object.keys(beatmapFileData).length !== 0) { 
             const isDifficultyChanging = scoreData.score.mods.some(mod => ['EZ', 'HR', 'DT', 'NC', 'FL', 'HT'].includes(mod));
             if (isDifficultyChanging) {
-                const mods = calculateModValue(scoreData.score.mods);
-                const { map } = new ojsama.parser().feed(beatmapFileData);
-                const updatedStarRating = new ojsama.std_diff().calc({ map, mods }).total;
-                setStarRating(updatedStarRating);
+                setStarRating(calculateStarRating(beatmapFileData, scoreData.score.mods));
             }
         }
 
