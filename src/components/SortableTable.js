@@ -16,6 +16,7 @@ import {
   Button,
   Title,
   NumberInput,
+  Drawer,
 } from "@mantine/core";
 import {
   IconSelector,
@@ -23,9 +24,12 @@ import {
   IconChevronUp,
   IconChevronRight,
   IconSearch,
-  IconArrowUp,
-  IconArrowDown,
+  IconFilter,
+  IconSortAscending,
+  IconSortDescending,
+  IconArrowsSort,
 } from "@tabler/icons-react";
+import { useDisclosure } from "@mantine/hooks";
 
 const useStyles = createStyles((theme) => ({
   th: {
@@ -362,6 +366,8 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
     </tr>
   ));
 
+  const [opened, { open, close }] = useDisclosure(false);
+
   return (
     <ScrollArea>
       <Flex
@@ -371,43 +377,52 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
       >
         <Flex
           direction={{ base: "row", sm: "column" }}
+          gap={{ base: "sm", sm: "lg" }}
           justify={{ sm: "center" }}
         >
-          <Flex
-            direction={{ base: "column", sm: "row" }}
-            gap={{ base: "sm", sm: "lg" }}
-            justify={{ sm: "center" }}
-          >
-            <Title order={4}>Filter</Title>
+          <Flex justify={{ sm: "center" }}>
+            <Drawer
+              opened={opened}
+              onClose={close}
+              title="Filter"
+              sx={{ fontFamily: "Segoe UI" }}
+            >
+              <TextInput
+                placeholder="Search by map name"
+                mb="md"
+                w="20rem"
+                icon={<IconSearch size="0.9rem" stroke={1.5} />}
+                value={mapSearch}
+                onChange={mapSearchChangeHandler}
+              />
 
-            <TextInput
-              placeholder="Search by map name"
-              mb="md"
-              w="20rem"
-              icon={<IconSearch size="0.9rem" stroke={1.5} />}
-              value={mapSearch}
-              onChange={mapSearchChangeHandler}
-            />
+              <TextInput
+                placeholder="Search by mapper"
+                mb="md"
+                w="20rem"
+                icon={<IconSearch size="0.9rem" stroke={1.5} />}
+                value={mapperSearch}
+                onChange={mapperSearchChangeHandler}
+              />
 
-            <TextInput
-              placeholder="Search by mapper"
-              mb="md"
-              w="20rem"
-              icon={<IconSearch size="0.9rem" stroke={1.5} />}
-              value={mapperSearch}
-              onChange={mapperSearchChangeHandler}
-            />
+              <NumberInput
+                placeholder="Minimum pp"
+                mb="md"
+                w="20rem"
+                value={minPPSearch}
+                onChange={minPPSearchChangeHandler}
+              />
 
-            <NumberInput
-              placeholder="Minimum pp"
-              value={minPPSearch}
-              onChange={minPPSearchChangeHandler}
-            />
-            <NumberInput
-              placeholder="Maximum pp"
-              value={maxPPSearch}
-              onChange={maxPPSearchChangeHandler}
-            />
+              <NumberInput
+                placeholder="Maximum pp"
+                mb="md"
+                w="20rem"
+                value={maxPPSearch}
+                onChange={maxPPSearchChangeHandler}
+              />
+            </Drawer>
+
+            <Button variant="outline" onClick={open} leftIcon={<IconFilter size={20}/>}>Filter</Button>
           </Flex>
 
           <Flex
@@ -416,8 +431,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
             justify={{ sm: "center" }}
             align="center"
           >
-            <Title order={4}>Sort</Title>
-
+            <IconArrowsSort/>
             <Select
               data={[
                 { value: "index", label: "Index" },
@@ -434,7 +448,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
             />
 
             <Button color="grape" onClick={reverseSortHandler}>
-              {isReverseSorted ? <IconArrowUp /> : <IconArrowDown />}
+              {isReverseSorted ? <IconSortAscending /> : <IconSortDescending />}
             </Button>
           </Flex>
         </Flex>
