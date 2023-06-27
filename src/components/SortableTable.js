@@ -366,7 +366,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
     </tr>
   ));
 
-  const [opened, { open, close }] = useDisclosure(false);
+  const [isFilterOpened, { open, close }] = useDisclosure(false);
 
   return (
     <ScrollArea>
@@ -382,7 +382,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
         >
           <Flex justify={{ sm: "center" }}>
             <Drawer
-              opened={opened}
+              opened={isFilterOpened}
               onClose={close}
               title="Filter"
               sx={{ fontFamily: "Segoe UI" }}
