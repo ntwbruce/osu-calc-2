@@ -176,34 +176,8 @@ function sortData(data, payload) {
 }
 
 export default function SortableTable({ rawScoresData, setStatChanges }) {
-  // Data manipulated into a more convenient format
-  const scoresData = rawScoresData.map((score, index) => {
-    return {
-      index,
-      beatmap_id: score.beatmap.id,
-      user_id: score.user_id,
-      map: `${score.beatmapset.artist} - ${score.beatmapset.title} [${score.beatmap.version}]`,
-      mapper: score.beatmapset.creator,
-      sr: score.beatmap.difficulty_rating,
-      sr_multiplier:
-        score.mods.includes("DT") ||
-        score.mods.includes("NC") ||
-        score.mods.includes("FL") ||
-        score.mods.includes("HR") ||
-        score.mods.includes("EZ")
-          ? "*"
-          : "",
-      mods: score.mods.length >= 1 ? score.mods : "NM",
-      pp: score.pp,
-      acc: score.accuracy,
-      rank:
-        score.rank === "X" || score.rank === "XH"
-          ? "SS"
-          : score.rank === "SH"
-          ? "S"
-          : score.rank,
-    };
-  });
+
+  // ============================================= STATES =============================================
 
   // Search states
   const [mapSearch, setMapSearch] = useState("");
@@ -223,10 +197,17 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
     new Array(sortedData.length).fill(false)
   );
 
+  // Drawer open state
+  const [isFilterOpened, { open, close }] = useDisclosure(false);
+  
+  // ============================================= EFFECTS =============================================
+
   // Recalculate stats and update stat changes context every time selection array is changed
   useEffect(() => {
     setStatChanges(selection);
   }, [selection]);
+
+  // ============================================= SORTING HANDLERS =============================================
 
   // Handler for changing sort parameter/reverse sort
   const sortChangeHandler = (field) => {
@@ -256,6 +237,8 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
       })
     );
   };
+
+  // ============================================= SEARCH FILTER HANDLERS =============================================
 
   // Handler for updating map name search state
   const mapSearchChangeHandler = (event) => {
@@ -327,6 +310,8 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
     );
   };
 
+  // ============================================= SELECTION HANDLERS =============================================
+
   // Handler for updating selection state
   const rowSelectionToggleHandler = (selectedIndex) => {
     setSelection((currSelection) =>
@@ -336,6 +321,38 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
     );
   };
 
+  // ============================================= DATA =============================================
+
+  // Manipulates raw score data into a more convenient format
+  const scoresData = rawScoresData.map((score, index) => {
+    return {
+      index,
+      beatmap_id: score.beatmap.id,
+      user_id: score.user_id,
+      map: `${score.beatmapset.artist} - ${score.beatmapset.title} [${score.beatmap.version}]`,
+      mapper: score.beatmapset.creator,
+      sr: score.beatmap.difficulty_rating,
+      sr_multiplier:
+        score.mods.includes("DT") ||
+        score.mods.includes("NC") ||
+        score.mods.includes("FL") ||
+        score.mods.includes("HR") ||
+        score.mods.includes("EZ")
+          ? "*"
+          : "",
+      mods: score.mods.length >= 1 ? score.mods : "NM",
+      pp: score.pp,
+      acc: score.accuracy,
+      rank:
+        score.rank === "X" || score.rank === "XH"
+          ? "SS"
+          : score.rank === "SH"
+          ? "S"
+          : score.rank,
+    };
+  });
+
+  // Converts each score into a row element
   const rows = sortedData.map((row) => (
     <tr key={row.index}>
       <td>{row.index + 1}</td>
@@ -366,7 +383,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
     </tr>
   ));
 
-  const [isFilterOpened, { open, close }] = useDisclosure(false);
+  // ============================================= OUTPUT =============================================
 
   return (
     <ScrollArea>
