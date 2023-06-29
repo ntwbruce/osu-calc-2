@@ -87,21 +87,33 @@ function Th({ children, isReverseSorted, isActiveSortingParam, onSort }) {
  * @returns filtered data.
  */
 function filterData(data, search) {
-  const { map, mapper, minPP, maxPP, minAcc, maxAcc, minSR, maxSR, mods } =
-    search;
+  const {
+    map,
+    mapper,
+    minPP,
+    maxPP,
+    minAcc,
+    maxAcc,
+    minSR,
+    maxSR,
+    mods,
+    rank,
+  } = search;
   return data.filter(
     (item) =>
-      (item["map"].toLowerCase().includes(map.toLowerCase().trim()) &&
-        item["mapper"].toLowerCase().includes(mapper.toLowerCase().trim()) &&
-        (minPP ? item["pp"] >= minPP : item["pp"] >= 0) &&
-        (maxPP ? item["pp"] <= maxPP : item["pp"] <= Number.MAX_VALUE) &&
-        (minAcc ? item["acc"] >= minAcc / 100 : item["acc"] >= 0) &&
-        (maxAcc ? item["acc"] <= maxAcc / 100 : item["acc"] <= 1) &&
-        (minSR ? item["sr"] >= minSR : item["sr"] >= 0) &&
-        (maxSR ? item["sr"] <= maxSR : item["sr"] <= Number.MAX_VALUE) &&
-        mods.length === item["mods"].length &&
-        mods.every((mod) => item["mods"].includes(mod))) ||
-      (mods.length === 1 && mods[0] === "NM" && item["mods"] === "NM")
+      item["map"].toLowerCase().includes(map.toLowerCase().trim()) &&
+      item["mapper"].toLowerCase().includes(mapper.toLowerCase().trim()) &&
+      (minPP ? item["pp"] >= minPP : item["pp"] >= 0) &&
+      (maxPP ? item["pp"] <= maxPP : item["pp"] <= Number.MAX_VALUE) &&
+      (minAcc ? item["acc"] >= minAcc / 100 : item["acc"] >= 0) &&
+      (maxAcc ? item["acc"] <= maxAcc / 100 : item["acc"] <= 1) &&
+      (minSR ? item["sr"] >= minSR : item["sr"] >= 0) &&
+      (maxSR ? item["sr"] <= maxSR : item["sr"] <= Number.MAX_VALUE) &&
+      (!mods ||
+        (mods.length === item["mods"].length &&
+          mods.every((mod) => item["mods"].includes(mod))) ||
+        (mods.length === 1 && mods[0] === "NM" && item["mods"] === "NM")) &&
+      (!rank || item["rank"] === rank)
   );
 }
 
@@ -226,6 +238,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
   const [minSRSearch, setMinSRSearch] = useState();
   const [maxSRSearch, setMaxSRSearch] = useState();
   const [modsSearch, setModsSearch] = useState();
+  const [rankSearch, setRankSearch] = useState();
 
   // Sorting states
   const [sortingParam, setSortingParam] = useState("index");
@@ -272,6 +285,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
             minSR: minSRSearch,
             maxSR: maxSRSearch,
             mods: modsSearch,
+            rank: rankSearch,
           },
         })
       );
@@ -295,6 +309,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
           minSR: minSRSearch,
           maxSR: maxSRSearch,
           mods: modsSearch,
+          rank: rankSearch,
         },
       })
     );
@@ -320,6 +335,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
           minSR: minSRSearch,
           maxSR: maxSRSearch,
           mods: modsSearch,
+          rank: rankSearch,
         },
       })
     );
@@ -343,6 +359,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
           minSR: minSRSearch,
           maxSR: maxSRSearch,
           mods: modsSearch,
+          rank: rankSearch,
         },
       })
     );
@@ -365,6 +382,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
           minSR: minSRSearch,
           maxSR: maxSRSearch,
           mods: modsSearch,
+          rank: rankSearch,
         },
       })
     );
@@ -387,6 +405,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
           minSR: minSRSearch,
           maxSR: maxSRSearch,
           mods: modsSearch,
+          rank: rankSearch,
         },
       })
     );
@@ -409,6 +428,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
           minSR: minSRSearch,
           maxSR: maxSRSearch,
           mods: modsSearch,
+          rank: rankSearch,
         },
       })
     );
@@ -431,6 +451,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
           minSR: minSRSearch,
           maxSR: maxSRSearch,
           mods: modsSearch,
+          rank: rankSearch,
         },
       })
     );
@@ -453,6 +474,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
           minSR: value,
           maxSR: maxSRSearch,
           mods: modsSearch,
+          rank: rankSearch,
         },
       })
     );
@@ -475,6 +497,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
           minSR: minSRSearch,
           maxSR: value,
           mods: modsSearch,
+          rank: rankSearch,
         },
       })
     );
@@ -497,6 +520,30 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
           minSR: minSRSearch,
           maxSR: maxSRSearch,
           mods: value,
+          rank: rankSearch,
+        },
+      })
+    );
+  };
+
+  // Handler for updating rank search state
+  const rankSearchChangeHandler = (value) => {
+    setRankSearch(value);
+    setSortedData(
+      sortData(scoresData, {
+        sortingParam,
+        reversed: isReverseSorted,
+        search: {
+          map: mapSearch,
+          mapper: mapperSearch,
+          minPP: minPPSearch,
+          maxPP: maxPPSearch,
+          minAcc: minAccSearch,
+          maxAcc: maxAccSearch,
+          minSR: minSRSearch,
+          maxSR: maxSRSearch,
+          mods: modsSearch,
+          rank: value,
         },
       })
     );
@@ -585,6 +632,45 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
                 onChange={mapperSearchChangeHandler}
               />
 
+              <MultiSelect
+                clearable
+                mb="md"
+                w="20rem"
+                placeholder="Mods"
+                data={[
+                  { value: "NM", label: "NM" },
+                  { value: "EZ", label: "EZ" },
+                  { value: "NF", label: "NF" },
+                  { value: "HT", label: "HT" },
+                  { value: "HR", label: "HR" },
+                  { value: "SD", label: "SD" },
+                  { value: "PF", label: "PF" },
+                  { value: "DT", label: "DT" },
+                  { value: "NC", label: "NC" },
+                  { value: "HD", label: "HD" },
+                  { value: "FL", label: "FL" },
+                  { value: "SO", label: "SO" },
+                ]}
+                value={modsSearch}
+                onChange={modsSearchChangeHandler}
+              />
+
+              <NumberInput
+                placeholder="Minimum star rating"
+                mb="md"
+                w="20rem"
+                value={minSRSearch}
+                onChange={minSRSearchChangeHandler}
+              />
+
+              <NumberInput
+                placeholder="Maximum star rating"
+                mb="md"
+                w="20rem"
+                value={maxSRSearch}
+                onChange={maxSRSearchChangeHandler}
+              />
+
               <NumberInput
                 placeholder="Minimum pp"
                 mb="md"
@@ -617,42 +703,21 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
                 onChange={maxAccSearchChangeHandler}
               />
 
-              <NumberInput
-                placeholder="Minimum star rating"
+              <Select
+                clearable
+                placeholder="Rank"
                 mb="md"
                 w="20rem"
-                value={minSRSearch}
-                onChange={minSRSearchChangeHandler}
-              />
-
-              <NumberInput
-                placeholder="Maximum star rating"
-                mb="md"
-                w="20rem"
-                value={maxSRSearch}
-                onChange={maxSRSearchChangeHandler}
-              />
-
-              <MultiSelect
-                mb="md"
-                w="20rem"
-                placeholder="Mods"
                 data={[
-                  { value: "NM", label: "NM" },
-                  { value: "EZ", label: "EZ" },
-                  { value: "NF", label: "NF" },
-                  { value: "HT", label: "HT" },
-                  { value: "HR", label: "HR" },
-                  { value: "SD", label: "SD" },
-                  { value: "PF", label: "PF" },
-                  { value: "DT", label: "DT" },
-                  { value: "NC", label: "NC" },
-                  { value: "HD", label: "HD" },
-                  { value: "FL", label: "FL" },
-                  { value: "SO", label: "SO" },
+                  { value: "SS", label: "SS" },
+                  { value: "S", label: "S" },
+                  { value: "A", label: "A" },
+                  { value: "B", label: "B" },
+                  { value: "C", label: "C" },
+                  { value: "D", label: "D" },
                 ]}
-                value={modsSearch}
-                onChange={modsSearchChangeHandler}
+                value={rankSearch}
+                onChange={rankSearchChangeHandler}
               />
             </Drawer>
 
