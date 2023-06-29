@@ -17,6 +17,7 @@ import {
   Title,
   NumberInput,
   Drawer,
+  MultiSelect,
 } from "@mantine/core";
 import {
   IconSelector,
@@ -86,13 +87,21 @@ function Th({ children, isReverseSorted, isActiveSortingParam, onSort }) {
  * @returns filtered data.
  */
 function filterData(data, search) {
-  const { map, mapper, minPP, maxPP } = search;
+  const { map, mapper, minPP, maxPP, minAcc, maxAcc, minSR, maxSR, mods } =
+    search;
   return data.filter(
     (item) =>
-      item["map"].toLowerCase().includes(map.toLowerCase().trim()) &&
-      item["mapper"].toLowerCase().includes(mapper.toLowerCase().trim()) &&
-      (minPP ? item["pp"] >= minPP : item["pp"] >= 0) &&
-      (maxPP ? item["pp"] <= maxPP : item["pp"] <= Number.MAX_VALUE)
+      (item["map"].toLowerCase().includes(map.toLowerCase().trim()) &&
+        item["mapper"].toLowerCase().includes(mapper.toLowerCase().trim()) &&
+        (minPP ? item["pp"] >= minPP : item["pp"] >= 0) &&
+        (maxPP ? item["pp"] <= maxPP : item["pp"] <= Number.MAX_VALUE) &&
+        (minAcc ? item["acc"] >= minAcc / 100 : item["acc"] >= 0) &&
+        (maxAcc ? item["acc"] <= maxAcc / 100 : item["acc"] <= 1) &&
+        (minSR ? item["sr"] >= minSR : item["sr"] >= 0) &&
+        (maxSR ? item["sr"] <= maxSR : item["sr"] <= Number.MAX_VALUE) &&
+        mods.length === item["mods"].length &&
+        mods.every((mod) => item["mods"].includes(mod))) ||
+      (mods.length === 1 && mods[0] === "NM" && item["mods"] === "NM")
   );
 }
 
@@ -176,153 +185,6 @@ function sortData(data, payload) {
 }
 
 export default function SortableTable({ rawScoresData, setStatChanges }) {
-
-  // ============================================= STATES =============================================
-
-  // Search states
-  const [mapSearch, setMapSearch] = useState("");
-  const [mapperSearch, setMapperSearch] = useState("");
-  const [minPPSearch, setMinPPSearch] = useState();
-  const [maxPPSearch, setMaxPPSearch] = useState();
-
-  // Sorting states
-  const [sortingParam, setSortingParam] = useState("index");
-  const [isReverseSorted, setIsReverseSorted] = useState(false);
-
-  // Score state
-  const [sortedData, setSortedData] = useState(scoresData);
-
-  // Selection state
-  const [selection, setSelection] = useState(
-    new Array(sortedData.length).fill(false)
-  );
-
-  // Drawer open state
-  const [isFilterOpened, { open, close }] = useDisclosure(false);
-  
-  // ============================================= EFFECTS =============================================
-
-  // Recalculate stats and update stat changes context every time selection array is changed
-  useEffect(() => {
-    setStatChanges(selection);
-  }, [selection]);
-
-  // ============================================= SORTING HANDLERS =============================================
-
-  // Handler for changing sort parameter/reverse sort
-  const sortChangeHandler = (field) => {
-    if (field === sortingParam) {
-      reverseSortHandler();
-    } else {
-      setIsReverseSorted(false);
-      setSortingParam(field);
-      setSortedData(
-        sortData(scoresData, {
-          sortingParam: field,
-          reversed: false,
-          search: { map: mapSearch, mapper: mapperSearch },
-        })
-      );
-    }
-  };
-
-  // Handler for reversing sort
-  const reverseSortHandler = () => {
-    setIsReverseSorted(!isReverseSorted);
-    setSortedData(
-      sortData(scoresData, {
-        sortingParam,
-        reversed: !isReverseSorted,
-        search: { map: mapSearch, mapper: mapperSearch },
-      })
-    );
-  };
-
-  // ============================================= SEARCH FILTER HANDLERS =============================================
-
-  // Handler for updating map name search state
-  const mapSearchChangeHandler = (event) => {
-    const { value } = event.currentTarget;
-    setMapSearch(value);
-    setSortedData(
-      sortData(scoresData, {
-        sortingParam,
-        reversed: isReverseSorted,
-        search: {
-          map: value,
-          mapper: mapperSearch,
-          minPP: minPPSearch,
-          maxPP: maxPPSearch,
-        },
-      })
-    );
-  };
-
-  // Handler for updating mapper name search state
-  const mapperSearchChangeHandler = (event) => {
-    const { value } = event.currentTarget;
-    setMapperSearch(value);
-    setSortedData(
-      sortData(scoresData, {
-        sortingParam,
-        reversed: isReverseSorted,
-        search: {
-          map: mapSearch,
-          mapper: value,
-          minPP: minPPSearch,
-          maxPP: maxPPSearch,
-        },
-      })
-    );
-  };
-
-  // Handler for updating minimum pp search state
-  const minPPSearchChangeHandler = (value) => {
-    setMinPPSearch(value);
-    setSortedData(
-      sortData(scoresData, {
-        sortingParam,
-        reversed: isReverseSorted,
-        search: {
-          map: mapSearch,
-          mapper: mapperSearch,
-          minPP: value,
-          maxPP: maxPPSearch,
-        },
-      })
-    );
-  };
-
-  // Handler for updating maximum pp search state
-  const maxPPSearchChangeHandler = (value) => {
-    setMaxPPSearch(value);
-    setSortedData(
-      sortData(scoresData, {
-        sortingParam,
-        reversed: isReverseSorted,
-        search: {
-          map: mapSearch,
-          mapper: mapperSearch,
-          minPP: minPPSearch,
-          maxPP: value,
-        },
-      })
-    );
-  };
-
-  // ============================================= SELECTION HANDLERS =============================================
-
-  // Handler for updating selection state
-  const rowSelectionToggleHandler = (selectedIndex) => {
-    setSelection((currSelection) =>
-      currSelection.map((curr, index) =>
-        index === selectedIndex ? !curr : curr
-      )
-    );
-  };
-
-  // ============================================= DATA =============================================
-
   // Manipulates raw score data into a more convenient format
   const scoresData = rawScoresData.map((score, index) => {
     return {
@@ -351,6 +213,307 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
           : score.rank,
     };
   });
+
+  // ============================================= STATES =============================================
+
+  // Search states
+  const [mapSearch, setMapSearch] = useState("");
+  const [mapperSearch, setMapperSearch] = useState("");
+  const [minPPSearch, setMinPPSearch] = useState();
+  const [maxPPSearch, setMaxPPSearch] = useState();
+  const [minAccSearch, setMinAccSearch] = useState();
+  const [maxAccSearch, setMaxAccSearch] = useState();
+  const [minSRSearch, setMinSRSearch] = useState();
+  const [maxSRSearch, setMaxSRSearch] = useState();
+  const [modsSearch, setModsSearch] = useState();
+
+  // Sorting states
+  const [sortingParam, setSortingParam] = useState("index");
+  const [isReverseSorted, setIsReverseSorted] = useState(false);
+
+  // Score state
+  const [sortedData, setSortedData] = useState(scoresData);
+
+  // Selection state
+  const [selection, setSelection] = useState(
+    new Array(sortedData.length).fill(false)
+  );
+
+  // Drawer open state
+  const [isFilterOpened, { open, close }] = useDisclosure(false);
+
+  // ============================================= EFFECTS =============================================
+
+  // Recalculate stats and update stat changes context every time selection array is changed
+  useEffect(() => {
+    setStatChanges(selection);
+  }, [selection]);
+
+  // ============================================= SORTING HANDLERS =============================================
+
+  // Handler for changing sort parameter/reverse sort
+  const sortChangeHandler = (field) => {
+    if (field === sortingParam) {
+      reverseSortHandler();
+    } else {
+      setIsReverseSorted(false);
+      setSortingParam(field);
+      setSortedData(
+        sortData(scoresData, {
+          sortingParam: field,
+          reversed: false,
+          search: {
+            map: mapSearch,
+            mapper: mapperSearch,
+            minPP: minPPSearch,
+            maxPP: maxPPSearch,
+            minAcc: minAccSearch,
+            maxAcc: maxAccSearch,
+            minSR: minSRSearch,
+            maxSR: maxSRSearch,
+            mods: modsSearch,
+          },
+        })
+      );
+    }
+  };
+
+  // Handler for reversing sort
+  const reverseSortHandler = () => {
+    setIsReverseSorted(!isReverseSorted);
+    setSortedData(
+      sortData(scoresData, {
+        sortingParam,
+        reversed: !isReverseSorted,
+        search: {
+          map: mapSearch,
+          mapper: mapperSearch,
+          minPP: minPPSearch,
+          maxPP: maxPPSearch,
+          minAcc: minAccSearch,
+          maxAcc: maxAccSearch,
+          minSR: minSRSearch,
+          maxSR: maxSRSearch,
+          mods: modsSearch,
+        },
+      })
+    );
+  };
+
+  // ============================================= SEARCH FILTER HANDLERS =============================================
+
+  // Handler for updating map name search state
+  const mapSearchChangeHandler = (event) => {
+    const { value } = event.currentTarget;
+    setMapSearch(value);
+    setSortedData(
+      sortData(scoresData, {
+        sortingParam,
+        reversed: isReverseSorted,
+        search: {
+          map: value,
+          mapper: mapperSearch,
+          minPP: minPPSearch,
+          maxPP: maxPPSearch,
+          minAcc: minAccSearch,
+          maxAcc: maxAccSearch,
+          minSR: minSRSearch,
+          maxSR: maxSRSearch,
+          mods: modsSearch,
+        },
+      })
+    );
+  };
+
+  // Handler for updating mapper name search state
+  const mapperSearchChangeHandler = (event) => {
+    const { value } = event.currentTarget;
+    setMapperSearch(value);
+    setSortedData(
+      sortData(scoresData, {
+        sortingParam,
+        reversed: isReverseSorted,
+        search: {
+          map: mapSearch,
+          mapper: value,
+          minPP: minPPSearch,
+          maxPP: maxPPSearch,
+          minAcc: minAccSearch,
+          maxAcc: maxAccSearch,
+          minSR: minSRSearch,
+          maxSR: maxSRSearch,
+          mods: modsSearch,
+        },
+      })
+    );
+  };
+
+  // Handler for updating minimum pp search state
+  const minPPSearchChangeHandler = (value) => {
+    setMinPPSearch(value);
+    setSortedData(
+      sortData(scoresData, {
+        sortingParam,
+        reversed: isReverseSorted,
+        search: {
+          map: mapSearch,
+          mapper: mapperSearch,
+          minPP: value,
+          maxPP: maxPPSearch,
+          minAcc: minAccSearch,
+          maxAcc: maxAccSearch,
+          minSR: minSRSearch,
+          maxSR: maxSRSearch,
+          mods: modsSearch,
+        },
+      })
+    );
+  };
+
+  // Handler for updating maximum pp search state
+  const maxPPSearchChangeHandler = (value) => {
+    setMaxPPSearch(value);
+    setSortedData(
+      sortData(scoresData, {
+        sortingParam,
+        reversed: isReverseSorted,
+        search: {
+          map: mapSearch,
+          mapper: mapperSearch,
+          minPP: minPPSearch,
+          maxPP: value,
+          minAcc: minAccSearch,
+          maxAcc: maxAccSearch,
+          minSR: minSRSearch,
+          maxSR: maxSRSearch,
+          mods: modsSearch,
+        },
+      })
+    );
+  };
+
+  // Handler for updating minimum accuracy search state
+  const minAccSearchChangeHandler = (value) => {
+    setMinAccSearch(value);
+    setSortedData(
+      sortData(scoresData, {
+        sortingParam,
+        reversed: isReverseSorted,
+        search: {
+          map: mapSearch,
+          mapper: mapperSearch,
+          minPP: minPPSearch,
+          maxPP: maxPPSearch,
+          minAcc: value,
+          maxAcc: maxAccSearch,
+          minSR: minSRSearch,
+          maxSR: maxSRSearch,
+          mods: modsSearch,
+        },
+      })
+    );
+  };
+
+  // Handler for updating maximum accuracy search state
+  const maxAccSearchChangeHandler = (value) => {
+    setMaxAccSearch(value);
+    setSortedData(
+      sortData(scoresData, {
+        sortingParam,
+        reversed: isReverseSorted,
+        search: {
+          map: mapSearch,
+          mapper: mapperSearch,
+          minPP: minPPSearch,
+          maxPP: maxPPSearch,
+          minAcc: minAccSearch,
+          maxAcc: value,
+          minSR: minSRSearch,
+          maxSR: maxSRSearch,
+          mods: modsSearch,
+        },
+      })
+    );
+  };
+
+  // Handler for updating minimum accuracy search state
+  const minSRSearchChangeHandler = (value) => {
+    setMinSRSearch(value);
+    setSortedData(
+      sortData(scoresData, {
+        sortingParam,
+        reversed: isReverseSorted,
+        search: {
+          map: mapSearch,
+          mapper: mapperSearch,
+          minPP: minPPSearch,
+          maxPP: maxPPSearch,
+          minAcc: minAccSearch,
+          maxAcc: maxAccSearch,
+          minSR: value,
+          maxSR: maxSRSearch,
+          mods: modsSearch,
+        },
+      })
+    );
+  };
+
+  // Handler for updating maximum accuracy search state
+  const maxSRSearchChangeHandler = (value) => {
+    setMaxSRSearch(value);
+    setSortedData(
+      sortData(scoresData, {
+        sortingParam,
+        reversed: isReverseSorted,
+        search: {
+          map: mapSearch,
+          mapper: mapperSearch,
+          minPP: minPPSearch,
+          maxPP: maxPPSearch,
+          minAcc: minAccSearch,
+          maxAcc: maxAccSearch,
+          minSR: minSRSearch,
+          maxSR: value,
+          mods: modsSearch,
+        },
+      })
+    );
+  };
+
+  // Handler for updating mods search state
+  const modsSearchChangeHandler = (value) => {
+    setModsSearch(value);
+    setSortedData(
+      sortData(scoresData, {
+        sortingParam,
+        reversed: isReverseSorted,
+        search: {
+          map: mapSearch,
+          mapper: mapperSearch,
+          minPP: minPPSearch,
+          maxPP: maxPPSearch,
+          minAcc: minAccSearch,
+          maxAcc: maxAccSearch,
+          minSR: minSRSearch,
+          maxSR: maxSRSearch,
+          mods: value,
+        },
+      })
+    );
+  };
+
+  // ============================================= SELECTION HANDLERS =============================================
+
+  // Handler for updating selection state
+  const rowSelectionToggleHandler = (selectedIndex) => {
+    setSelection((currSelection) =>
+      currSelection.map((curr, index) =>
+        index === selectedIndex ? !curr : curr
+      )
+    );
+  };
+
+  // ============================================= ROW DATA =============================================
 
   // Converts each score into a row element
   const rows = sortedData.map((row) => (
@@ -437,9 +600,69 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
                 value={maxPPSearch}
                 onChange={maxPPSearchChangeHandler}
               />
+
+              <NumberInput
+                placeholder="Minimum accuracy"
+                mb="md"
+                w="20rem"
+                value={minAccSearch}
+                onChange={minAccSearchChangeHandler}
+              />
+
+              <NumberInput
+                placeholder="Maximum accuracy"
+                mb="md"
+                w="20rem"
+                value={maxAccSearch}
+                onChange={maxAccSearchChangeHandler}
+              />
+
+              <NumberInput
+                placeholder="Minimum star rating"
+                mb="md"
+                w="20rem"
+                value={minSRSearch}
+                onChange={minSRSearchChangeHandler}
+              />
+
+              <NumberInput
+                placeholder="Maximum star rating"
+                mb="md"
+                w="20rem"
+                value={maxSRSearch}
+                onChange={maxSRSearchChangeHandler}
+              />
+
+              <MultiSelect
+                mb="md"
+                w="20rem"
+                placeholder="Mods"
+                data={[
+                  { value: "NM", label: "NM" },
+                  { value: "EZ", label: "EZ" },
+                  { value: "NF", label: "NF" },
+                  { value: "HT", label: "HT" },
+                  { value: "HR", label: "HR" },
+                  { value: "SD", label: "SD" },
+                  { value: "PF", label: "PF" },
+                  { value: "DT", label: "DT" },
+                  { value: "NC", label: "NC" },
+                  { value: "HD", label: "HD" },
+                  { value: "FL", label: "FL" },
+                  { value: "SO", label: "SO" },
+                ]}
+                value={modsSearch}
+                onChange={modsSearchChangeHandler}
+              />
             </Drawer>
 
-            <Button variant="outline" onClick={open} leftIcon={<IconFilter size={20}/>}>Filter</Button>
+            <Button
+              variant="outline"
+              onClick={open}
+              leftIcon={<IconFilter size={20} />}
+            >
+              Filter
+            </Button>
           </Flex>
 
           <Flex
@@ -448,7 +671,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
             justify={{ sm: "center" }}
             align="center"
           >
-            <IconArrowsSort/>
+            <IconArrowsSort />
             <Select
               data={[
                 { value: "index", label: "Index" },
