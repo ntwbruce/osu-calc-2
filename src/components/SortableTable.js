@@ -109,7 +109,8 @@ function filterData(data, search) {
       (maxAcc ? item["acc"] <= maxAcc / 100 : item["acc"] <= 1) &&
       (minSR ? item["sr"] >= minSR : item["sr"] >= 0) &&
       (maxSR ? item["sr"] <= maxSR : item["sr"] <= Number.MAX_VALUE) &&
-      (!mods || mods.length === 0 ||
+      (!mods ||
+        mods.length === 0 ||
         (mods.length === item["mods"].length &&
           mods.every((mod) => item["mods"].includes(mod))) ||
         (mods.length === 1 && mods[0] === "NM" && item["mods"] === "NM")) &&
@@ -274,6 +275,18 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
         setMapperSearch(value);
         search = { ...currentSearchParams, mapper: value };
         break;
+      case "mods":
+        setModsSearch(value);
+        search = { ...currentSearchParams, mods: value };
+        break;
+      case "minSR":
+        setMinSRSearch(value);
+        search = { ...currentSearchParams, minSR: value };
+        break;
+      case "maxSR":
+        setMaxSRSearch(value);
+        search = { ...currentSearchParams, maxSR: value };
+        break;
       case "minPP":
         setMinPPSearch(value);
         search = { ...currentSearchParams, minPP: value };
@@ -289,18 +302,6 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
       case "maxAcc":
         setMaxAccSearch(value);
         search = { ...currentSearchParams, maxAcc: value };
-        break;
-      case "minSR":
-        setMinSRSearch(value);
-        search = { ...currentSearchParams, minSR: value };
-        break;
-      case "maxSR":
-        setMaxSRSearch(value);
-        search = { ...currentSearchParams, maxSR: value };
-        break;
-      case "mods":
-        setModsSearch(value);
-        search = { ...currentSearchParams, mods: value };
         break;
       case "rank":
         setRankSearch(value);
@@ -427,111 +428,145 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
               title="Filter"
               sx={{ fontFamily: "Segoe UI" }}
             >
-              <TextInput
-                placeholder="Search by map name"
-                mb="md"
-                w="20rem"
-                icon={<IconSearch size="0.9rem" stroke={1.5} />}
-                value={mapSearch}
-                onChange={event => filterUpdateHandler("map", event.currentTarget.value)}
-              />
+              <Flex
+                direction={{ base: "row", sm: "column" }}
+                justify={{ sm: "center" }}
+              >
+                <Title order={5}>Map</Title>
+                <TextInput
+                  placeholder="Find map name"
+                  mb="md"
+                  w="22.05rem"
+                  icon={<IconSearch size="0.9rem" stroke={1.5} />}
+                  value={mapSearch}
+                  onChange={(event) =>
+                    filterUpdateHandler("map", event.currentTarget.value)
+                  }
+                />
 
-              <TextInput
-                placeholder="Search by mapper"
-                mb="md"
-                w="20rem"
-                icon={<IconSearch size="0.9rem" stroke={1.5} />}
-                value={mapperSearch}
-                onChange={event => filterUpdateHandler("mapper", event.currentTarget.value)}
-              />
+                <Title order={5}>Mapper</Title>
+                <TextInput
+                  placeholder="Find mapper name"
+                  mb="md"
+                  w="22.05rem"
+                  icon={<IconSearch size="0.9rem" stroke={1.5} />}
+                  value={mapperSearch}
+                  onChange={(event) =>
+                    filterUpdateHandler("mapper", event.currentTarget.value)
+                  }
+                />
 
-              <MultiSelect
-                clearable
-                mb="md"
-                w="20rem"
-                placeholder="Mods"
-                data={[
-                  { value: "NM", label: "NM" },
-                  { value: "EZ", label: "EZ" },
-                  { value: "NF", label: "NF" },
-                  { value: "HT", label: "HT" },
-                  { value: "HR", label: "HR" },
-                  { value: "SD", label: "SD" },
-                  { value: "PF", label: "PF" },
-                  { value: "DT", label: "DT" },
-                  { value: "NC", label: "NC" },
-                  { value: "HD", label: "HD" },
-                  { value: "FL", label: "FL" },
-                  { value: "SO", label: "SO" },
-                ]}
-                value={modsSearch}
-                onChange={value => filterUpdateHandler("mods", value)}
-              />
+                <Title order={5}>Mods</Title>
+                <MultiSelect
+                  clearable
+                  mb="md"
+                  w="22.05rem"
+                  placeholder="Select mods"
+                  data={[
+                    { value: "NM", label: "NM" },
+                    { value: "EZ", label: "EZ" },
+                    { value: "NF", label: "NF" },
+                    { value: "HT", label: "HT" },
+                    { value: "HR", label: "HR" },
+                    { value: "SD", label: "SD" },
+                    { value: "PF", label: "PF" },
+                    { value: "DT", label: "DT" },
+                    { value: "NC", label: "NC" },
+                    { value: "HD", label: "HD" },
+                    { value: "FL", label: "FL" },
+                    { value: "SO", label: "SO" },
+                  ]}
+                  value={modsSearch}
+                  onChange={(value) => filterUpdateHandler("mods", value)}
+                />
 
-              <NumberInput
-                placeholder="Minimum star rating"
-                mb="md"
-                w="20rem"
-                value={minSRSearch}
-                onChange={value => filterUpdateHandler("minSR", value)}
-              />
+                <Title order={5}>Star rating</Title>
+                <Flex gap={{ base: "sm" }}>
+                  <NumberInput
+                    hideControls
+                    placeholder="Minimum star rating"
+                    mb="md"
+                    w="10rem"
+                    value={minSRSearch}
+                    onChange={(value) => filterUpdateHandler("minSR", value)}
+                  />
 
-              <NumberInput
-                placeholder="Maximum star rating"
-                mb="md"
-                w="20rem"
-                value={maxSRSearch}
-                onChange={value => filterUpdateHandler("maxSR", value)}
-              />
+                  <Title order={3}> - </Title>
 
-              <NumberInput
-                placeholder="Minimum pp"
-                mb="md"
-                w="20rem"
-                value={minPPSearch}
-                onChange={value => filterUpdateHandler("minPP", value)}
-              />
+                  <NumberInput
+                    hideControls
+                    placeholder="Maximum star rating"
+                    mb="md"
+                    w="10rem"
+                    value={maxSRSearch}
+                    onChange={(value) => filterUpdateHandler("maxSR", value)}
+                  />
+                </Flex>
 
-              <NumberInput
-                placeholder="Maximum pp"
-                mb="md"
-                w="20rem"
-                value={maxPPSearch}
-                onChange={value => filterUpdateHandler("maxPP", value)}
-              />
+                <Title order={5}>pp</Title>
+                <Flex gap={{ base: "sm" }}>
+                  <NumberInput
+                    hideControls
+                    placeholder="Minimum pp"
+                    mb="md"
+                    w="10rem"
+                    value={minPPSearch}
+                    onChange={(value) => filterUpdateHandler("minPP", value)}
+                  />
 
-              <NumberInput
-                placeholder="Minimum accuracy"
-                mb="md"
-                w="20rem"
-                value={minAccSearch}
-                onChange={value => filterUpdateHandler("minAcc", value)}
-              />
+                  <Title order={3}> - </Title>
 
-              <NumberInput
-                placeholder="Maximum accuracy"
-                mb="md"
-                w="20rem"
-                value={maxAccSearch}
-                onChange={value => filterUpdateHandler("maxAcc", value)}
-              />
+                  <NumberInput
+                    hideControls
+                    placeholder="Maximum pp"
+                    mb="md"
+                    w="1 0rem"
+                    value={maxPPSearch}
+                    onChange={(value) => filterUpdateHandler("maxPP", value)}
+                  />
+                </Flex>
 
-              <Select
-                clearable
-                placeholder="Rank"
-                mb="md"
-                w="20rem"
-                data={[
-                  { value: "SS", label: "SS" },
-                  { value: "S", label: "S" },
-                  { value: "A", label: "A" },
-                  { value: "B", label: "B" },
-                  { value: "C", label: "C" },
-                  { value: "D", label: "D" },
-                ]}
-                value={rankSearch}
-                onChange={value => filterUpdateHandler("rank", value)}
-              />
+                <Title order={5}>Accuracy</Title>
+                <Flex gap={{ base: "sm" }}>
+                  <NumberInput
+                    hideControls
+                    placeholder="Minimum accuracy"
+                    mb="md"
+                    w="10rem"
+                    value={minAccSearch}
+                    onChange={(value) => filterUpdateHandler("minAcc", value)}
+                  />
+
+                  <Title order={3}> - </Title>
+
+                  <NumberInput
+                    hideControls
+                    placeholder="Maximum accuracy"
+                    mb="md"
+                    w="10rem"
+                    value={maxAccSearch}
+                    onChange={(value) => filterUpdateHandler("maxAcc", value)}
+                  />
+                </Flex>
+
+                <Title order={5}>Rank</Title>
+                <Select
+                  clearable
+                  placeholder="Select rank"
+                  mb="md"
+                  w="22.05rem"
+                  data={[
+                    { value: "SS", label: "SS" },
+                    { value: "S", label: "S" },
+                    { value: "A", label: "A" },
+                    { value: "B", label: "B" },
+                    { value: "C", label: "C" },
+                    { value: "D", label: "D" },
+                  ]}
+                  value={rankSearch}
+                  onChange={(value) => filterUpdateHandler("rank", value)}
+                />
+              </Flex>
             </Drawer>
 
             <Button
