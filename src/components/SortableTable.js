@@ -198,7 +198,6 @@ function sortData(data, payload) {
 }
 
 export default function SortableTable({ rawScoresData, setStatChanges }) {
-
   // ============================================= DATA =============================================
 
   // Manipulates raw score data into a more convenient format
@@ -263,6 +262,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
     rank: rankSearch,
   };
 
+  // Handler for updating the filter
   const filterUpdateHandler = (filterParam, value) => {
     let search;
 
@@ -484,9 +484,11 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
                 <Flex gap={{ base: "sm" }}>
                   <NumberInput
                     hideControls
-                    placeholder="Minimum star rating"
+                    placeholder="Min. star rating"
                     mb="md"
                     w="10rem"
+                    step={0.01}
+                    precision={2}
                     value={minSRSearch}
                     onChange={(value) => filterUpdateHandler("minSR", value)}
                   />
@@ -495,9 +497,11 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
 
                   <NumberInput
                     hideControls
-                    placeholder="Maximum star rating"
+                    placeholder="Max. star rating"
                     mb="md"
                     w="10rem"
+                    step={0.01}
+                    precision={2}
                     value={maxSRSearch}
                     onChange={(value) => filterUpdateHandler("maxSR", value)}
                   />
@@ -507,9 +511,11 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
                 <Flex gap={{ base: "sm" }}>
                   <NumberInput
                     hideControls
-                    placeholder="Minimum pp"
+                    placeholder="Min. pp"
                     mb="md"
                     w="10rem"
+                    step={0.01}
+                    precision={2}
                     value={minPPSearch}
                     onChange={(value) => filterUpdateHandler("minPP", value)}
                   />
@@ -518,9 +524,11 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
 
                   <NumberInput
                     hideControls
-                    placeholder="Maximum pp"
+                    placeholder="Max. pp"
                     mb="md"
-                    w="1 0rem"
+                    w="10rem"
+                    step={0.01}
+                    precision={2}
                     value={maxPPSearch}
                     onChange={(value) => filterUpdateHandler("maxPP", value)}
                   />
@@ -530,9 +538,11 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
                 <Flex gap={{ base: "sm" }}>
                   <NumberInput
                     hideControls
-                    placeholder="Minimum accuracy"
+                    placeholder="Min. accuracy"
                     mb="md"
                     w="10rem"
+                    step={0.01}
+                    precision={2}
                     value={minAccSearch}
                     onChange={(value) => filterUpdateHandler("minAcc", value)}
                   />
@@ -541,9 +551,11 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
 
                   <NumberInput
                     hideControls
-                    placeholder="Maximum accuracy"
+                    placeholder="Max. accuracy"
                     mb="md"
                     w="10rem"
+                    step={0.01}
+                    precision={2}
                     value={maxAccSearch}
                     onChange={(value) => filterUpdateHandler("maxAcc", value)}
                   />
