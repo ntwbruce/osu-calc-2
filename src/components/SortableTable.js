@@ -317,58 +317,6 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
     );
   };
 
-  // Handler for updating map name search state
-  const mapSearchChangeHandler = (event) => {
-    const { value } = event.currentTarget;
-    filterUpdateHandler("map", value);
-  };
-
-  // Handler for updating mapper name search state
-  const mapperSearchChangeHandler = (event) => {
-    const { value } = event.currentTarget;
-    filterUpdateHandler("mapper", value);
-  };
-
-  // Handler for updating minimum pp search state
-  const minPPSearchChangeHandler = (value) => {
-    filterUpdateHandler("minPP", value);
-  };
-
-  // Handler for updating maximum pp search state
-  const maxPPSearchChangeHandler = (value) => {
-    filterUpdateHandler("maxPP", value);
-  };
-
-  // Handler for updating minimum accuracy search state
-  const minAccSearchChangeHandler = (value) => {
-    filterUpdateHandler("minAcc", value);
-  };
-
-  // Handler for updating maximum accuracy search state
-  const maxAccSearchChangeHandler = (value) => {
-    filterUpdateHandler("maxAcc", value);
-  };
-
-  // Handler for updating minimum accuracy search state
-  const minSRSearchChangeHandler = (value) => {
-    filterUpdateHandler("minSR", value);
-  };
-
-  // Handler for updating maximum accuracy search state
-  const maxSRSearchChangeHandler = (value) => {
-    filterUpdateHandler("maxSR", value);
-  };
-
-  // Handler for updating mods search state
-  const modsSearchChangeHandler = (value) => {
-    filterUpdateHandler("mods", value);
-  };
-
-  // Handler for updating rank search state
-  const rankSearchChangeHandler = (value) => {
-    filterUpdateHandler("rank", value);
-  };
-
   // ============================================= SORTING =============================================
 
   // Sorting states
@@ -386,18 +334,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
         sortData(scoresData, {
           sortingParam: field,
           isReverseSorted: false,
-          search: {
-            map: mapSearch,
-            mapper: mapperSearch,
-            minPP: minPPSearch,
-            maxPP: maxPPSearch,
-            minAcc: minAccSearch,
-            maxAcc: maxAccSearch,
-            minSR: minSRSearch,
-            maxSR: maxSRSearch,
-            mods: modsSearch,
-            rank: rankSearch,
-          },
+          search: currentSearchParams,
         })
       );
     }
@@ -410,18 +347,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
       sortData(scoresData, {
         sortingParam,
         isReverseSorted: !isReverseSorted,
-        search: {
-          map: mapSearch,
-          mapper: mapperSearch,
-          minPP: minPPSearch,
-          maxPP: maxPPSearch,
-          minAcc: minAccSearch,
-          maxAcc: maxAccSearch,
-          minSR: minSRSearch,
-          maxSR: maxSRSearch,
-          mods: modsSearch,
-          rank: rankSearch,
-        },
+        search: currentSearchParams,
       })
     );
   };
@@ -507,7 +433,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
                 w="20rem"
                 icon={<IconSearch size="0.9rem" stroke={1.5} />}
                 value={mapSearch}
-                onChange={mapSearchChangeHandler}
+                onChange={event => filterUpdateHandler("map", event.currentTarget.value)}
               />
 
               <TextInput
@@ -516,7 +442,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
                 w="20rem"
                 icon={<IconSearch size="0.9rem" stroke={1.5} />}
                 value={mapperSearch}
-                onChange={mapperSearchChangeHandler}
+                onChange={event => filterUpdateHandler("mapper", event.currentTarget.value)}
               />
 
               <MultiSelect
@@ -539,7 +465,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
                   { value: "SO", label: "SO" },
                 ]}
                 value={modsSearch}
-                onChange={modsSearchChangeHandler}
+                onChange={value => filterUpdateHandler("mods", value)}
               />
 
               <NumberInput
@@ -547,7 +473,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
                 mb="md"
                 w="20rem"
                 value={minSRSearch}
-                onChange={minSRSearchChangeHandler}
+                onChange={value => filterUpdateHandler("minSR", value)}
               />
 
               <NumberInput
@@ -555,7 +481,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
                 mb="md"
                 w="20rem"
                 value={maxSRSearch}
-                onChange={maxSRSearchChangeHandler}
+                onChange={value => filterUpdateHandler("maxSR", value)}
               />
 
               <NumberInput
@@ -563,7 +489,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
                 mb="md"
                 w="20rem"
                 value={minPPSearch}
-                onChange={minPPSearchChangeHandler}
+                onChange={value => filterUpdateHandler("minPP", value)}
               />
 
               <NumberInput
@@ -571,7 +497,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
                 mb="md"
                 w="20rem"
                 value={maxPPSearch}
-                onChange={maxPPSearchChangeHandler}
+                onChange={value => filterUpdateHandler("maxPP", value)}
               />
 
               <NumberInput
@@ -579,7 +505,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
                 mb="md"
                 w="20rem"
                 value={minAccSearch}
-                onChange={minAccSearchChangeHandler}
+                onChange={value => filterUpdateHandler("minAcc", value)}
               />
 
               <NumberInput
@@ -587,7 +513,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
                 mb="md"
                 w="20rem"
                 value={maxAccSearch}
-                onChange={maxAccSearchChangeHandler}
+                onChange={value => filterUpdateHandler("maxAcc", value)}
               />
 
               <Select
@@ -604,7 +530,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
                   { value: "D", label: "D" },
                 ]}
                 value={rankSearch}
-                onChange={rankSearchChangeHandler}
+                onChange={value => filterUpdateHandler("rank", value)}
               />
             </Drawer>
 
