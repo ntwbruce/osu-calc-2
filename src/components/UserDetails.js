@@ -1,4 +1,5 @@
-import { Title, Flex, Image } from "@mantine/core";
+import { Title, Flex, Image, BackgroundImage, Overlay } from "@mantine/core";
+import { useEffect } from "react";
 
 export default function UserDetails({ userData, statChangeData }) {
   const pfp = userData.avatar_url;
@@ -20,37 +21,51 @@ export default function UserDetails({ userData, statChangeData }) {
     : "--";
   const pp = userData.statistics.is_ranked ? userData.statistics.pp : "--";
   const acc = userData.statistics.hit_accuracy;
+  const cover_url = userData.cover_url;
 
   const { ppChange, accChange } = statChangeData;
 
   return (
-    <Flex
-      direction={{ base: "column", sm: "row" }}
-      gap="xl"
-      justify={{ sm: "center" }}
-    >
-      <Image width="15rem" height="15rem" src={pfp} />
+    <BackgroundImage src={cover_url} sx={{ position: "relative" }}>
+      <div
+        style={{
+          backgroundColor: "rgba(0, 0, 0, 0.55)",
+          width: "100%",
+          height: "100%",
+          position: "absolute",
+          top: "0",
+          left: "0",
+          zIndex: "2",
+        }}
+      />
       <Flex
-        direction={{ base: "row", sm: "column" }}
-        gap="md"
+        direction={{ base: "column", sm: "row" }}
+        gap="xl"
         justify={{ sm: "center" }}
       >
-        <Title order={1}>{username}</Title>
-        <Title order={3}>Mode: {playmode}</Title>
-        <Title order={3}>
-          Rank: {global_rank} ({country_code}#{country_rank})
-        </Title>
-        <Title order={3}>
-          PP:{" "}
-          {(Math.round((pp + ppChange) * 100) / 100.0).toFixed(2)}pp 
-          ({(Math.round(ppChange * 100) / 100.0).toFixed(2)}pp)
-        </Title>
-        <Title order={3}>
-          Accuracy:{" "}
-          {`${(acc + Math.round(accChange * 100) / 100).toFixed(2)}% 
+        <Image width="15rem" height="15rem" src={pfp} sx={{ zIndex: "3" }} />
+        <Flex
+          direction={{ base: "row", sm: "column" }}
+          gap="md"
+          justify={{ sm: "center" }}
+          sx={{ zIndex: "3", color: "white" }}
+        >
+          <Title order={1}>{username}</Title>
+          <Title order={3}>Mode: {playmode}</Title>
+          <Title order={3}>
+            Rank: {global_rank} ({country_code}#{country_rank})
+          </Title>
+          <Title order={3}>
+            PP: {(Math.round((pp + ppChange) * 100) / 100.0).toFixed(2)}pp (
+            {(Math.round(ppChange * 100) / 100.0).toFixed(2)}pp)
+          </Title>
+          <Title order={3}>
+            Accuracy:{" "}
+            {`${(acc + Math.round(accChange * 100) / 100).toFixed(2)}% 
           (${accChange > 0 ? "+" : ""}${accChange.toFixed(2)}%)`}
-        </Title>
+          </Title>
+        </Flex>
       </Flex>
-    </Flex>
+    </BackgroundImage>
   );
 }

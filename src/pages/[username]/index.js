@@ -8,11 +8,11 @@ import SortableTable from "@/components/SortableTable";
 import {
   calculateTotalPP,
   calculateTotalPPNoSelection,
-} from "@/lib/PPCalculator";
+} from "@/lib/calculators/PPCalculator";
 import {
   calculateOverallAcc,
   calculateOverallAccNoSelection,
-} from "@/lib/AccCalculator";
+} from "@/lib/calculators/AccCalculator";
 
 export default function UserProfilePage() {
   const router = useRouter();
