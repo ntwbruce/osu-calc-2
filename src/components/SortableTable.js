@@ -264,50 +264,40 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
 
   // Handler for updating the filter
   const filterUpdateHandler = (filterParam, value) => {
-    let search;
-
     switch (filterParam) {
       case "map":
-        setMapSearch(value);
-        search = { ...currentSearchParams, map: value };
+        setMapSearch(value)
         break;
       case "mapper":
         setMapperSearch(value);
-        search = { ...currentSearchParams, mapper: value };
         break;
       case "mods":
         setModsSearch(value);
-        search = { ...currentSearchParams, mods: value };
         break;
       case "minSR":
         setMinSRSearch(value);
-        search = { ...currentSearchParams, minSR: value };
         break;
       case "maxSR":
         setMaxSRSearch(value);
-        search = { ...currentSearchParams, maxSR: value };
         break;
       case "minPP":
         setMinPPSearch(value);
-        search = { ...currentSearchParams, minPP: value };
         break;
       case "maxPP":
         setMaxPPSearch(value);
-        search = { ...currentSearchParams, maxPP: value };
         break;
       case "minAcc":
         setMinAccSearch(value);
-        search = { ...currentSearchParams, minAcc: value };
         break;
       case "maxAcc":
         setMaxAccSearch(value);
-        search = { ...currentSearchParams, maxAcc: value };
         break;
       case "rank":
         setRankSearch(value);
-        search = { ...currentSearchParams, rank: value };
         break;
     }
+
+    const search = { ...currentSearchParams, [filterParam]: value };
 
     setSortedData(
       sortData(scoresData, {
