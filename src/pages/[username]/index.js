@@ -51,7 +51,7 @@ export default function UserProfilePage() {
       setLeaderboardData(response.data);
       setIsLeaderboardDataSet(true);
     } catch (error) {
-      console.log("error fetching leaderboard data: " + error.response.data); 
+      console.log("error fetching leaderboard data: " + error.response.data);
       setLeaderboardData([]);
       setIsLeaderboardDataSet(false);
     }
@@ -100,15 +100,10 @@ export default function UserProfilePage() {
     }
   }, [router.isReady, authTokenPresent]);
 
-  // ============================================= SCORE DATA FETCHING =============================================
+  // ============================================= BEST SCORES DATA FETCHING =============================================
 
   const [bestScoresData, setBestScoresData] = useState({});
   const [isBestScoresDataSet, setIsBestScoresDataSet] = useState(false);
-  const [isShowingBestScores, setIsShowingBestScores] = useState(true);
-
-  const [recentScoresData, setRecentScoresData] = useState({});
-  const [isRecentScoresDataSet, setIsRecentScoresDataSet] = useState(false);
-  const [isShowingRecentScores, setIsShowingRecentScores] = useState(false);
 
   async function fetchBestScoresDataHandler() {
     try {
@@ -133,38 +128,6 @@ export default function UserProfilePage() {
     }
   }, [isUserDataSet]);
 
-  // * Disable score selection buttons and recent score logic, implementing seperate pages for best and recent scores later
-
-  // async function fetchRecentScoresDataHandler() {
-  //   try {
-  //     const response = (
-  //       await axios.get(
-  //         `/api/users/${userData.id}/scores/recent?include_fails=1&limit=100`
-  //       )
-  //     ).data;
-  //     setRecentScoresData(response.data);
-  //     setIsRecentScoresDataSet(true);
-  //   } catch (error) {
-  //     console.log("error fetching score data: " + error.response.data);
-  //     setRecentScoresData([]);
-  //     setIsRecentScoresDataSet(false);
-  //   }
-  // }
-
-  // const fetchBestScoresButtonHandler = (event) => {
-  //   event.preventDefault();
-  //   fetchBestScoresDataHandler();
-  //   setIsShowingBestScores(!isShowingBestScores);
-  //   setIsShowingRecentScores(false);
-  // };
-
-  // const fetchRecentScoresButtonHandler = (event) => {
-  //   event.preventDefault();
-  //   fetchRecentScoresDataHandler();
-  //   setIsShowingRecentScores(!isShowingRecentScores);
-  //   setIsShowingBestScores(false);
-  // };
-
   // ============================================= STAT CHANGE HANDLING =============================================
 
   const [statChangeData, setStatChangeData] = useState({
@@ -186,7 +149,9 @@ export default function UserProfilePage() {
       setStatChangeData({
         ppChange: ppChange,
         accChange: calculateOverallAcc(accValues, selection) - baseOverallAcc,
-        rankChange: baseRank - calculateRank(userData.statistics.pp + ppChange, rankValues)
+        rankChange:
+          baseRank -
+          calculateRank(userData.statistics.pp + ppChange, rankValues),
       });
     }
   };
@@ -202,18 +167,22 @@ export default function UserProfilePage() {
       setAccValues(accValues);
       setBaseOverallAcc(calculateOverallAccNoSelection(accValues));
 
-      const globalValues = leaderboardData.globalLeaderboardData.map(player => {
-        return { 
-          pp: player.pp, 
-          rank: player.global_rank
+      const globalValues = leaderboardData.globalLeaderboardData.map(
+        (player) => {
+          return {
+            pp: player.pp,
+            rank: player.global_rank,
+          };
         }
-      });
-      const countryValues = leaderboardData.countryLeaderboardData.map(player => {
-        return { 
-          pp: player.pp, 
-          rank: player.global_rank
+      );
+      const countryValues = leaderboardData.countryLeaderboardData.map(
+        (player) => {
+          return {
+            pp: player.pp,
+            rank: player.global_rank,
+          };
         }
-      });
+      );
       setRankValues({ globalValues, countryValues });
       setBaseRank(userData.statistics.global_rank);
 
@@ -241,47 +210,13 @@ export default function UserProfilePage() {
           </>
         )}
 
-        <Flex
-          direction={{ base: "column", sm: "row" }}
-          gap={{ base: "sm", sm: "xl" }}
-          justify={{ sm: "center" }}
-        >
-          {isUserDataSet && (
-            <Button
-              variant={isShowingBestScores ? "filled" : "outline"}
-            >
-              Best Scores
-            </Button>
-          )}
-
-          {isUserDataSet && (
-            <Button
-              variant={isShowingRecentScores ? "filled" : "outline"}
-            >
-              Recent Scores
-            </Button>
-          )}
-        </Flex>
-
-        {isUserDataSet && isBestScoresDataSet && isShowingBestScores && areStatChangeValuesSet && (
+        {isUserDataSet && isBestScoresDataSet && areStatChangeValuesSet && (
           <>
             <Title order={1} align="center">
               Best Scores
             </Title>
             <SortableTable
               rawScoresData={bestScoresData}
-              setStatChanges={statChangeHandler}
-            />
-          </>
-        )}
-
-        {isUserDataSet && isRecentScoresDataSet && isShowingRecentScores && (
-          <>
-            <Title order={1} align="center">
-              Recent Scores
-            </Title>
-            <SortableTable
-              rawScoresData={recentScoresData}
               setStatChanges={statChangeHandler}
             />
           </>
