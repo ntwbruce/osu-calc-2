@@ -13,6 +13,7 @@ import {
   calculateOverallAcc,
   calculateOverallAccNoSelection,
 } from "@/lib/calculators/AccCalculator";
+import { calculateRank } from "@/lib/calculators/RankCalculator";
 
 export default function UserProfilePage() {
   const router = useRouter();
@@ -34,12 +35,18 @@ export default function UserProfilePage() {
   const [statChangeData, setStatChangeData] = useState({
     ppChange: 0,
     accChange: 0,
+    rankChange: 0,
   });
   const [PPValues, setPPValues] = useState([]);
   const [baseRawPPValue, setBaseRawPPValue] = useState(0);
   const [accValues, setAccValues] = useState([]);
   const [baseOverallAcc, setBaseOverallAcc] = useState(0);
-  const [arePPAccValuesSet, setArePPAccValuesSet] = useState(false);
+  const [rankValues, setRankValues] = useState([]);
+  const [baseRank, setBaseRank] = useState(0);
+  const [areStatChangeValuesSet, setAreStatChangeValuesSet] = useState(false);
+
+  const [leaderboardData, setLeaderboardData] = useState({});
+  const [isLeaderboardDataSet, setIsLeaderboardDataSet] = useState(false);
 
   // * Fetch oauth token on homepage initialisation (runs upon new page reload)
   async function fetchAuthToken() {
@@ -84,6 +91,7 @@ export default function UserProfilePage() {
     if (router.isReady && authTokenPresent) {
       // wait for router to obtain username before querying user data, as well as waiting for a authToken to be present
       fetchUserDataHandler(router.query.username);
+      fetchLeaderboardDataHandler();
     }
   }, [router.isReady, authTokenPresent]);
 
@@ -94,12 +102,8 @@ export default function UserProfilePage() {
           `/api/users/${userData.id}/scores/best?limit=${userData.scores_best_count}`
         )
       ).data;
-
       setBestScoresData(response.data);
       setIsBestScoresDataSet(true);
-
-      // console.log("fetch best scores success");
-      // console.log(score_data);
     } catch (error) {
       console.log("error fetching best scores: " + error.response.data);
       setBestScoresData([]);
@@ -114,15 +118,24 @@ export default function UserProfilePage() {
           `/api/users/${userData.id}/scores/recent?include_fails=1&limit=100`
         )
       ).data;
-
-      // console.log(response.data);
       setRecentScoresData(response.data);
       setIsRecentScoresDataSet(true);
     } catch (error) {
       console.log("error fetching score data: " + error.response.data);
-
       setRecentScoresData([]);
       setIsRecentScoresDataSet(false);
+    }
+  }
+
+  async function fetchLeaderboardDataHandler() {
+    try {
+      const response = (await axios.get(`/api/rankings`)).data;
+      setLeaderboardData(response.data);
+      setIsLeaderboardDataSet(true);
+    } catch (error) {
+      console.log("error fetching leaderboard data: " + error.response.data); 
+      setLeaderboardData([]);
+      setIsLeaderboardDataSet(false);
     }
   }
 
@@ -145,10 +158,12 @@ export default function UserProfilePage() {
   };
 
   const statChangeHandler = (selection) => {
-    if (arePPAccValuesSet) {
+    if (areStatChangeValuesSet) {
+      const ppChange = calculateTotalPP(PPValues, selection) - baseRawPPValue;
       setStatChangeData({
-        ppChange: calculateTotalPP(PPValues, selection) - baseRawPPValue,
+        ppChange: ppChange,
         accChange: calculateOverallAcc(accValues, selection) - baseOverallAcc,
+        rankChange: baseRank - calculateRank(userData.statistics.pp + ppChange, rankValues)
       });
     }
   };
@@ -163,9 +178,29 @@ export default function UserProfilePage() {
       setAccValues(accValues);
       setBaseOverallAcc(calculateOverallAccNoSelection(accValues));
 
-      setArePPAccValuesSet(true);
+      setAreStatChangeValuesSet(true);
     }
   }, [isUserDataSet, isBestScoresDataSet]);
+
+  useEffect(() => {
+    if (isUserDataSet && isLeaderboardDataSet) {
+      setRankValues({ 
+        global: leaderboardData.globalLeaderboardData.map(player => {
+          return { 
+            pp: player.pp, 
+            rank: player.global_rank
+          }
+        }),
+        country: leaderboardData.countryLeaderboardData.map(player => {
+          return { 
+            pp: player.pp, 
+            rank: player.global_rank
+          }
+        })
+      });
+      setBaseRank(userData.statistics.global_rank);
+    }
+  }, [isUserDataSet, isLeaderboardDataSet]);
 
   return (
     <>
@@ -181,10 +216,7 @@ export default function UserProfilePage() {
         {authTokenPresent && isUserDataSet && (
           <>
             <Button onClick={homeRedirectHandler}>reset</Button>
-            <UserDetails
-              userData={userData}
-              statChangeData={statChangeData}
-            />
+            <UserDetails userData={userData} statChangeData={statChangeData} />
           </>
         )}
 
@@ -208,6 +240,15 @@ export default function UserProfilePage() {
               onClick={fetchRecentScoresButtonHandler}
             >
               Recent Scores
+            </Button>
+          )}
+
+          {isUserDataSet && (
+            <Button
+              variant={isShowingRecentScores ? "filled" : "outline"}
+              onClick={fetchLeaderboardDataHandler}
+            >
+              Leaderboard
             </Button>
           )}
         </Flex>
