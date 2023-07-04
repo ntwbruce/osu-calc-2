@@ -1,7 +1,7 @@
 // Calculate estimated new rank based on given pp value.
 export const calculateRank = (pp, data) => {
-    const { global, country } = data;
-    const leaderboardInUse = pp < global[9999].pp ? country : global;
+    const { globalValues, countryValues } = data;
+    const leaderboardInUse = pp < globalValues[9999].pp ? countryValues : globalValues;
 
     let min = 0;
     let max = 9999;
