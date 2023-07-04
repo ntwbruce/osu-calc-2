@@ -23,7 +23,7 @@ export default function UserDetails({ userData, statChangeData }) {
   const acc = userData.statistics.hit_accuracy;
   const cover_url = userData.cover_url;
 
-  const { ppChange, accChange } = statChangeData;
+  const { ppChange, accChange, rankChange } = statChangeData;
 
   return (
     <BackgroundImage src={cover_url} sx={{ position: "relative" }}>
@@ -53,7 +53,7 @@ export default function UserDetails({ userData, statChangeData }) {
           <Title order={1}>{username}</Title>
           <Title order={3}>Mode: {playmode}</Title>
           <Title order={3}>
-            Rank: {global_rank} ({country_code}#{country_rank})
+            Rank: {global_rank - rankChange} ({rankChange > 0 ? "+" : ""}{rankChange}) 
           </Title>
           <Title order={3}>
             PP: {(Math.round((pp + ppChange) * 100) / 100.0).toFixed(2)}pp (
