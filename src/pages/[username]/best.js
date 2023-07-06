@@ -222,7 +222,7 @@ export default function UserBestScoresPage() {
           <UserDetails userData={userData} statChangeData={statChangeData} />
         )}
 
-        {isUserDataSet && isBestScoresDataSet && areStatChangeValuesSet && (
+        {isUserDataSet && isBestScoresDataSet && (
           <>
             <Title order={1} align="center">
               Best Scores
@@ -231,6 +231,7 @@ export default function UserBestScoresPage() {
               rawScoresData={bestScoresData}
               setStatChanges={statChangeHandler}
               toggleStatChanges={toggleStatChangeHandler}
+              isStatChangeReady={areStatChangeValuesSet}
             />
           </>
         )}

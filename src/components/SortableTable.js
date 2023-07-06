@@ -18,6 +18,7 @@ import {
   NumberInput,
   Drawer,
   MultiSelect,
+  Loader,
 } from "@mantine/core";
 import {
   IconSelector,
@@ -201,6 +202,7 @@ export default function SortableTable({
   rawScoresData,
   setStatChanges,
   toggleStatChanges,
+  isStatChangeReady,
 }) {
   // ============================================= DATA =============================================
 
@@ -372,8 +374,8 @@ export default function SortableTable({
 
   const showSelectionHandler = () => {
     toggleStatChanges();
-    setShowSelection(isShowing => !isShowing);
-  }
+    setShowSelection((isShowing) => !isShowing);
+  };
 
   // ============================================= ROW CONVERSION =============================================
 
@@ -398,7 +400,7 @@ export default function SortableTable({
       <td>{(Math.round(row.pp * 100) / 100).toFixed(2)}</td>
       <td>{(row.acc * 100).toFixed(2)}</td>
       <td>{row.rank}</td>
-      {showSelection && 
+      {showSelection && (
         <td>
           <Checkbox
             checked={selection[row.index]}
@@ -406,7 +408,7 @@ export default function SortableTable({
             transitionDuration={0}
           />
         </td>
-      }
+      )}
     </tr>
   ));
 
@@ -626,7 +628,23 @@ export default function SortableTable({
             justify={{ sm: "center" }}
             align="center"
           >
-            <Button variant={showSelection ? "outline" : "filled"} onClick={showSelectionHandler}>Delete Scores</Button>
+            {isStatChangeReady ? (
+              <Button
+                variant={showSelection ? "outline" : "filled"}
+                onClick={showSelectionHandler}
+              >
+                Delete Scores
+              </Button>
+            ) : (
+              <Button
+                data-disabled
+                variant="outline"
+                onClick={showSelectionHandler}
+                rightIcon={<Loader size="sm" color="dark" />}
+              >
+                Delete Scores
+              </Button>
+            )}
           </Flex>
         </Flex>
 
