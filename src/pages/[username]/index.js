@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import UserDetails from "@/components/UserDetails";
 import axios from "axios";
-import { Button, Title, Flex } from "@mantine/core";
+import { Button, Title, Flex, Center } from "@mantine/core";
 import Head from "next/head";
 import SortableTable from "@/components/SortableTable";
 import {
@@ -38,31 +38,6 @@ export default function UserProfilePage() {
   useEffect(() => {
     fetchAuthToken();
   }, []);
-
-  // ============================================= LEADERBOARD DATA FETCHING =============================================
-  // ! This should eventually be moved to somewhere where it persists across the site's lifetime rather than re-fetched every time a user page is (re)loaded
-
-  const [leaderboardData, setLeaderboardData] = useState({});
-  const [isLeaderboardDataSet, setIsLeaderboardDataSet] = useState(false);
-
-  async function fetchLeaderboardDataHandler() {
-    try {
-      const response = (await axios.get(`/api/rankings`)).data;
-      setLeaderboardData(response.data);
-      setIsLeaderboardDataSet(true);
-    } catch (error) {
-      console.log("error fetching leaderboard data: " + error.response.data);
-      setLeaderboardData([]);
-      setIsLeaderboardDataSet(false);
-    }
-  }
-
-  // * Fetch leaderboard data upon user page initialisation
-  useEffect(() => {
-    if (authTokenPresent) {
-      fetchLeaderboardDataHandler();
-    }
-  }, [authTokenPresent]);
 
   // ============================================= USER DATA FETCHING =============================================
 
@@ -100,96 +75,6 @@ export default function UserProfilePage() {
     }
   }, [router.isReady, authTokenPresent]);
 
-  // ============================================= BEST SCORES DATA FETCHING =============================================
-
-  const [bestScoresData, setBestScoresData] = useState({});
-  const [isBestScoresDataSet, setIsBestScoresDataSet] = useState(false);
-
-  async function fetchBestScoresDataHandler() {
-    try {
-      const response = (
-        await axios.get(
-          `/api/users/${userData.id}/scores/best?limit=${userData.scores_best_count}`
-        )
-      ).data;
-      setBestScoresData(response.data);
-      setIsBestScoresDataSet(true);
-    } catch (error) {
-      console.log("error fetching best scores: " + error.response.data);
-      setBestScoresData([]);
-      setIsBestScoresDataSet(false);
-    }
-  }
-
-  // * Fetch best score data
-  useEffect(() => {
-    if (isUserDataSet) {
-      fetchBestScoresDataHandler();
-    }
-  }, [isUserDataSet]);
-
-  // ============================================= STAT CHANGE HANDLING =============================================
-
-  const [statChangeData, setStatChangeData] = useState({
-    ppChange: 0,
-    accChange: 0,
-    rankChange: 0,
-  });
-  const [PPValues, setPPValues] = useState([]);
-  const [baseRawPPValue, setBaseRawPPValue] = useState(0);
-  const [accValues, setAccValues] = useState([]);
-  const [baseOverallAcc, setBaseOverallAcc] = useState(0);
-  const [rankValues, setRankValues] = useState([]);
-  const [baseRank, setBaseRank] = useState(0);
-  const [areStatChangeValuesSet, setAreStatChangeValuesSet] = useState(false);
-
-  const statChangeHandler = (selection) => {
-    if (areStatChangeValuesSet) {
-      const ppChange = calculateTotalPP(PPValues, selection) - baseRawPPValue;
-      setStatChangeData({
-        ppChange: ppChange,
-        accChange: calculateOverallAcc(accValues, selection) - baseOverallAcc,
-        rankChange:
-          baseRank -
-          calculateRank(userData.statistics.pp + ppChange, rankValues),
-      });
-    }
-  };
-
-  // * Set values for pp, acc and rank calculation once user data, leaderboard data, and best score data are available
-  useEffect(() => {
-    if (isUserDataSet && isBestScoresDataSet && isLeaderboardDataSet) {
-      const ppValues = bestScoresData.map((score) => score.pp);
-      setPPValues(ppValues);
-      setBaseRawPPValue(calculateTotalPPNoSelection(ppValues));
-
-      const accValues = bestScoresData.map((score) => score.accuracy);
-      setAccValues(accValues);
-      setBaseOverallAcc(calculateOverallAccNoSelection(accValues));
-
-      const globalValues = leaderboardData.globalLeaderboardData.map(
-        (player) => {
-          return {
-            pp: player.pp,
-            rank: player.global_rank,
-          };
-        }
-      );
-      const countryValues = leaderboardData.countryLeaderboardData.map(
-        (player) => {
-          return {
-            pp: player.pp,
-            rank: player.global_rank,
-          };
-        }
-      );
-      setRankValues({ globalValues, countryValues });
-      setBaseRank(userData.statistics.global_rank);
-
-      setAreStatChangeValuesSet(true);
-    }
-  }, [isUserDataSet, isBestScoresDataSet, isLeaderboardDataSet]);
-
   // ============================================= OUTPUT =============================================
 
   return (
@@ -203,22 +88,29 @@ export default function UserProfilePage() {
         gap={{ base: "sm", sm: "md" }}
         justify={{ sm: "center" }}
       >
-        {authTokenPresent && isUserDataSet && (
-          <>
-            <Button onClick={() => router.push("/")}>reset</Button>
-            <UserDetails userData={userData} statChangeData={statChangeData} />
-          </>
+        {authTokenPresent && (
+          <Button onClick={() => router.push("/")}>reset</Button>
         )}
 
-        {isUserDataSet && isBestScoresDataSet && areStatChangeValuesSet && (
+        {authTokenPresent && isUserDataSet && (
           <>
-            <Title order={1} align="center">
-              Best Scores
-            </Title>
-            <SortableTable
-              rawScoresData={bestScoresData}
-              setStatChanges={statChangeHandler}
+            <UserDetails
+              userData={userData}
+              statChangeData={{
+                ppChange: 0,
+                accChange: 0,
+                rankChange: 0,
+                showChanges: false,
+              }}
             />
+            <Center>
+              <Button
+                onClick={() => router.push(`/${router.query.username}/best`)}
+                w="25%"
+              >
+                Best Scores
+              </Button>
+            </Center>
           </>
         )}
 
