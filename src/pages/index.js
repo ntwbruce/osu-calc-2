@@ -7,10 +7,6 @@ import Link from "next/link";
 export default function HomePage() {
   const router = useRouter();
 
-  function userPageRedirectHandler(username) {
-    router.push(`/${username}`);
-  }
-
   const link1 = "https://www.youtube.com/watch?v=3d_l_Kyb5GM";
   const link2 = "https://www.youtube.com/watch?v=NY0ffyEu6uo";
 
@@ -19,7 +15,7 @@ export default function HomePage() {
       <Head>
         <title>silver wolf cheese slap meme</title>
       </Head>
-      <Link href={Math.random() > 0.6 ? link1 : link2} target="_blank">
+      <Link href={Math.random() > 0.8 ? link1 : link2} target="_blank">
         <Button type="button">I'm feeling lucky (viewer discretion)</Button>
       </Link>
       <Flex
@@ -30,7 +26,7 @@ export default function HomePage() {
         <Title order={1} align="center">
           le osu game a la peppy
         </Title>
-        <UsernameForm onSubmit={userPageRedirectHandler} />
+        <UsernameForm onSubmit={username => router.push(`/${username}`)} />
       </Flex>
     </>
   );

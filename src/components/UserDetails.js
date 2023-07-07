@@ -1,5 +1,4 @@
-import { Title, Flex, Image, BackgroundImage, Overlay } from "@mantine/core";
-import { useEffect } from "react";
+import { Title, Flex, Image, BackgroundImage } from "@mantine/core";
 
 export default function UserDetails({ userData, statChangeData }) {
   const pfp = userData.avatar_url;
@@ -23,7 +22,7 @@ export default function UserDetails({ userData, statChangeData }) {
   const acc = userData.statistics.hit_accuracy;
   const cover_url = userData.cover_url;
 
-  const { ppChange, accChange, rankChange } = statChangeData;
+  const { ppChange, accChange, rankChange, showChanges } = statChangeData;
 
   return (
     <BackgroundImage src={cover_url} sx={{ position: "relative" }}>
@@ -53,16 +52,16 @@ export default function UserDetails({ userData, statChangeData }) {
           <Title order={1}>{username}</Title>
           <Title order={3}>Mode: {playmode}</Title>
           <Title order={3}>
-            Rank: {global_rank - rankChange} ({rankChange > 0 ? "+" : ""}{rankChange}) 
+            Rank: {showChanges ? global_rank - rankChange : global_rank}{" "}
+            {showChanges ? `(${rankChange > 0 ? "+" : ""}${rankChange})` : ""}
           </Title>
           <Title order={3}>
-            PP: {(Math.round((pp + ppChange) * 100) / 100.0).toFixed(2)}pp (
-            {(Math.round(ppChange * 100) / 100.0).toFixed(2)}pp)
+            PP: {showChanges ? (Math.round((pp + ppChange) * 100) / 100.0).toFixed(2) : pp.toFixed(2)}pp{" "}
+            {showChanges ? `(${(Math.round(ppChange * 100) / 100.0).toFixed(2)}pp)` : ""}
           </Title>
           <Title order={3}>
-            Accuracy:{" "}
-            {`${(acc + Math.round(accChange * 100) / 100).toFixed(2)}% 
-          (${accChange > 0 ? "+" : ""}${accChange.toFixed(2)}%)`}
+            Accuracy: {showChanges ? `${(acc + Math.round(accChange * 100) / 100).toFixed(2)}` : acc.toFixed(2)}%{" "}
+            {showChanges ? `(${accChange > 0 ? "+" : ""}${accChange.toFixed(2)}%)` : ""}
           </Title>
         </Flex>
       </Flex>

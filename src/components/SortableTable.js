@@ -18,6 +18,7 @@ import {
   NumberInput,
   Drawer,
   MultiSelect,
+  Loader,
 } from "@mantine/core";
 import {
   IconSelector,
@@ -197,7 +198,12 @@ function sortData(data, payload) {
   );
 }
 
-export default function SortableTable({ rawScoresData, setStatChanges }) {
+export default function SortableTable({
+  rawScoresData,
+  setStatChanges,
+  toggleStatChanges,
+  isStatChangeReady,
+}) {
   // ============================================= DATA =============================================
 
   // Manipulates raw score data into a more convenient format
@@ -266,7 +272,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
   const filterUpdateHandler = (filterParam, value) => {
     switch (filterParam) {
       case "map":
-        setMapSearch(value)
+        setMapSearch(value);
         break;
       case "mapper":
         setMapperSearch(value);
@@ -350,6 +356,8 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
     new Array(sortedData.length).fill(false)
   );
 
+  const [showSelection, setShowSelection] = useState(false);
+
   // Recalculate stats and update stat changes context every time selection array is changed
   useEffect(() => {
     setStatChanges(selection);
@@ -362,6 +370,11 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
         index === selectedIndex ? !curr : curr
       )
     );
+  };
+
+  const showSelectionHandler = () => {
+    toggleStatChanges();
+    setShowSelection((isShowing) => !isShowing);
   };
 
   // ============================================= ROW CONVERSION =============================================
@@ -387,13 +400,15 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
       <td>{(Math.round(row.pp * 100) / 100).toFixed(2)}</td>
       <td>{(row.acc * 100).toFixed(2)}</td>
       <td>{row.rank}</td>
-      <td>
-        <Checkbox
-          checked={selection[row.index]}
-          onChange={() => rowSelectionToggleHandler(row.index)}
-          transitionDuration={0}
-        />
-      </td>
+      {showSelection && (
+        <td>
+          <Checkbox
+            checked={selection[row.index]}
+            onChange={() => rowSelectionToggleHandler(row.index)}
+            transitionDuration={0}
+          />
+        </td>
+      )}
     </tr>
   ));
 
@@ -572,7 +587,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
             </Drawer>
 
             <Button
-              variant="outline"
+              variant={isFilterOpened ? "outline" : "filled"}
               onClick={open}
               leftIcon={<IconFilter size={20} />}
             >
@@ -605,6 +620,31 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
             <Button color="grape" onClick={reverseSortHandler}>
               {isReverseSorted ? <IconSortAscending /> : <IconSortDescending />}
             </Button>
+          </Flex>
+
+          <Flex
+            direction={{ base: "column", sm: "row" }}
+            gap={{ base: "sm", sm: "lg" }}
+            justify={{ sm: "center" }}
+            align="center"
+          >
+            {isStatChangeReady ? (
+              <Button
+                variant={showSelection ? "outline" : "filled"}
+                onClick={showSelectionHandler}
+              >
+                Delete Scores
+              </Button>
+            ) : (
+              <Button
+                data-disabled
+                variant="outline"
+                onClick={showSelectionHandler}
+                rightIcon={<Loader size="sm" color="dark" />}
+              >
+                Delete Scores
+              </Button>
+            )}
           </Flex>
         </Flex>
 
@@ -681,7 +721,7 @@ export default function SortableTable({ rawScoresData, setStatChanges }) {
               >
                 Rank
               </Th>
-              <th>Delete</th>
+              {showSelection && <th>Delete</th>}
             </tr>
           </thead>
           <tbody>

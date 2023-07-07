@@ -2,11 +2,12 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import UserDetails from "@/components/UserDetails";
 import axios from "axios";
-import { Button, Title, Flex, Loader, Paper, Center } from "@mantine/core";
+import { Button, Title, Flex, Center, Paper, Loader } from "@mantine/core";
 import Head from "next/head";
-import { IconZoomQuestion } from "@tabler/icons-react";
+import SortableTable from "@/components/SortableTable";
+import { IconHammer } from "@tabler/icons-react";
 
-export default function UserProfilePage() {
+export default function UserRecentScoresPage() {
   const router = useRouter();
 
   // ============================================= AUTH TOKEN FETCHING =============================================
@@ -80,6 +81,9 @@ export default function UserProfilePage() {
       >
         {authTokenPresent && (
           <Flex gap={{ base: "sm" }} justify={{ sm: "center" }}>
+            <Button onClick={() => router.back()} w="25%">
+              Back
+            </Button>
             <Button onClick={() => router.push("/")} w="25%">
               Reset
             </Button>
@@ -87,39 +91,23 @@ export default function UserProfilePage() {
         )}
 
         {authTokenPresent && isUserDataSet && (
-          <>
-            <UserDetails
-              userData={userData}
-              statChangeData={{
-                ppChange: 0,
-                accChange: 0,
-                rankChange: 0,
-                showChanges: false,
-              }}
-            />
-            <Flex
-              direction={{ base: "column", sm: "row" }}
-              gap={{ base: "sm", sm: "md" }}
-              justify={{ sm: "center" }}
-            >
-              <Button
-                onClick={() => router.push(`/${router.query.username}/best`)}
-                w="25%"
-              >
-                Best Scores
-              </Button>
-              <Button
-                onClick={() => router.push(`/${router.query.username}/recent`)}
-                w="25%"
-              >
-                Recent Scores
-              </Button>
-            </Flex>
-          </>
+          <UserDetails
+            userData={userData}
+            statChangeData={{
+              ppChange: 0,
+              accChange: 0,
+              rankChange: 0,
+              showChanges: false,
+            }}
+          />
         )}
 
-        {!isUserDataSet && doesUserExist && (
-          <Center>
+        {isUserDataSet && (
+          <>
+            <Title order={1} align="center">
+              Recent Scores
+            </Title>
+            <Center>
             <Paper w="50%" p="md" radius="md">
               <Flex
                 direction={{ base: "row", sm: "column" }}
@@ -127,11 +115,14 @@ export default function UserProfilePage() {
                 justify={{ sm: "center" }}
                 align={"center"}
               >
-                <Loader size={60} />
-                <Title order={2}>Loading profile...</Title>
+                <IconHammer size={60} />
+              <Title order={2} align="center">
+                Work in progress, come back later!
+              </Title>
               </Flex>
             </Paper>
           </Center>
+          </>
         )}
 
         {!doesUserExist && (
