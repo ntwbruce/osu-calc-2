@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import UserDetails from "@/components/UserDetails";
 import axios from "axios";
-import { Button, Title, Flex } from "@mantine/core";
+import { Button, Title, Flex, Loader, Paper, Center } from "@mantine/core";
 import Head from "next/head";
 import SortableTable from "@/components/SortableTable";
 import {
@@ -15,7 +15,6 @@ import {
 } from "@/lib/calculators/AccCalculator";
 import { calculateRank } from "@/lib/calculators/RankCalculator";
 
-// * Life cycle: get auth token (persists, refresh daily) --> get leaderboard data (persists, refresh daily) --> get user data --> get best/recent scores data
 export default function UserBestScoresPage() {
   const router = useRouter();
 
@@ -144,28 +143,29 @@ export default function UserBestScoresPage() {
   const [baseRank, setBaseRank] = useState(0);
   const [areStatChangeValuesSet, setAreStatChangeValuesSet] = useState(false);
 
-
   const statChangeHandler = (selection) => {
     if (areStatChangeValuesSet) {
       const ppChange = calculateTotalPP(PPValues, selection) - baseRawPPValue;
-      setStatChangeData(statChangeData => {
+      setStatChangeData((statChangeData) => {
         return {
           ...statChangeData,
           ppChange: ppChange,
           accChange: calculateOverallAcc(accValues, selection) - baseOverallAcc,
-          rankChange: baseRank - calculateRank(userData.statistics.pp + ppChange, rankValues),
-        }
+          rankChange:
+            baseRank -
+            calculateRank(userData.statistics.pp + ppChange, rankValues),
+        };
       });
     }
   };
 
   const toggleStatChangeHandler = () => {
     if (areStatChangeValuesSet) {
-      setStatChangeData(statChangeData => {
-        return {...statChangeData, showChanges: !statChangeData.showChanges}
+      setStatChangeData((statChangeData) => {
+        return { ...statChangeData, showChanges: !statChangeData.showChanges };
       });
     }
-  }
+  };
 
   // * Set values for pp, acc and rank calculation once user data, leaderboard data, and best score data are available
   useEffect(() => {
@@ -215,7 +215,14 @@ export default function UserBestScoresPage() {
         justify={{ sm: "center" }}
       >
         {authTokenPresent && (
-          <Button onClick={() => router.back()}>back</Button>
+          <Flex gap={{ base: "sm" }} justify={{ sm: "center" }}>
+            <Button onClick={() => router.back()} w="25%">
+              Back
+            </Button>
+            <Button onClick={() => router.push("/")} w="25%">
+              Reset
+            </Button>
+          </Flex>
         )}
 
         {authTokenPresent && isUserDataSet && (
@@ -236,7 +243,53 @@ export default function UserBestScoresPage() {
           </>
         )}
 
-        {!doesUserExist && <Title order={2}>Profile does not exist.</Title>}
+        {!isUserDataSet && doesUserExist && (
+          <Center>
+            <Paper w="50%" p="md" radius="md">
+              <Flex
+                direction={{ base: "row", sm: "column" }}
+                gap={{ base: "md" }}
+                justify={{ sm: "center" }}
+                align={"center"}
+              >
+                <Loader size={60} />
+                <Title order={2}>Loading profile...</Title>
+              </Flex>
+            </Paper>
+          </Center>
+        )}
+
+        {!isBestScoresDataSet && doesUserExist && (
+          <Center>
+            <Paper w="50%" p="md" radius="md">
+              <Flex
+                direction={{ base: "row", sm: "column" }}
+                gap={{ base: "md" }}
+                justify={{ sm: "center" }}
+                align={"center"}
+              >
+                <Loader size={60} />
+                <Title order={2}>Loading scores...</Title>
+              </Flex>
+            </Paper>
+          </Center>
+        )}
+
+        {!doesUserExist && (
+          <Center>
+            <Paper w="50%" p="md" radius="md">
+              <Flex
+                direction={{ base: "row", sm: "column" }}
+                gap={{ base: "md" }}
+                justify={{ sm: "center" }}
+                align={"center"}
+              >
+                <IconZoomQuestion size={60} />
+                <Title order={2}>Profile does not exist.</Title>
+              </Flex>
+            </Paper>
+          </Center>
+        )}
       </Flex>
     </>
   );
