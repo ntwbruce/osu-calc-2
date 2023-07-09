@@ -6,6 +6,7 @@ import { Button, Title, Flex, Center, Paper, Loader } from "@mantine/core";
 import Head from "next/head";
 import SortableTable from "@/components/SortableTable";
 import { IconHammer } from "@tabler/icons-react";
+import { HeaderBar } from "@/components/HeaderBar";
 
 export default function UserRecentScoresPage() {
   const router = useRouter();
@@ -74,22 +75,21 @@ export default function UserRecentScoresPage() {
         <title>silver wolf cheese slap meme</title>
       </Head>
 
+      <HeaderBar
+        pages={[
+          { label: "Profile", link: `/${router.query.username}` },
+          { label: "Best Scores", link: `/${router.query.username}/best` },
+          { label: "Recent Scores", link: `/${router.query.username}/recent` },
+        ]}
+        home={{ label: "Check another profile", link: "/" }}
+        currPage="Recent Scores"
+      />
+
       <Flex
         direction={{ base: "row", sm: "column" }}
         gap={{ base: "sm", sm: "md" }}
         justify={{ sm: "center" }}
       >
-        {authTokenPresent && (
-          <Flex gap={{ base: "sm" }} justify={{ sm: "center" }}>
-            <Button onClick={() => router.back()} w="25%">
-              Back
-            </Button>
-            <Button onClick={() => router.push("/")} w="25%">
-              Reset
-            </Button>
-          </Flex>
-        )}
-
         {authTokenPresent && isUserDataSet && (
           <UserDetails
             userData={userData}
