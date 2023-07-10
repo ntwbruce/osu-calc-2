@@ -4,7 +4,7 @@ import UserDetails from "@/components/UserDetails";
 import axios from "axios";
 import { Title, Flex, Center, Paper } from "@mantine/core";
 import Head from "next/head";
-import { IconHammer } from "@tabler/icons-react";
+import { IconHammer, IconZoomQuestion } from "@tabler/icons-react";
 import { HeaderBar } from "@/components/HeaderBar";
 
 export default function UserRecentScoresPage() {

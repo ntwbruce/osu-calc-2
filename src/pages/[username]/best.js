@@ -15,6 +15,7 @@ import {
 } from "@/lib/calculators/AccCalculator";
 import { calculateRank } from "@/lib/calculators/RankCalculator";
 import { HeaderBar } from "@/components/HeaderBar";
+import { IconZoomQuestion } from "@tabler/icons-react";
 
 export default function UserBestScoresPage() {
   const router = useRouter();
@@ -244,7 +245,7 @@ export default function UserBestScoresPage() {
         )}
 
         {!isUserDataSet && doesUserExist && (
-          <Center>
+          <Center mb={10} mt={10}>
             <Paper w="50%" p="md" radius="md">
               <Flex
                 direction={{ base: "row", sm: "column" }}
