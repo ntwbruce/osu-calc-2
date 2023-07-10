@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import UserDetails from "@/components/UserDetails";
 import axios from "axios";
-import { Button, Title, Flex, Loader, Paper, Center } from "@mantine/core";
+import { Title, Flex, Loader, Paper, Center } from "@mantine/core";
 import Head from "next/head";
 import SortableTable from "@/components/SortableTable";
 import {
@@ -14,6 +14,8 @@ import {
   calculateOverallAccNoSelection,
 } from "@/lib/calculators/AccCalculator";
 import { calculateRank } from "@/lib/calculators/RankCalculator";
+import { HeaderBar } from "@/components/HeaderBar";
+import { IconZoomQuestion } from "@tabler/icons-react";
 
 export default function UserBestScoresPage() {
   const router = useRouter();
@@ -209,22 +211,21 @@ export default function UserBestScoresPage() {
         <title>silver wolf cheese slap meme</title>
       </Head>
 
+      <HeaderBar
+        pages={[
+          { label: "Profile", link: `/${router.query.username}` },
+          { label: "Best Scores", link: `/${router.query.username}/best` },
+          { label: "Recent Scores", link: `/${router.query.username}/recent` },
+        ]}
+        home={{ label: "Check another profile", link: "/" }}
+        currPage="Best Scores"
+      />
+
       <Flex
         direction={{ base: "row", sm: "column" }}
         gap={{ base: "sm", sm: "md" }}
         justify={{ sm: "center" }}
       >
-        {authTokenPresent && (
-          <Flex gap={{ base: "sm" }} justify={{ sm: "center" }}>
-            <Button onClick={() => router.back()} w="25%">
-              Back
-            </Button>
-            <Button onClick={() => router.push("/")} w="25%">
-              Reset
-            </Button>
-          </Flex>
-        )}
-
         {authTokenPresent && isUserDataSet && (
           <UserDetails userData={userData} statChangeData={statChangeData} />
         )}
@@ -244,7 +245,7 @@ export default function UserBestScoresPage() {
         )}
 
         {!isUserDataSet && doesUserExist && (
-          <Center>
+          <Center mb={10} mt={10}>
             <Paper w="50%" p="md" radius="md">
               <Flex
                 direction={{ base: "row", sm: "column" }}
@@ -260,7 +261,7 @@ export default function UserBestScoresPage() {
         )}
 
         {!isBestScoresDataSet && doesUserExist && (
-          <Center>
+          <Center mb={10} mt={10}>
             <Paper w="50%" p="md" radius="md">
               <Flex
                 direction={{ base: "row", sm: "column" }}
@@ -276,7 +277,7 @@ export default function UserBestScoresPage() {
         )}
 
         {!doesUserExist && (
-          <Center>
+          <Center mb={10} mt={10}>
             <Paper w="50%" p="md" radius="md">
               <Flex
                 direction={{ base: "row", sm: "column" }}

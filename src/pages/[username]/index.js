@@ -2,9 +2,10 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import UserDetails from "@/components/UserDetails";
 import axios from "axios";
-import { Button, Title, Flex, Loader, Paper, Center } from "@mantine/core";
+import { Title, Flex, Loader, Paper, Center } from "@mantine/core";
 import Head from "next/head";
 import { IconZoomQuestion } from "@tabler/icons-react";
+import { HeaderBar } from "@/components/HeaderBar";
 
 export default function UserProfilePage() {
   const router = useRouter();
@@ -73,53 +74,35 @@ export default function UserProfilePage() {
         <title>silver wolf cheese slap meme</title>
       </Head>
 
+      <HeaderBar
+        pages={[
+          { label: "Profile", link: `/${router.query.username}` },
+          { label: "Best Scores", link: `/${router.query.username}/best` },
+          { label: "Recent Scores", link: `/${router.query.username}/recent` },
+        ]}
+        home={{ label: "Check another profile", link: "/" }}
+        currPage="Profile"
+      />
+
       <Flex
         direction={{ base: "row", sm: "column" }}
         gap={{ base: "sm", sm: "md" }}
         justify={{ sm: "center" }}
       >
-        {authTokenPresent && (
-          <Flex gap={{ base: "sm" }} justify={{ sm: "center" }}>
-            <Button onClick={() => router.push("/")} w="25%">
-              Reset
-            </Button>
-          </Flex>
-        )}
-
         {authTokenPresent && isUserDataSet && (
-          <>
-            <UserDetails
-              userData={userData}
-              statChangeData={{
-                ppChange: 0,
-                accChange: 0,
-                rankChange: 0,
-                showChanges: false,
-              }}
-            />
-            <Flex
-              direction={{ base: "column", sm: "row" }}
-              gap={{ base: "sm", sm: "md" }}
-              justify={{ sm: "center" }}
-            >
-              <Button
-                onClick={() => router.push(`/${router.query.username}/best`)}
-                w="25%"
-              >
-                Best Scores
-              </Button>
-              <Button
-                onClick={() => router.push(`/${router.query.username}/recent`)}
-                w="25%"
-              >
-                Recent Scores
-              </Button>
-            </Flex>
-          </>
+          <UserDetails
+            userData={userData}
+            statChangeData={{
+              ppChange: 0,
+              accChange: 0,
+              rankChange: 0,
+              showChanges: false,
+            }}
+          />
         )}
 
         {!isUserDataSet && doesUserExist && (
-          <Center>
+          <Center mb={10} mt={10}>
             <Paper w="50%" p="md" radius="md">
               <Flex
                 direction={{ base: "row", sm: "column" }}
@@ -135,7 +118,7 @@ export default function UserProfilePage() {
         )}
 
         {!doesUserExist && (
-          <Center>
+          <Center mb={10} mt={10}>
             <Paper w="50%" p="md" radius="md">
               <Flex
                 direction={{ base: "row", sm: "column" }}
