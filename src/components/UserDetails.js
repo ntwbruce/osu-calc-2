@@ -1,5 +1,6 @@
 import { Title, Flex, Image, BackgroundImage, Center } from "@mantine/core";
 import { useEffect } from "react";
+import Flag from "react-flagkit";
 
 export default function UserDetails({ userData, statChangeData }) {
   const pfp = userData.avatar_url;
@@ -22,8 +23,13 @@ export default function UserDetails({ userData, statChangeData }) {
   const pp = userData.statistics.is_ranked ? userData.statistics.pp : "--";
   const acc = userData.statistics.hit_accuracy;
   const cover_url = userData.cover_url;
+  const country_code = userData.country_code;
 
   const { ppChange, accChange, rankChange, showChanges } = statChangeData;
+
+  useEffect(() => {
+    console.log(userData);
+  }, []);
 
   return (
     <Center>
@@ -67,7 +73,12 @@ export default function UserDetails({ userData, statChangeData }) {
             justify={{ sm: "center" }}
             sx={{ zIndex: "3", color: "white" }}
           >
-            <Title order={1}>{username}</Title>
+            <Flex gap="md">
+              <Title order={1}>{username}</Title>
+              <Center>
+                <Flag country={country_code} />
+              </Center>
+            </Flex>
             <Title order={3}>Mode: {playmode}</Title>
             <Title order={3}>
               Rank: {showChanges ? global_rank - rankChange : global_rank}{" "}
@@ -77,10 +88,10 @@ export default function UserDetails({ userData, statChangeData }) {
               PP:{" "}
               {pp === "--"
                 ? pp
-                : (showChanges
-                  ? (Math.round((pp + ppChange) * 100) / 100.0).toFixed(2)
-                  : pp.toFixed(2))
-              }pp{" "}
+                : showChanges
+                ? (Math.round((pp + ppChange) * 100) / 100.0).toFixed(2)
+                : pp.toFixed(2)}
+              pp{" "}
               {showChanges
                 ? `(${(Math.round(ppChange * 100) / 100.0).toFixed(2)}pp)`
                 : ""}

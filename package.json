@@ -23,6 +23,7 @@
     "next": "13.4.4",
     "ojsama": "^2.2.0",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "react-flagkit": "^2.0.4"
   }
 }

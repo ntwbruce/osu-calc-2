@@ -101,7 +101,7 @@ export function HeaderBar({ pages, home, currPage }) {
           size="sm"
           className={classes.burger}
         />
-        <Group className={classes.links} spacing={5}>
+        <Group className={classes.links} spacing={5} position="left">
           {pageButtons}
         </Group>
         <Group className={classes.links} position="right">
