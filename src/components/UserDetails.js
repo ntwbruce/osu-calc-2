@@ -15,10 +15,10 @@ export default function UserDetails({ userData, statChangeData }) {
   const global_rank = userData.statistics.is_ranked
     ? userData.statistics.global_rank
     : "--";
-  const country_code = userData.country_code;
-  const country_rank = userData.statistics.is_ranked
-    ? userData.statistics.country_rank
-    : "--";
+  // const country_code = userData.country_code;
+  // const country_rank = userData.statistics.is_ranked
+  //   ? userData.statistics.country_rank
+  //   : "--";
   const pp = userData.statistics.is_ranked ? userData.statistics.pp : "--";
   const acc = userData.statistics.hit_accuracy;
   const cover_url = userData.cover_url;
@@ -44,7 +44,7 @@ export default function UserDetails({ userData, statChangeData }) {
             top: "0",
             left: "0",
             zIndex: "2",
-            borderRadius: "10px"
+            borderRadius: "10px",
           }}
         />
         <Flex
@@ -75,10 +75,12 @@ export default function UserDetails({ userData, statChangeData }) {
             </Title>
             <Title order={3}>
               PP:{" "}
-              {showChanges
-                ? (Math.round((pp + ppChange) * 100) / 100.0).toFixed(2)
-                : pp.toFixed(2)}
-              pp{" "}
+              {pp === "--"
+                ? pp
+                : (showChanges
+                  ? (Math.round((pp + ppChange) * 100) / 100.0).toFixed(2)
+                  : pp.toFixed(2))
+              }pp{" "}
               {showChanges
                 ? `(${(Math.round(ppChange * 100) / 100.0).toFixed(2)}pp)`
                 : ""}
