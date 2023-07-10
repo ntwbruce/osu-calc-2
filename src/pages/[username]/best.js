@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import UserDetails from "@/components/UserDetails";
 import axios from "axios";
-import { Button, Title, Flex, Loader, Paper, Center } from "@mantine/core";
+import { Title, Flex, Loader, Paper, Center } from "@mantine/core";
 import Head from "next/head";
 import SortableTable from "@/components/SortableTable";
 import {
@@ -260,7 +260,7 @@ export default function UserBestScoresPage() {
         )}
 
         {!isBestScoresDataSet && doesUserExist && (
-          <Center>
+          <Center mb={10} mt={10}>
             <Paper w="50%" p="md" radius="md">
               <Flex
                 direction={{ base: "row", sm: "column" }}
@@ -276,7 +276,7 @@ export default function UserBestScoresPage() {
         )}
 
         {!doesUserExist && (
-          <Center>
+          <Center mb={10} mt={10}>
             <Paper w="50%" p="md" radius="md">
               <Flex
                 direction={{ base: "row", sm: "column" }}

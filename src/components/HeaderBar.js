@@ -7,7 +7,6 @@ import {
   rem,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { MantineLogo } from "@mantine/ds";
 import Link from "next/link";
 
 const useStyles = createStyles((theme) => ({

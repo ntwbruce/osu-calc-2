@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import UserDetails from "@/components/UserDetails";
 import axios from "axios";
-import { Button, Title, Flex, Loader, Paper, Center } from "@mantine/core";
+import { Title, Flex, Loader, Paper, Center } from "@mantine/core";
 import Head from "next/head";
 import { IconZoomQuestion } from "@tabler/icons-react";
 import { HeaderBar } from "@/components/HeaderBar";
@@ -102,7 +102,7 @@ export default function UserProfilePage() {
         )}
 
         {!isUserDataSet && doesUserExist && (
-          <Center>
+          <Center mb={10} mt={10}>
             <Paper w="50%" p="md" radius="md">
               <Flex
                 direction={{ base: "row", sm: "column" }}
@@ -118,7 +118,7 @@ export default function UserProfilePage() {
         )}
 
         {!doesUserExist && (
-          <Center>
+          <Center mb={10} mt={10}>
             <Paper w="50%" p="md" radius="md">
               <Flex
                 direction={{ base: "row", sm: "column" }}
