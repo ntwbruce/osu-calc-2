@@ -16,10 +16,6 @@ export default function UserDetails({ userData, statChangeData }) {
   const global_rank = userData.statistics.is_ranked
     ? userData.statistics.global_rank
     : "--";
-  // const country_code = userData.country_code;
-  // const country_rank = userData.statistics.is_ranked
-  //   ? userData.statistics.country_rank
-  //   : "--";
   const pp = userData.statistics.is_ranked ? userData.statistics.pp : "--";
   const acc = userData.statistics.hit_accuracy;
   const cover_url = userData.cover_url;
@@ -35,77 +31,98 @@ export default function UserDetails({ userData, statChangeData }) {
     <Center>
       <BackgroundImage
         src={cover_url}
-        sx={{ position: "relative", outline: "solid", borderRadius: "10px" }}
+        sx={{
+          position: "relative",
+          outline: "solid",
+          borderRadius: "10px",
+          color: "white",
+        }}
         w="80%"
         h={300}
         mb={10}
         mt={10}
       >
-        <div
-          style={{
-            backgroundColor: "rgba(0, 0, 0, 0.55)",
-            width: "100%",
-            height: "100%",
-            position: "absolute",
-            top: "0",
-            left: "0",
-            zIndex: "2",
-            borderRadius: "10px",
-          }}
-        />
         <Flex
-          direction={{ base: "column", sm: "row" }}
-          gap="xl"
-          justify={{ sm: "center" }}
-          h={300}
+          mih="100%"
+          bg="rgba(0, 0, 0, .6)"
+          gap="5%"
+          justify="center"
+          align="center"
+          direction="row"
         >
-          <Center>
-            <Image
-              width="15rem"
-              height="15rem"
-              src={pfp}
-              sx={{ zIndex: "3", borderRadius: "10px" }}
-            />
-          </Center>
           <Flex
-            direction={{ base: "row", sm: "column" }}
-            gap="md"
-            justify={{ sm: "center" }}
-            sx={{ zIndex: "3", color: "white" }}
+            direction="column"
+            gap={"md"}
+            justify="center"
+            align="center"
+            ml="5%"
           >
-            <Flex gap="md">
-              <Title order={1}>{username}</Title>
-              <Center>
-                <Flag country={country_code} />
-              </Center>
+            <Image width="12rem" height="12rem" src={pfp} radius="lg" />
+            <Title order={2} align="center">
+              {username} {<Flag country={country_code} />}
+            </Title>
+          </Flex>
+
+          <Flex
+            w="70%"
+            mih="100%"
+            gap="10%"
+            justify="center"
+            align="center"
+            direction="row"
+            wrap="wrap"
+            mr="5%"
+          >
+            <Flex direction="column" justify="center" align="center">
+              <Title order={4}>MODE</Title>
+              <Title>{playmode}</Title>
             </Flex>
-            <Title order={3}>Mode: {playmode}</Title>
-            <Title order={3}>
-              Rank: {showChanges ? global_rank - rankChange : global_rank}{" "}
-              {showChanges ? `(${rankChange > 0 ? "+" : ""}${rankChange})` : ""}
-            </Title>
-            <Title order={3}>
-              PP:{" "}
-              {pp === "--"
-                ? pp
-                : showChanges
-                ? (Math.round((pp + ppChange) * 100) / 100.0).toFixed(2)
-                : pp.toFixed(2)}
-              pp{" "}
-              {showChanges
-                ? `(${(Math.round(ppChange * 100) / 100.0).toFixed(2)}pp)`
-                : ""}
-            </Title>
-            <Title order={3}>
-              Accuracy:{" "}
-              {showChanges
-                ? `${(acc + Math.round(accChange * 100) / 100).toFixed(2)}`
-                : acc.toFixed(2)}
-              %{" "}
-              {showChanges
-                ? `(${accChange > 0 ? "+" : ""}${accChange.toFixed(2)}%)`
-                : ""}
-            </Title>
+
+            <Flex direction="column" justify="center" align="center">
+              <Title order={4}>RANK</Title>
+              <Title>
+                {showChanges ? global_rank - rankChange : global_rank}
+              </Title>
+              {showChanges && (
+                <Title order={3}>
+                  ({rankChange > 0 ? "+" : ""}
+                  {rankChange})
+                </Title>
+              )}
+            </Flex>
+
+            <Flex direction="column" justify="center" align="center">
+              <Title order={4}>PERFORMANCE</Title>
+              <Title>
+                {pp === "--"
+                  ? pp
+                  : showChanges
+                  ? (Math.round((pp + ppChange) * 100) / 100.0).toFixed(2)
+                  : pp.toFixed(2)}
+                pp
+              </Title>
+              {showChanges && (
+                <Title order={3}>
+                  ({(Math.round(ppChange * 100) / 100.0).toFixed(2)}pp)
+                </Title>
+              )}
+            </Flex>
+
+            <Flex direction="column" justify="center" align="center">
+              <Title order={4}>ACCURACY</Title>
+              <Title>
+                {showChanges
+                  ? `${(acc + Math.round(accChange * 100) / 100).toFixed(2)}`
+                  : acc.toFixed(2)}
+                %
+              </Title>
+              {showChanges && (
+                <Title order={3}>
+                  ({accChange > 0 ? "+" : ""}
+                  {accChange.toFixed(2)}%)
+                </Title>
+              )}
+            </Flex>
           </Flex>
         </Flex>
       </BackgroundImage>
