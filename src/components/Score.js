@@ -14,9 +14,9 @@ export default function Score({ scoreData }) {
           color: "white",
         }}
       >
-        <Grid h={120} bg="rgba(0, 0, 0, .75)" justify="center" align="center">
+        <Grid h={120} bg="rgba(0, 0, 0, .75)" justify="center" align="center" grow>
           <Grid.Col span={1}>
-            <Flex direction="column" justify="center" ml="10px">
+            <Flex direction="column" justify="center" ml="20px">
               <Title>{scoreData.index + 1}</Title>
             </Flex>
           </Grid.Col>
@@ -47,7 +47,7 @@ export default function Score({ scoreData }) {
               direction="column"
               justify="center"
               align="flex-end"
-              mr="10px"
+              mr="20px"
             >
               <Title order={1}>{scoreData.rank}</Title>
               <Title order={5}>{(scoreData.acc * 100).toFixed(2)}%</Title>
