@@ -90,7 +90,8 @@ function Th({ children, isReverseSorted, isActiveSortingParam, onSort }) {
  */
 function filterData(data, search) {
   const {
-    map,
+    artist,
+    title,
     mapper,
     minPP,
     maxPP,
@@ -103,7 +104,8 @@ function filterData(data, search) {
   } = search;
   return data.filter(
     (item) =>
-      item["map"].toLowerCase().includes(map.toLowerCase().trim()) &&
+      item["artist"].toLowerCase().includes(artist.toLowerCase().trim()) &&
+      item["title"].toLowerCase().includes(title.toLowerCase().trim()) &&
       item["mapper"].toLowerCase().includes(mapper.toLowerCase().trim()) &&
       (minPP ? item["pp"] >= minPP : item["pp"] >= 0) &&
       (maxPP ? item["pp"] <= maxPP : item["pp"] <= Number.MAX_VALUE) &&
@@ -249,7 +251,8 @@ export default function SortableTable({
   const [isFilterOpened, { open, close }] = useDisclosure(false);
 
   // Search states
-  const [mapSearch, setMapSearch] = useState("");
+  const [artistSearch, setArtistSearch] = useState("");
+  const [titleSearch, setTitleSearch] = useState("");
   const [mapperSearch, setMapperSearch] = useState("");
   const [minPPSearch, setMinPPSearch] = useState();
   const [maxPPSearch, setMaxPPSearch] = useState();
@@ -261,7 +264,8 @@ export default function SortableTable({
   const [rankSearch, setRankSearch] = useState();
 
   const currentSearchParams = {
-    map: mapSearch,
+    artist: artistSearch,
+    title: titleSearch,
     mapper: mapperSearch,
     minPP: minPPSearch,
     maxPP: maxPPSearch,
@@ -276,8 +280,11 @@ export default function SortableTable({
   // Handler for updating the filter
   const filterUpdateHandler = (filterParam, value) => {
     switch (filterParam) {
-      case "map":
-        setMapSearch(value);
+      case "artist":
+        setArtistSearch(value);
+        break;
+      case "title":
+        setTitleSearch(value);
         break;
       case "mapper":
         setMapperSearch(value);
@@ -414,15 +421,27 @@ export default function SortableTable({
                 direction={{ base: "row", sm: "column" }}
                 justify={{ sm: "center" }}
               >
-                <Title order={5}>Map</Title>
+                <Title order={5}>Artist</Title>
                 <TextInput
-                  placeholder="Find map name"
+                  placeholder="Find artist name"
                   mb="md"
                   w="22.05rem"
                   icon={<IconSearch size="0.9rem" stroke={1.5} />}
-                  value={mapSearch}
+                  value={artistSearch}
                   onChange={(event) =>
-                    filterUpdateHandler("map", event.currentTarget.value)
+                    filterUpdateHandler("artist", event.currentTarget.value)
+                  }
+                />
+
+                <Title order={5}>Title</Title>
+                <TextInput
+                  placeholder="Find map title"
+                  mb="md"
+                  w="22.05rem"
+                  icon={<IconSearch size="0.9rem" stroke={1.5} />}
+                  value={titleSearch}
+                  onChange={(event) =>
+                    filterUpdateHandler("title", event.currentTarget.value)
                   }
                 />
 
@@ -582,7 +601,8 @@ export default function SortableTable({
             <Select
               data={[
                 { value: "index", label: "Index" },
-                { value: "map", label: "Map" },
+                { value: "artist", label: "Artist" },
+                { value: "title", label: "Title" },
                 { value: "mapper", label: "Mapper" },
                 { value: "mods", label: "Mods" },
                 { value: "sr", label: "Star Rating" },

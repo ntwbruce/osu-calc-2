@@ -14,7 +14,7 @@ export default function Score({ scoreData }) {
           color: "white",
         }}
       >
-        <Grid h={120} bg="rgba(0, 0, 0, .7)" justify="center" align="center">
+        <Grid h={120} bg="rgba(0, 0, 0, .75)" justify="center" align="center">
           <Grid.Col span={1}>
             <Flex direction="column" justify="center" ml="10px">
               <Title>{scoreData.index + 1}</Title>
@@ -22,7 +22,7 @@ export default function Score({ scoreData }) {
           </Grid.Col>
 
           <Grid.Col span={4}>
-            <Flex direction="column" justify="center" align="flex-start">
+            <Flex direction="column" align="flex-start">
               <Title order={5}>{scoreData.artist}</Title>
               <Title order={3}>{scoreData.title}</Title>
               <Title order={5}>
