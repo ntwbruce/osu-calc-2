@@ -1,18 +1,9 @@
 import { Title, Flex, Image, BackgroundImage, Center } from "@mantine/core";
-import { useEffect } from "react";
 import Flag from "react-flagkit";
 
 export default function UserDetails({ userData, statChangeData }) {
   const pfp = userData.avatar_url;
   const username = userData.username;
-  const playmode =
-    userData.playmode === "osu"
-      ? "Standard"
-      : userData.playmode === "taiko"
-      ? "Taiko"
-      : userData.playmode === "mania"
-      ? "Mania"
-      : "Catch";
   const global_rank = userData.statistics.is_ranked
     ? userData.statistics.global_rank
     : "--";
@@ -23,16 +14,11 @@ export default function UserDetails({ userData, statChangeData }) {
 
   const { ppChange, accChange, rankChange, showChanges } = statChangeData;
 
-  useEffect(() => {
-    console.log(userData);
-  }, []);
-
   return (
     <Center>
       <BackgroundImage
         src={cover_url}
         sx={{
-          position: "relative",
           outline: "solid",
           borderRadius: "10px",
           color: "white",
@@ -52,7 +38,7 @@ export default function UserDetails({ userData, statChangeData }) {
         >
           <Flex
             direction="column"
-            gap={"md"}
+            gap="md"
             justify="center"
             align="center"
             ml="5%"
@@ -64,7 +50,7 @@ export default function UserDetails({ userData, statChangeData }) {
           </Flex>
 
           <Flex
-            w="70%"
+            w="60%"
             mih="100%"
             gap="10%"
             justify="center"
@@ -73,11 +59,6 @@ export default function UserDetails({ userData, statChangeData }) {
             wrap="wrap"
             mr="5%"
           >
-            <Flex direction="column" justify="center" align="center">
-              <Title order={4}>MODE</Title>
-              <Title>{playmode}</Title>
-            </Flex>
-
             <Flex direction="column" justify="center" align="center">
               <Title order={4}>RANK</Title>
               <Title>

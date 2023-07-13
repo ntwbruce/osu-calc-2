@@ -32,6 +32,7 @@ import {
   IconArrowsSort,
 } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
+import Score from "./Score";
 
 const useStyles = createStyles((theme) => ({
   th: {
@@ -209,10 +210,13 @@ export default function SortableTable({
   // Manipulates raw score data into a more convenient format
   const scoresData = rawScoresData.map((score, index) => {
     return {
+      key: index,
       index,
       beatmap_id: score.beatmap.id,
       user_id: score.user_id,
-      map: `${score.beatmapset.artist} - ${score.beatmapset.title} [${score.beatmap.version}]`,
+      artist: score.beatmapset.artist,
+      title: score.beatmapset.title,
+      difficulty: score.beatmap.version,
       mapper: score.beatmapset.creator,
       sr: score.beatmap.difficulty_rating,
       sr_multiplier:
@@ -232,6 +236,7 @@ export default function SortableTable({
           : score.rank === "SH"
           ? "S"
           : score.rank,
+      background: score.beatmapset.covers.cover,
     };
   });
 
@@ -379,37 +384,9 @@ export default function SortableTable({
 
   // ============================================= ROW CONVERSION =============================================
 
-  // Converts each score into a row element
-  const rows = sortedData.map((row) => (
-    <tr key={row.index}>
-      <td>{row.index + 1}</td>
-      <td>
-        <NavLink
-          component="a"
-          href={`/beatmaps/${row.beatmap_id}/scores/users/${row.user_id}`}
-          label={row.map}
-          rightSection={<IconChevronRight size="0.8rem" stroke={1.5} />}
-        />
-      </td>
-      <td>{row.mapper}</td>
-      <td>{row.mods}</td>
-      <td>
-        {(Math.round(row.sr * 100) / 100).toFixed(2)}
-        {row.sr_multiplier}
-      </td>
-      <td>{(Math.round(row.pp * 100) / 100).toFixed(2)}</td>
-      <td>{(row.acc * 100).toFixed(2)}</td>
-      <td>{row.rank}</td>
-      {showSelection && (
-        <td>
-          <Checkbox
-            checked={selection[row.index]}
-            onChange={() => rowSelectionToggleHandler(row.index)}
-            transitionDuration={0}
-          />
-        </td>
-      )}
-    </tr>
+  // Converts each score into a Score object
+  const scores = sortedData.map((scoreData, index) => (
+    <Score key={index} scoreData={scoreData} />
   ));
 
   // ============================================= OUTPUT =============================================
@@ -630,10 +607,11 @@ export default function SortableTable({
           >
             {isStatChangeReady ? (
               <Button
+                data-disabled
                 variant={showSelection ? "outline" : "filled"}
                 onClick={showSelectionHandler}
               >
-                Delete Scores
+                Delete Scores (WIP)
               </Button>
             ) : (
               <Button
@@ -657,87 +635,7 @@ export default function SortableTable({
           <Title order={3}>{sortedData.length} score(s) found!</Title>
         </Flex>
 
-        <Table
-          horizontalSpacing="md"
-          verticalSpacing="xs"
-          miw={700}
-          sx={{ tableLayout: "fixed" }}
-        >
-          <thead>
-            <tr>
-              <Th
-                isActiveSortingParam={sortingParam === "index"}
-                isReverseSorted={isReverseSorted}
-                onSort={() => sortChangeHandler("index")}
-              >
-                Index
-              </Th>
-              <Th
-                isActiveSortingParam={sortingParam === "map"}
-                isReverseSorted={isReverseSorted}
-                onSort={() => sortChangeHandler("map")}
-              >
-                Map
-              </Th>
-              <Th
-                isActiveSortingParam={sortingParam === "mapper"}
-                isReverseSorted={isReverseSorted}
-                onSort={() => sortChangeHandler("mapper")}
-              >
-                Mapper
-              </Th>
-              <Th
-                isActiveSortingParam={sortingParam === "mods"}
-                isReverseSorted={isReverseSorted}
-                onSort={() => sortChangeHandler("mods")}
-              >
-                Mods
-              </Th>
-              <Th
-                isActiveSortingParam={sortingParam === "sr"}
-                isReverseSorted={isReverseSorted}
-                onSort={() => sortChangeHandler("sr")}
-              >
-                Star Rating
-              </Th>
-              <Th
-                isActiveSortingParam={sortingParam === "pp"}
-                isReverseSorted={isReverseSorted}
-                onSort={() => sortChangeHandler("pp")}
-              >
-                Peformance (pp)
-              </Th>
-              <Th
-                isActiveSortingParam={sortingParam === "acc"}
-                isReverseSorted={isReverseSorted}
-                onSort={() => sortChangeHandler("acc")}
-              >
-                Accuracy (%)
-              </Th>
-              <Th
-                isActiveSortingParam={sortingParam === "rank"}
-                isReverseSorted={isReverseSorted}
-                onSort={() => sortChangeHandler("rank")}
-              >
-                Rank
-              </Th>
-              {showSelection && <th>Delete</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.length > 0 ? (
-              rows
-            ) : (
-              <tr>
-                <td colSpan={8}>
-                  <Text weight={500} align="center">
-                    Nothing found
-                  </Text>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
+        {scores}
       </Flex>
     </ScrollArea>
   );
