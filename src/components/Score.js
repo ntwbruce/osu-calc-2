@@ -21,7 +21,7 @@ export default function Score({ scoreData }) {
             </Flex>
           </Grid.Col>
 
-          <Grid.Col span={4}>
+          <Grid.Col span={6}>
             <Flex direction="column" align="flex-start">
               <Title order={5}>{scoreData.artist}</Title>
               <Title order={3}>{scoreData.title}</Title>
@@ -33,17 +33,12 @@ export default function Score({ scoreData }) {
 
           <Grid.Col span={2}>
             <Flex direction="column" justify="center" align="center">
+              <Title order={2}>{scoreData.mods}</Title>
               <Title order={2}>
                 {scoreData.sr.toFixed(2)}
-                {scoreData.sr_multiplier}
+                {scoreData.sr_multiplier}{" "}
                 {<IconStarFilled />}
               </Title>
-            </Flex>
-          </Grid.Col>
-
-          <Grid.Col span={2}>
-            <Flex direction="column" justify="center" align="center">
-              <Title order={2}>{scoreData.mods}</Title>
             </Flex>
           </Grid.Col>
 
