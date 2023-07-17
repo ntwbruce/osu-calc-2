@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import {
   createStyles,
-  Table,
-  ScrollArea,
   UnstyledButton,
   Group,
   Text,
@@ -10,8 +8,6 @@ import {
   TextInput,
   rem,
   Flex,
-  NavLink,
-  Checkbox,
   Select,
   Button,
   Title,
@@ -24,7 +20,6 @@ import {
   IconSelector,
   IconChevronDown,
   IconChevronUp,
-  IconChevronRight,
   IconSearch,
   IconFilter,
   IconSortAscending,
@@ -57,30 +52,6 @@ const useStyles = createStyles((theme) => ({
     borderRadius: rem(21),
   },
 }));
-
-// For table header styling.
-function Th({ children, isReverseSorted, isActiveSortingParam, onSort }) {
-  const { classes } = useStyles();
-  const Icon = isActiveSortingParam
-    ? isReverseSorted
-      ? IconChevronUp
-      : IconChevronDown
-    : IconSelector;
-  return (
-    <th className={classes.th}>
-      <UnstyledButton onClick={onSort} className={classes.control}>
-        <Group position="apart">
-          <Text fw={500} fz="sm">
-            {children}
-          </Text>
-          <Center className={classes.icon}>
-            <Icon size="0.9rem" stroke={1.5} />
-          </Center>
-        </Group>
-      </UnstyledButton>
-    </th>
-  );
-}
 
 /**
  * Filters data by given search parameters object.
