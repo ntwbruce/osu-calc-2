@@ -3,11 +3,10 @@ import { IconStarFilled } from "@tabler/icons-react";
 
 export default function Score({ scoreData }) {
   return (
-    <Center>
+    <Center m={20}>
       <BackgroundImage
         src={scoreData.background}
         h={110}
-        w="60%"
         sx={{
           outline: "solid",
           borderRadius: "10px",

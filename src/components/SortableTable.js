@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import {
-  createStyles,
   TextInput,
-  rem,
   Flex,
   Select,
   Button,
@@ -10,14 +8,13 @@ import {
   NumberInput,
   Drawer,
   MultiSelect,
-  Loader,
+  ScrollArea,
 } from "@mantine/core";
 import {
   IconSearch,
   IconFilter,
   IconSortAscending,
   IconSortDescending,
-  IconArrowsSort,
 } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import Score from "./Score";
@@ -90,18 +87,18 @@ function sortData(data, payload) {
 
         case "mods":
           const multipliers = {
-            NM: 1.0,
-            EZ: 0.5,
-            NF: 0.49,
             HT: 0.3,
-            HR: 1.06,
-            SD: 1.01,
-            PF: 1.02,
-            DT: 1.13,
-            NC: 1.12,
-            HD: 1.05,
-            FL: 1.1,
+            NF: 0.5,
+            EZ: 0.5 + 0.01,
             SO: 0.9,
+            NM: 1.0,
+            SD: 1.0 + 0.01,
+            PF: 1.0 + 0.02,
+            HD: 1.06,
+            HR: 1.06 + 0.01,
+            FL: 1.12,
+            NC: 1.12 + 0.01,
+            DT: 1.12 + 0.02,
           };
           const firstMultiplier = Array.isArray(first[sortingParam])
             ? first[sortingParam].reduce(
@@ -345,7 +342,7 @@ export default function SortableTable({
       justify={{ sm: "center" }}
     >
       <Flex
-        direction={{ base: "row", sm: "column" }}
+        direction="row"
         gap={{ base: "sm", sm: "lg" }}
         justify={{ sm: "center" }}
       >
@@ -355,6 +352,7 @@ export default function SortableTable({
             onClose={close}
             title="Filter"
             sx={{ fontFamily: "Segoe UI" }}
+            size="25%"
           >
             <Flex
               direction={{ base: "row", sm: "column" }}
@@ -530,13 +528,14 @@ export default function SortableTable({
           </Button>
         </Flex>
 
+        <Title order={3}>||</Title>
+
         <Flex
           direction={{ base: "column", sm: "row" }}
           gap={{ base: "sm", sm: "lg" }}
           justify={{ sm: "center" }}
           align="center"
         >
-          <IconArrowsSort />
           <Select
             data={[
               { value: "index", label: "Index" },
@@ -558,6 +557,8 @@ export default function SortableTable({
           </Button>
         </Flex>
 
+        <Title order={3}>||</Title>
+
         <Flex
           direction={{ base: "column", sm: "row" }}
           gap={{ base: "sm", sm: "lg" }}
@@ -577,9 +578,9 @@ export default function SortableTable({
               data-disabled
               variant="outline"
               onClick={showSelectionHandler}
-              rightIcon={<Loader size="sm" color="dark" />}
+              // rightIcon={<Loader size="sm" color="dark" />}
             >
-              Delete Scores
+              Delete Scores (WIP)
             </Button>
           )}
         </Flex>
@@ -594,7 +595,7 @@ export default function SortableTable({
         <Title order={3}>{sortedData.length} score(s) found!</Title>
       </Flex>
 
-      {scores}
+      <ScrollArea h="70vh">{scores}</ScrollArea>
     </Flex>
   );
 }

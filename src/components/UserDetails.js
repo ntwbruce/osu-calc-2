@@ -1,7 +1,13 @@
-import { Title, Flex, Image, BackgroundImage, Center } from "@mantine/core";
+import {
+  Title,
+  Flex,
+  Image,
+  BackgroundImage,
+  Center,
+} from "@mantine/core";
 import Flag from "react-flagkit";
 
-export default function UserDetails({ userData, statChangeData }) {
+export default function UserDetails({ userData, statChangeData, isVertical }) {
   const pfp = userData.avatar_url;
   const username = userData.username;
   const global_rank = userData.statistics.is_ranked
@@ -23,43 +29,33 @@ export default function UserDetails({ userData, statChangeData }) {
           borderRadius: "10px",
           color: "white",
         }}
-        w="80%"
-        h={300}
+        h={isVertical ? "87vh" : 300}
         mb={10}
         mt={10}
       >
         <Flex
           mih="100%"
           bg="rgba(0, 0, 0, .6)"
-          gap="5%"
           justify="center"
           align="center"
-          direction="row"
+          direction={isVertical ? "column" : "row"}
         >
-          <Flex
-            direction="column"
-            gap="md"
-            justify="center"
-            align="center"
-            ml="5%"
-          >
+          <Flex direction="column" gap="md" justify="center" align="center" m={20}>
             <Image width="12rem" height="12rem" src={pfp} radius="lg" />
-            <Title order={2} align="center">
+            <Title order={1} align="center">
               {username} {<Flag country={country_code} />}
             </Title>
           </Flex>
 
           <Flex
             w="60%"
-            mih="100%"
+            h="60%"
             gap="10%"
             justify="center"
-            align="center"
-            direction="row"
-            wrap="wrap"
-            mr="5%"
+            direction={isVertical ? "column" : "row"}
+            m="5%"
           >
-            <Flex direction="column" justify="center" align="center">
+            <Flex direction="column" justify="center" align="center" mt={10} mb={10}>
               <Title order={4}>RANK</Title>
               <Title>
                 {showChanges ? global_rank - rankChange : global_rank}
@@ -72,7 +68,7 @@ export default function UserDetails({ userData, statChangeData }) {
               )}
             </Flex>
 
-            <Flex direction="column" justify="center" align="center">
+            <Flex direction="column" justify="center" align="center" mt={10} mb={10}>
               <Title order={4}>PERFORMANCE</Title>
               <Title>
                 {pp === "--"
@@ -89,7 +85,7 @@ export default function UserDetails({ userData, statChangeData }) {
               )}
             </Flex>
 
-            <Flex direction="column" justify="center" align="center">
+            <Flex direction="column" justify="center" align="center" mt={10} mb={10}>
               <Title order={4}>ACCURACY</Title>
               <Title>
                 {showChanges

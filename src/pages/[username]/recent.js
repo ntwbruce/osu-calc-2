@@ -88,6 +88,8 @@ export default function UserRecentScoresPage() {
         direction={{ base: "row", sm: "column" }}
         gap={{ base: "sm", sm: "md" }}
         justify={{ sm: "center" }}
+        ml={25}
+        mr={25}
       >
         {authTokenPresent && isUserDataSet && (
           <UserDetails
@@ -98,6 +100,7 @@ export default function UserRecentScoresPage() {
               rankChange: 0,
               showChanges: false,
             }}
+            isVertical={false}
           />
         )}
 

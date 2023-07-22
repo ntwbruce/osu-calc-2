@@ -2,7 +2,14 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import UserDetails from "@/components/UserDetails";
 import axios from "axios";
-import { Title, Flex, Loader, Paper, Center } from "@mantine/core";
+import {
+  Title,
+  Flex,
+  Loader,
+  Paper,
+  Center,
+  Grid,
+} from "@mantine/core";
 import Head from "next/head";
 import SortableTable from "@/components/SortableTable";
 import {
@@ -221,77 +228,87 @@ export default function UserBestScoresPage() {
         currPage="Best Scores"
       />
 
-      <Flex
-        direction={{ base: "row", sm: "column" }}
-        gap={{ base: "sm", sm: "md" }}
-        justify={{ sm: "center" }}
-      >
-        {authTokenPresent && isUserDataSet && (
-          <UserDetails userData={userData} statChangeData={statChangeData} />
-        )}
-
-        {isUserDataSet && isBestScoresDataSet && (
-          <>
-            <Title order={1} align="center">
-              Best Scores
-            </Title>
-            <SortableTable
-              rawScoresData={bestScoresData}
-              setStatChanges={statChangeHandler}
-              toggleStatChanges={toggleStatChangeHandler}
-              isStatChangeReady={areStatChangeValuesSet}
+      <Grid justify="center" align="center" grow ml={10} mr={10} gutter={20}>
+        <Grid.Col span={1}>
+          {authTokenPresent && isUserDataSet && (
+            <UserDetails
+              userData={userData}
+              statChangeData={statChangeData}
+              isVertical={true}
             />
-          </>
-        )}
+          )}
 
-        {!isUserDataSet && doesUserExist && (
-          <Center mb={10} mt={10}>
-            <Paper w="50%" p="md" radius="md">
-              <Flex
-                direction={{ base: "row", sm: "column" }}
-                gap={{ base: "md" }}
-                justify={{ sm: "center" }}
-                align={"center"}
-              >
-                <Loader size={60} />
-                <Title order={2}>Loading profile...</Title>
-              </Flex>
-            </Paper>
-          </Center>
-        )}
+          {!isUserDataSet && doesUserExist && (
+            <Center mb={10} mt={10}>
+              <Paper w="80%" p="md" radius="md">
+                <Flex
+                  direction={{ base: "row", sm: "column" }}
+                  gap={{ base: "md" }}
+                  justify={{ sm: "center" }}
+                  align={"center"}
+                >
+                  <Loader size={60} />
+                  <Title order={2}>Loading profile...</Title>
+                </Flex>
+              </Paper>
+            </Center>
+          )}
+        </Grid.Col>
 
-        {!isBestScoresDataSet && doesUserExist && (
-          <Center mb={10} mt={10}>
-            <Paper w="50%" p="md" radius="md">
-              <Flex
-                direction={{ base: "row", sm: "column" }}
-                gap={{ base: "md" }}
-                justify={{ sm: "center" }}
-                align={"center"}
-              >
-                <Loader size={60} />
-                <Title order={2}>Loading scores...</Title>
-              </Flex>
-            </Paper>
-          </Center>
-        )}
+        <Grid.Col span={7}>
+          <Flex
+            direction={{ base: "row", sm: "column" }}
+            gap={{ base: "sm", sm: "md" }}
+            justify={{ sm: "center" }}
+          >
+            {isUserDataSet && isBestScoresDataSet && (
+              <>
+                <Title order={1} align="center">
+                  Best Scores
+                </Title>
+                <SortableTable
+                  rawScoresData={bestScoresData}
+                  setStatChanges={statChangeHandler}
+                  toggleStatChanges={toggleStatChangeHandler}
+                  isStatChangeReady={areStatChangeValuesSet}
+                />
+              </>
+            )}
 
-        {!doesUserExist && (
-          <Center mb={10} mt={10}>
-            <Paper w="50%" p="md" radius="md">
-              <Flex
-                direction={{ base: "row", sm: "column" }}
-                gap={{ base: "md" }}
-                justify={{ sm: "center" }}
-                align={"center"}
-              >
-                <IconZoomQuestion size={60} />
-                <Title order={2}>Profile does not exist.</Title>
-              </Flex>
-            </Paper>
-          </Center>
-        )}
-      </Flex>
+            {!isBestScoresDataSet && doesUserExist && (
+              <Center mb={10} mt={10}>
+                <Paper w="50%" p="md" radius="md">
+                  <Flex
+                    direction={{ base: "row", sm: "column" }}
+                    gap={{ base: "md" }}
+                    justify={{ sm: "center" }}
+                    align={"center"}
+                  >
+                    <Loader size={60} />
+                    <Title order={2}>Loading scores...</Title>
+                  </Flex>
+                </Paper>
+              </Center>
+            )}
+
+            {!doesUserExist && (
+              <Center mb={10} mt={10}>
+                <Paper w="50%" p="md" radius="md">
+                  <Flex
+                    direction={{ base: "row", sm: "column" }}
+                    gap={{ base: "md" }}
+                    justify={{ sm: "center" }}
+                    align={"center"}
+                  >
+                    <IconZoomQuestion size={60} />
+                    <Title order={2}>Profile does not exist.</Title>
+                  </Flex>
+                </Paper>
+              </Center>
+            )}
+          </Flex>
+        </Grid.Col>
+      </Grid>
     </>
   );
 }
