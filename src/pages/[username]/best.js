@@ -255,7 +255,7 @@ export default function UserBestScoresPage() {
           )}
         </Grid.Col>
 
-        <Grid.Col span={7}>
+        <Grid.Col span={8}>
           <Flex
             direction={{ base: "row", sm: "column" }}
             gap={{ base: "sm", sm: "md" }}
