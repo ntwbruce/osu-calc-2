@@ -21,7 +21,6 @@ export default function UserBestScoresPage() {
   const router = useRouter();
 
   // ============================================= AUTH TOKEN FETCHING =============================================
-  // ! This should eventually be moved to somewhere where it persists across the site's lifetime rather than re-fetched every time a user page is (re)loaded
 
   const [authTokenPresent, setAuthTokenPresent] = useState(false);
 
@@ -41,7 +40,7 @@ export default function UserBestScoresPage() {
   }, []);
 
   // ============================================= LEADERBOARD DATA FETCHING =============================================
-  // ! This should eventually be moved to somewhere where it persists across the site's lifetime rather than re-fetched every time a user page is (re)loaded
+  // ! This should eventually be fixed to check for leaderboard data: if not yet fetched or expired, then fetch, if not then use cached one
 
   const [leaderboardData, setLeaderboardData] = useState({});
   const [isLeaderboardDataSet, setIsLeaderboardDataSet] = useState(false);
@@ -61,7 +60,8 @@ export default function UserBestScoresPage() {
   // * Fetch leaderboard data upon user page initialisation
   useEffect(() => {
     if (authTokenPresent) {
-      fetchLeaderboardDataHandler();
+      // Temporarily disabled to prevent excessive API calling while fixing other things
+      // fetchLeaderboardDataHandler();
     }
   }, [authTokenPresent]);
 
