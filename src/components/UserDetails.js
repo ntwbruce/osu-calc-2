@@ -1,10 +1,4 @@
-import {
-  Title,
-  Flex,
-  Image,
-  BackgroundImage,
-  Center,
-} from "@mantine/core";
+import { Title, Flex, Image, BackgroundImage, Center } from "@mantine/core";
 import Flag from "react-flagkit";
 
 export default function UserDetails({ userData, statChangeData, isVertical }) {
@@ -40,8 +34,24 @@ export default function UserDetails({ userData, statChangeData, isVertical }) {
           align="center"
           direction={isVertical ? "column" : "row"}
         >
-          <Flex direction="column" gap="md" justify="center" align="center" m={20}>
-            <Image width="12rem" height="12rem" src={pfp} radius="lg" />
+          <Flex
+            direction="column"
+            gap="md"
+            justify="center"
+            align="center"
+            m={20}
+          >
+            <Image
+              width="12rem"
+              height="12rem"
+              src={pfp}
+              radius="lg"
+              sx={{
+                outline: "solid",
+                borderRadius: "10px",
+                color: "white",
+              }}
+            />
             <Title order={1} align="center">
               {username} {<Flag country={country_code} />}
             </Title>
@@ -55,7 +65,13 @@ export default function UserDetails({ userData, statChangeData, isVertical }) {
             direction={isVertical ? "column" : "row"}
             m="5%"
           >
-            <Flex direction="column" justify="center" align="center" mt={10} mb={10}>
+            <Flex
+              direction="column"
+              justify="center"
+              align="center"
+              mt={10}
+              mb={10}
+            >
               <Title order={4}>RANK</Title>
               <Title>
                 {showChanges ? global_rank - rankChange : global_rank}
@@ -68,7 +84,13 @@ export default function UserDetails({ userData, statChangeData, isVertical }) {
               )}
             </Flex>
 
-            <Flex direction="column" justify="center" align="center" mt={10} mb={10}>
+            <Flex
+              direction="column"
+              justify="center"
+              align="center"
+              mt={10}
+              mb={10}
+            >
               <Title order={4}>PERFORMANCE</Title>
               <Title>
                 {pp === "--"
@@ -85,7 +107,13 @@ export default function UserDetails({ userData, statChangeData, isVertical }) {
               )}
             </Flex>
 
-            <Flex direction="column" justify="center" align="center" mt={10} mb={10}>
+            <Flex
+              direction="column"
+              justify="center"
+              align="center"
+              mt={10}
+              mb={10}
+            >
               <Title order={4}>ACCURACY</Title>
               <Title>
                 {showChanges
