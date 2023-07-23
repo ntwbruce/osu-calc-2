@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import UserDetails from "@/components/UserDetails";
 import axios from "axios";
-import { Title, Flex, Center, Paper } from "@mantine/core";
+import { Title, Flex, Center, Paper, Loader } from "@mantine/core";
 import Head from "next/head";
 import { IconHammer, IconZoomQuestion } from "@tabler/icons-react";
 import { HeaderBar } from "@/components/HeaderBar";
@@ -110,6 +110,25 @@ export default function UserRecentScoresPage() {
               Recent Scores
             </Title>
             <Center>
+              <Paper w="50%" p="md" radius="md">
+                <Flex
+                  direction={{ base: "row", sm: "column" }}
+                  gap={{ base: "md" }}
+                  justify={{ sm: "center" }}
+                  align={"center"}
+                >
+                  <IconHammer size={60} />
+                  <Title order={2} align="center">
+                    Work in progress, come back later!
+                  </Title>
+                </Flex>
+              </Paper>
+            </Center>
+          </>
+        )}
+
+        {!isUserDataSet && doesUserExist && (
+          <Center mb={10} mt={10}>
             <Paper w="50%" p="md" radius="md">
               <Flex
                 direction={{ base: "row", sm: "column" }}
@@ -117,14 +136,11 @@ export default function UserRecentScoresPage() {
                 justify={{ sm: "center" }}
                 align={"center"}
               >
-                <IconHammer size={60} />
-              <Title order={2} align="center">
-                Work in progress, come back later!
-              </Title>
+                <Loader size={60} />
+                <Title order={2}>Loading profile...</Title>
               </Flex>
             </Paper>
           </Center>
-          </>
         )}
 
         {!doesUserExist && (

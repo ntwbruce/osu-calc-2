@@ -26,7 +26,7 @@ export default function HomePage() {
         <Title order={1} align="center">
           le osu game a la peppy
         </Title>
-        <UsernameForm onSubmit={username => router.push(`/${username}`)} />
+        <UsernameForm onSubmit={username => router.push(`/${username}/best`)} />
       </Flex>
     </>
   );
