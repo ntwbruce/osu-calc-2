@@ -38,6 +38,9 @@ export default function Score({ scoreData }) {
                 {scoreData.sr_multiplier}{" "}
                 {<IconStarFilled />}
               </Title>
+              <Title order={6}>
+                {scoreData.date.toLocaleString()}
+              </Title>
             </Flex>
           </Grid.Col>
 

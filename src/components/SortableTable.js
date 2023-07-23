@@ -17,7 +17,9 @@ import {
   IconSortDescending,
 } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
+import { DateInput } from "@mantine/dates";
 import Score from "./Score";
+import { calculateDate } from "@/lib/calculators/DateCalculator";
 
 /**
  * Filters data by given search parameters object.
@@ -36,9 +38,12 @@ function filterData(data, search) {
     maxAcc,
     minSR,
     maxSR,
+    minDate,
+    maxDate,
     mods,
     rank,
   } = search;
+
   return data.filter(
     (item) =>
       item["artist"].toLowerCase().includes(artist.toLowerCase().trim()) &&
@@ -50,6 +55,8 @@ function filterData(data, search) {
       (maxAcc ? item["acc"] <= maxAcc / 100 : item["acc"] <= 1) &&
       (minSR ? item["sr"] >= minSR : item["sr"] >= 0) &&
       (maxSR ? item["sr"] <= maxSR : item["sr"] <= Number.MAX_VALUE) &&
+      (!minDate || minDate <= item["date"]) &&
+      (!maxDate || item["date"] <= calculateDate(maxDate, 1)) &&
       (!mods ||
         mods.length === 0 ||
         (mods.length === item["mods"].length &&
@@ -81,10 +88,6 @@ function sortData(data, payload) {
 
       let compValue = 0;
       switch (sortingParam) {
-        case "index":
-          compValue = first[sortingParam] - second[sortingParam];
-          break;
-
         case "mods":
           const multipliers = {
             HT: 0.3,
@@ -118,6 +121,7 @@ function sortData(data, payload) {
         case "sr":
         case "pp":
         case "acc":
+        case "date":
           compValue = second[sortingParam] - first[sortingParam];
           break;
 
@@ -176,6 +180,7 @@ export default function SortableTable({
           ? "S"
           : score.rank,
       background: score.beatmapset.covers.cover,
+      date: new Date(score.created_at),
     };
   });
 
@@ -197,6 +202,8 @@ export default function SortableTable({
   const [maxAccSearch, setMaxAccSearch] = useState();
   const [minSRSearch, setMinSRSearch] = useState();
   const [maxSRSearch, setMaxSRSearch] = useState();
+  const [minDateSearch, setMinDateSearch] = useState();
+  const [maxDateSearch, setMaxDateSearch] = useState();
   const [modsSearch, setModsSearch] = useState();
   const [rankSearch, setRankSearch] = useState();
 
@@ -210,6 +217,8 @@ export default function SortableTable({
     maxAcc: maxAccSearch,
     minSR: minSRSearch,
     maxSR: maxSRSearch,
+    minDate: minDateSearch,
+    maxDate: maxDateSearch,
     mods: modsSearch,
     rank: rankSearch,
   };
@@ -247,6 +256,12 @@ export default function SortableTable({
       case "maxAcc":
         setMaxAccSearch(value);
         break;
+      case "minDate":
+        setMinDateSearch(value);
+        break;
+      case "maxDate":
+        setMaxDateSearch(value);
+        break;
       case "rank":
         setRankSearch(value);
         break;
@@ -266,7 +281,7 @@ export default function SortableTable({
   // ============================================= SORTING =============================================
 
   // Sorting states
-  const [sortingParam, setSortingParam] = useState("index");
+  const [sortingParam, setSortingParam] = useState("pp");
   const [isReverseSorted, setIsReverseSorted] = useState(false);
 
   // Handler for changing sort parameter/reverse sort
@@ -352,7 +367,7 @@ export default function SortableTable({
             onClose={close}
             title="Filter"
             sx={{ fontFamily: "Segoe UI" }}
-            size="25%"
+            size={400}
           >
             <Flex
               direction={{ base: "row", sm: "column" }}
@@ -499,6 +514,29 @@ export default function SortableTable({
                 />
               </Flex>
 
+              <Title order={5}>Date</Title>
+              <Flex gap={{ base: "sm" }}>
+                <DateInput
+                  clearable
+                  placeholder="Start date"
+                  mb="md"
+                  w="10rem"
+                  value={minDateSearch}
+                  onChange={(value) => filterUpdateHandler("minDate", value)}
+                />
+
+                <Title order={3}> - </Title>
+
+                <DateInput
+                  clearable
+                  placeholder="End date"
+                  mb="md"
+                  w="10rem"
+                  value={maxDateSearch}
+                  onChange={(value) => filterUpdateHandler("maxDate", value)}
+                />
+              </Flex>
+
               <Title order={5}>Rank</Title>
               <Select
                 clearable
@@ -538,15 +576,15 @@ export default function SortableTable({
         >
           <Select
             data={[
-              { value: "index", label: "Index" },
+              { value: "pp", label: "Performance Points (pp)" },
               { value: "artist", label: "Artist" },
               { value: "title", label: "Title" },
               { value: "mapper", label: "Mapper" },
               { value: "mods", label: "Mods" },
               { value: "sr", label: "Star Rating" },
-              { value: "pp", label: "Performance Points (pp)" },
-              { value: "acc", label: "Accuracy" },
+              { value: "date", label: "Date" },
               { value: "rank", label: "Rank" },
+              { value: "acc", label: "Accuracy" },
             ]}
             onChange={sortChangeHandler}
             value={sortingParam}
@@ -565,7 +603,7 @@ export default function SortableTable({
           justify={{ sm: "center" }}
           align="center"
         >
-          {isStatChangeReady ? (
+          {/* {isStatChangeReady ? (
             <Button
               data-disabled
               variant={showSelection ? "outline" : "filled"}
@@ -578,11 +616,18 @@ export default function SortableTable({
               data-disabled
               variant="outline"
               onClick={showSelectionHandler}
-              // rightIcon={<Loader size="sm" color="dark" />}
+              rightIcon={<Loader size="sm" color="dark" />}
             >
               Delete Scores (WIP)
             </Button>
-          )}
+          )} */}
+          <Button
+            data-disabled
+            variant={showSelection ? "outline" : "filled"}
+            onClick={showSelectionHandler}
+          >
+            Delete Scores (WIP)
+          </Button>
         </Flex>
       </Flex>
 
@@ -595,7 +640,9 @@ export default function SortableTable({
         <Title order={3}>{sortedData.length} score(s) found!</Title>
       </Flex>
 
-      <ScrollArea h="70vh">{scores}</ScrollArea>
+      <ScrollArea h="70vh" type="auto">
+        {scores}
+      </ScrollArea>
     </Flex>
   );
 }
