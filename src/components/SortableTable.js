@@ -32,16 +32,16 @@ function filterData(data, search) {
     artist,
     title,
     mapper,
-    minPP,
-    maxPP,
-    minAcc,
-    maxAcc,
+    mods,
     minSR,
     maxSR,
     minDate,
     maxDate,
-    mods,
     rank,
+    minAcc,
+    maxAcc,
+    minPP,
+    maxPP,
   } = search;
 
   return data.filter(
@@ -49,20 +49,20 @@ function filterData(data, search) {
       item["artist"].toLowerCase().includes(artist.toLowerCase().trim()) &&
       item["title"].toLowerCase().includes(title.toLowerCase().trim()) &&
       item["mapper"].toLowerCase().includes(mapper.toLowerCase().trim()) &&
-      (minPP ? item["pp"] >= minPP : item["pp"] >= 0) &&
-      (maxPP ? item["pp"] <= maxPP : item["pp"] <= Number.MAX_VALUE) &&
-      (minAcc ? item["acc"] >= minAcc / 100 : item["acc"] >= 0) &&
-      (maxAcc ? item["acc"] <= maxAcc / 100 : item["acc"] <= 1) &&
-      (minSR ? item["sr"] >= minSR : item["sr"] >= 0) &&
-      (maxSR ? item["sr"] <= maxSR : item["sr"] <= Number.MAX_VALUE) &&
-      (!minDate || minDate <= item["date"]) &&
-      (!maxDate || item["date"] <= calculateDate(maxDate, 1)) &&
       (!mods ||
         mods.length === 0 ||
         (mods.length === item["mods"].length &&
           mods.every((mod) => item["mods"].includes(mod))) ||
         (mods.length === 1 && mods[0] === "NM" && item["mods"] === "NM")) &&
-      (!rank || item["rank"] === rank)
+      (minSR ? item["sr"] >= minSR : item["sr"] >= 0) &&
+      (maxSR ? item["sr"] <= maxSR : item["sr"] <= Number.MAX_VALUE) &&
+      (!minDate || minDate <= item["date"]) &&
+      (!maxDate || item["date"] <= calculateDate(maxDate, 1)) &&
+      (!rank || item["rank"] === rank) &&
+      (minAcc ? item["acc"] >= minAcc / 100 : item["acc"] >= 0) &&
+      (maxAcc ? item["acc"] <= maxAcc / 100 : item["acc"] <= 1) &&
+      (minPP ? item["pp"] >= minPP : item["pp"] >= 0) &&
+      (maxPP ? item["pp"] <= maxPP : item["pp"] <= Number.MAX_VALUE)
   );
 }
 
@@ -196,31 +196,31 @@ export default function SortableTable({
   const [artistSearch, setArtistSearch] = useState("");
   const [titleSearch, setTitleSearch] = useState("");
   const [mapperSearch, setMapperSearch] = useState("");
-  const [minPPSearch, setMinPPSearch] = useState();
-  const [maxPPSearch, setMaxPPSearch] = useState();
-  const [minAccSearch, setMinAccSearch] = useState();
-  const [maxAccSearch, setMaxAccSearch] = useState();
+  const [modsSearch, setModsSearch] = useState();
   const [minSRSearch, setMinSRSearch] = useState();
   const [maxSRSearch, setMaxSRSearch] = useState();
   const [minDateSearch, setMinDateSearch] = useState();
   const [maxDateSearch, setMaxDateSearch] = useState();
-  const [modsSearch, setModsSearch] = useState();
   const [rankSearch, setRankSearch] = useState();
+  const [minAccSearch, setMinAccSearch] = useState();
+  const [maxAccSearch, setMaxAccSearch] = useState();
+  const [minPPSearch, setMinPPSearch] = useState();
+  const [maxPPSearch, setMaxPPSearch] = useState();
 
   const currentSearchParams = {
     artist: artistSearch,
     title: titleSearch,
     mapper: mapperSearch,
-    minPP: minPPSearch,
-    maxPP: maxPPSearch,
-    minAcc: minAccSearch,
-    maxAcc: maxAccSearch,
+    mods: modsSearch,
     minSR: minSRSearch,
     maxSR: maxSRSearch,
     minDate: minDateSearch,
     maxDate: maxDateSearch,
-    mods: modsSearch,
     rank: rankSearch,
+    minAcc: minAccSearch,
+    maxAcc: maxAccSearch,
+    minPP: minPPSearch,
+    maxPP: maxPPSearch,
   };
 
   // Handler for updating the filter
@@ -244,18 +244,6 @@ export default function SortableTable({
       case "maxSR":
         setMaxSRSearch(value);
         break;
-      case "minPP":
-        setMinPPSearch(value);
-        break;
-      case "maxPP":
-        setMaxPPSearch(value);
-        break;
-      case "minAcc":
-        setMinAccSearch(value);
-        break;
-      case "maxAcc":
-        setMaxAccSearch(value);
-        break;
       case "minDate":
         setMinDateSearch(value);
         break;
@@ -264,6 +252,18 @@ export default function SortableTable({
         break;
       case "rank":
         setRankSearch(value);
+        break;
+      case "minAcc":
+        setMinAccSearch(value);
+        break;
+      case "maxAcc":
+        setMaxAccSearch(value);
+        break;
+      case "minPP":
+        setMinPPSearch(value);
+        break;
+      case "maxPP":
+        setMaxPPSearch(value);
         break;
     }
 
@@ -367,7 +367,7 @@ export default function SortableTable({
             onClose={close}
             title="Filter"
             sx={{ fontFamily: "Segoe UI" }}
-            size={400}
+            size={420}
           >
             <Flex
               direction={{ base: "row", sm: "column" }}
@@ -377,7 +377,7 @@ export default function SortableTable({
               <TextInput
                 placeholder="Find artist name"
                 mb="md"
-                w="22.05rem"
+                w="23.92rem"
                 icon={<IconSearch size="0.9rem" stroke={1.5} />}
                 value={artistSearch}
                 onChange={(event) =>
@@ -389,7 +389,7 @@ export default function SortableTable({
               <TextInput
                 placeholder="Find map title"
                 mb="md"
-                w="22.05rem"
+                w="23.92rem"
                 icon={<IconSearch size="0.9rem" stroke={1.5} />}
                 value={titleSearch}
                 onChange={(event) =>
@@ -401,7 +401,7 @@ export default function SortableTable({
               <TextInput
                 placeholder="Find mapper name"
                 mb="md"
-                w="22.05rem"
+                w="23.92rem"
                 icon={<IconSearch size="0.9rem" stroke={1.5} />}
                 value={mapperSearch}
                 onChange={(event) =>
@@ -413,7 +413,7 @@ export default function SortableTable({
               <MultiSelect
                 clearable
                 mb="md"
-                w="22.05rem"
+                w="23.92rem"
                 placeholder="Select mods"
                 data={[
                   { value: "NM", label: "NM" },
@@ -439,7 +439,7 @@ export default function SortableTable({
                   hideControls
                   placeholder="Min. star rating"
                   mb="md"
-                  w="10rem"
+                  w="11rem"
                   step={0.01}
                   precision={2}
                   value={minSRSearch}
@@ -452,7 +452,7 @@ export default function SortableTable({
                   hideControls
                   placeholder="Max. star rating"
                   mb="md"
-                  w="10rem"
+                  w="11rem"
                   step={0.01}
                   precision={2}
                   value={maxSRSearch}
@@ -460,13 +460,54 @@ export default function SortableTable({
                 />
               </Flex>
 
+              <Title order={5}>Date</Title>
+              <Flex gap={{ base: "sm" }}>
+                <DateInput
+                  clearable
+                  placeholder="Start date"
+                  mb="md"
+                  w="11rem"
+                  value={minDateSearch}
+                  onChange={(value) => filterUpdateHandler("minDate", value)}
+                />
+
+                <Title order={3}> - </Title>
+
+                <DateInput
+                  clearable
+                  placeholder="End date"
+                  mb="md"
+                  w="11rem"
+                  value={maxDateSearch}
+                  onChange={(value) => filterUpdateHandler("maxDate", value)}
+                />
+              </Flex>
+
+              <Title order={5}>Rank</Title>
+              <Select
+                clearable
+                placeholder="Select rank"
+                mb="md"
+                w="23.92rem"
+                data={[
+                  { value: "SS", label: "SS" },
+                  { value: "S", label: "S" },
+                  { value: "A", label: "A" },
+                  { value: "B", label: "B" },
+                  { value: "C", label: "C" },
+                  { value: "D", label: "D" },
+                ]}
+                value={rankSearch}
+                onChange={(value) => filterUpdateHandler("rank", value)}
+              />
+
               <Title order={5}>pp</Title>
               <Flex gap={{ base: "sm" }}>
                 <NumberInput
                   hideControls
                   placeholder="Min. pp"
                   mb="md"
-                  w="10rem"
+                  w="11rem"
                   step={0.01}
                   precision={2}
                   value={minPPSearch}
@@ -479,7 +520,7 @@ export default function SortableTable({
                   hideControls
                   placeholder="Max. pp"
                   mb="md"
-                  w="10rem"
+                  w="11rem"
                   step={0.01}
                   precision={2}
                   value={maxPPSearch}
@@ -493,7 +534,7 @@ export default function SortableTable({
                   hideControls
                   placeholder="Min. accuracy"
                   mb="md"
-                  w="10rem"
+                  w="11rem"
                   step={0.01}
                   precision={2}
                   value={minAccSearch}
@@ -506,54 +547,13 @@ export default function SortableTable({
                   hideControls
                   placeholder="Max. accuracy"
                   mb="md"
-                  w="10rem"
+                  w="11rem"
                   step={0.01}
                   precision={2}
                   value={maxAccSearch}
                   onChange={(value) => filterUpdateHandler("maxAcc", value)}
                 />
               </Flex>
-
-              <Title order={5}>Date</Title>
-              <Flex gap={{ base: "sm" }}>
-                <DateInput
-                  clearable
-                  placeholder="Start date"
-                  mb="md"
-                  w="10rem"
-                  value={minDateSearch}
-                  onChange={(value) => filterUpdateHandler("minDate", value)}
-                />
-
-                <Title order={3}> - </Title>
-
-                <DateInput
-                  clearable
-                  placeholder="End date"
-                  mb="md"
-                  w="10rem"
-                  value={maxDateSearch}
-                  onChange={(value) => filterUpdateHandler("maxDate", value)}
-                />
-              </Flex>
-
-              <Title order={5}>Rank</Title>
-              <Select
-                clearable
-                placeholder="Select rank"
-                mb="md"
-                w="22.05rem"
-                data={[
-                  { value: "SS", label: "SS" },
-                  { value: "S", label: "S" },
-                  { value: "A", label: "A" },
-                  { value: "B", label: "B" },
-                  { value: "C", label: "C" },
-                  { value: "D", label: "D" },
-                ]}
-                value={rankSearch}
-                onChange={(value) => filterUpdateHandler("rank", value)}
-              />
             </Flex>
           </Drawer>
 
