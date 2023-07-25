@@ -1,4 +1,4 @@
-import { BackgroundImage, Center, Flex, Grid, Title } from "@mantine/core";
+import { BackgroundImage, Center, Flex, Grid, Image, Title } from "@mantine/core";
 import { IconStarFilled } from "@tabler/icons-react";
 
 export default function Score({ scoreData }) {
@@ -13,7 +13,13 @@ export default function Score({ scoreData }) {
           color: "white",
         }}
       >
-        <Grid h={120} bg="rgba(0, 0, 0, .75)" justify="center" align="center" grow>
+        <Grid
+          h={120}
+          bg="rgba(0, 0, 0, .75)"
+          justify="center"
+          align="center"
+          grow
+        >
           <Grid.Col span={1}>
             <Flex direction="column" justify="center" ml="20px">
               <Title>{scoreData.index + 1}</Title>
@@ -32,14 +38,18 @@ export default function Score({ scoreData }) {
 
           <Grid.Col span={2}>
             <Flex direction="column" justify="center" align="center">
-              <Title order={2}>{scoreData.mods}</Title>
+              <Flex direction="row">{scoreData.mods.map(mod => <Image src={`/mods/${mod}.png`} width={44} height={31} mt={2} mb={3}/>)}</Flex>
               <Title order={2}>
                 {scoreData.sr.toFixed(2)}
-                {scoreData.sr_multiplier}{" "}
-                {<IconStarFilled />}
+                {scoreData.sr_multiplier} {<IconStarFilled />}
               </Title>
               <Title order={6}>
-                {scoreData.date.toLocaleString()}
+                {`0${scoreData.date.getDate()}`.slice(-2)}/
+                {`0${scoreData.date.getMonth() + 1}`.slice(-2)}/
+                {scoreData.date.getFullYear()}{" "}
+                {`0${scoreData.date.getHours()}`.slice(-2)}:
+                {`0${scoreData.date.getMinutes()}`.slice(-2)}:
+                {`0${scoreData.date.getSeconds()}`.slice(-2)}
               </Title>
             </Flex>
           </Grid.Col>

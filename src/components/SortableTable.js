@@ -170,7 +170,7 @@ export default function SortableTable({
         score.mods.includes("EZ")
           ? "*"
           : "",
-      mods: score.mods.length >= 1 ? score.mods : "NM",
+      mods: score.mods.length >= 1 ? score.mods : ["NM"],
       pp: score.pp,
       acc: score.accuracy,
       rank:
@@ -186,6 +186,8 @@ export default function SortableTable({
 
   // Score state
   const [sortedData, setSortedData] = useState(scoresData);
+
+  useEffect(() => {console.log(sortedData)}, [sortedData]);
 
   // ============================================= FILTER BY SEARCH =============================================
 
