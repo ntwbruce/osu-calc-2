@@ -48,6 +48,7 @@ export default function Score({ scoreData }) {
               <Flex direction="row">
                 {scoreData.mods.map((mod) => (
                   <Image
+                    key={mod}
                     src={`/mods/${mod}.png`}
                     width={44}
                     height={31}
@@ -57,8 +58,10 @@ export default function Score({ scoreData }) {
                 ))}
               </Flex>
               <Title order={2}>
-                {scoreData.sr.toFixed(2)}
-                {scoreData.sr_multiplier} {<IconStarFilled />}
+                <Flex align="center" gap={5}>
+                  {scoreData.sr.toFixed(2)}
+                  {scoreData.sr_multiplier} {<IconStarFilled />}
+                </Flex>
               </Title>
               <Title order={6}>
                 {`0${scoreData.date.getDate()}`.slice(-2)}/
