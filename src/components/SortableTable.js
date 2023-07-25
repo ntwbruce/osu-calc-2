@@ -9,6 +9,7 @@ import {
   Drawer,
   MultiSelect,
   ScrollArea,
+  Image,
 } from "@mantine/core";
 import {
   IconSearch,
@@ -187,8 +188,6 @@ export default function SortableTable({
 
   // Score state
   const [sortedData, setSortedData] = useState(scoresData);
-
-  useEffect(() => {console.log(sortedData)}, [sortedData]);
 
   // ============================================= FILTER BY SEARCH =============================================
 
@@ -419,20 +418,28 @@ export default function SortableTable({
                 w="23.92rem"
                 placeholder="Select mods"
                 data={[
-                  { value: "NM", label: "NM" },
-                  { value: "EZ", label: "EZ" },
-                  { value: "NF", label: "NF" },
-                  { value: "HT", label: "HT" },
-                  { value: "HR", label: "HR" },
-                  { value: "SD", label: "SD" },
-                  { value: "PF", label: "PF" },
-                  { value: "DT", label: "DT" },
-                  { value: "NC", label: "NC" },
-                  { value: "HD", label: "HD" },
-                  { value: "FL", label: "FL" },
-                  { value: "SO", label: "SO" },
-                  { value: "TD", label: "TD" },
-                ]}
+                  "NM",
+                  "EZ",
+                  "NF",
+                  "HT",
+                  "HR",
+                  "SD",
+                  "PF",
+                  "DT",
+                  "NC",
+                  "HD",
+                  "FL",
+                  "SO",
+                  "TD",
+                ].map((mod) => ({
+                  value: mod,
+                  label: (
+                    <Flex direction="row" gap="md">
+                      <Image src={`/mods/${mod}.png`} width={44} height={31} />
+                      <Title order={3}>{mod}</Title>
+                    </Flex>
+                  ),
+                }))}
                 value={modsSearch}
                 onChange={(value) => filterUpdateHandler("mods", value)}
               />
