@@ -94,9 +94,10 @@ function sortData(data, payload) {
             NF: 0.5,
             EZ: 0.5 + 0.01,
             SO: 0.9,
-            NM: 1.0,
-            SD: 1.0 + 0.01,
-            PF: 1.0 + 0.02,
+            TD: 1.0,
+            NM: 1.0 + 0.01,
+            SD: 1.0 + 0.02,
+            PF: 1.0 + 0.03,
             HD: 1.06,
             HR: 1.06 + 0.01,
             FL: 1.12,
@@ -430,6 +431,7 @@ export default function SortableTable({
                   { value: "HD", label: "HD" },
                   { value: "FL", label: "FL" },
                   { value: "SO", label: "SO" },
+                  { value: "TD", label: "TD" },
                 ]}
                 value={modsSearch}
                 onChange={(value) => filterUpdateHandler("mods", value)}

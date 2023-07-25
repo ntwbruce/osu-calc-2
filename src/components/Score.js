@@ -1,4 +1,11 @@
-import { BackgroundImage, Center, Flex, Grid, Image, Title } from "@mantine/core";
+import {
+  BackgroundImage,
+  Center,
+  Flex,
+  Grid,
+  Image,
+  Title,
+} from "@mantine/core";
 import { IconStarFilled } from "@tabler/icons-react";
 
 export default function Score({ scoreData }) {
@@ -38,7 +45,17 @@ export default function Score({ scoreData }) {
 
           <Grid.Col span={2}>
             <Flex direction="column" justify="center" align="center">
-              <Flex direction="row">{scoreData.mods.map(mod => <Image src={`/mods/${mod}.png`} width={44} height={31} mt={2} mb={3}/>)}</Flex>
+              <Flex direction="row">
+                {scoreData.mods.map((mod) => (
+                  <Image
+                    src={`/mods/${mod}.png`}
+                    width={44}
+                    height={31}
+                    mt={2}
+                    mb={3}
+                  />
+                ))}
+              </Flex>
               <Title order={2}>
                 {scoreData.sr.toFixed(2)}
                 {scoreData.sr_multiplier} {<IconStarFilled />}
