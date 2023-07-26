@@ -4,7 +4,7 @@ import UserDetails from "@/components/UserDetails";
 import axios from "axios";
 import { Title, Flex, Loader, Paper, Center } from "@mantine/core";
 import Head from "next/head";
-import { IconZoomQuestion } from "@tabler/icons-react";
+import { IconHammer, IconZoomQuestion } from "@tabler/icons-react";
 import { HeaderBar } from "@/components/HeaderBar";
 
 export default function UserProfilePage() {
@@ -83,11 +83,13 @@ export default function UserProfilePage() {
         home={{ label: "Check another profile", link: "/" }}
         currPage="Profile"
       />
-
       <Flex
         direction={{ base: "row", sm: "column" }}
         gap={{ base: "sm", sm: "md" }}
         justify={{ sm: "center" }}
+        s
+        ml={25}
+        mr={25}
       >
         {authTokenPresent && isUserDataSet && (
           <UserDetails
@@ -98,7 +100,31 @@ export default function UserProfilePage() {
               rankChange: 0,
               showChanges: false,
             }}
+            isVertical={false}
           />
+        )}
+
+        {isUserDataSet && (
+          <>
+            <Title order={1} align="center">
+              Profile
+            </Title>
+            <Center>
+              <Paper w="50%" p="md" radius="md">
+                <Flex
+                  direction={{ base: "row", sm: "column" }}
+                  gap={{ base: "md" }}
+                  justify={{ sm: "center" }}
+                  align={"center"}
+                >
+                  <IconHammer size={60} />
+                  <Title order={2} align="center">
+                    Work in progress, come back later!
+                  </Title>
+                </Flex>
+              </Paper>
+            </Center>
+          </>
         )}
 
         {!isUserDataSet && doesUserExist && (
