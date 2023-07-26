@@ -606,7 +606,7 @@ export default function SortableTable({
           </Button>
         </Flex>
 
-        <Title order={3}>||</Title>
+        {/* <Title order={3}>||</Title>
 
         <Flex
           direction={{ base: "column", sm: "row" }}
@@ -614,7 +614,7 @@ export default function SortableTable({
           justify={{ sm: "center" }}
           align="center"
         >
-          {/* {isStatChangeReady ? (
+          {isStatChangeReady ? (
             <Button
               data-disabled
               variant={showSelection ? "outline" : "filled"}
@@ -631,7 +631,7 @@ export default function SortableTable({
             >
               Delete Scores (WIP)
             </Button>
-          )} */}
+          )}
           <Button
             data-disabled
             variant={showSelection ? "outline" : "filled"}
@@ -639,7 +639,7 @@ export default function SortableTable({
           >
             Delete Scores (WIP)
           </Button>
-        </Flex>
+        </Flex> */}
       </Flex>
 
       <Flex
