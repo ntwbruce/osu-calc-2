@@ -169,9 +169,8 @@ export default function SortableTable({
         score.mods.includes("NC") ||
         score.mods.includes("FL") ||
         score.mods.includes("HR") ||
-        score.mods.includes("EZ")
-          ? "*"
-          : "",
+        score.mods.includes("EZ") ||
+        score.mods.includes("HT"),
       mods: score.mods.length >= 1 ? score.mods : ["NM"],
       pp: score.pp,
       acc: score.accuracy,
@@ -183,6 +182,14 @@ export default function SortableTable({
           : score.rank,
       background: score.beatmapset.covers.cover,
       date: new Date(score.created_at),
+      max_combo: score.max_combo,
+      hit_counts: {
+        count_300: score.statistics.count_300,
+        count_100: score.statistics.count_100,
+        count_50: score.statistics.count_50,
+        count_miss: score.statistics.count_miss,
+      },
+      score: score.score,
     };
   });
 
