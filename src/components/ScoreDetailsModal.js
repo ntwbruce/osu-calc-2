@@ -1,5 +1,14 @@
+import { calculateMapStats } from "@/lib/calculators/MapStatCalculator";
 import { calculateStarRating } from "@/lib/calculators/StarRatingCalculator";
-import { BackgroundImage, Flex, Loader, Modal, Title } from "@mantine/core";
+import { calculateModValue } from "@/lib/modbits";
+import {
+  BackgroundImage,
+  Flex,
+  Image,
+  Loader,
+  Modal,
+  Title,
+} from "@mantine/core";
 import { IconStarFilled } from "@tabler/icons-react";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -10,6 +19,8 @@ export default function ScoreDetailsModal({ opened, close, scoreData }) {
   const [onlineScoreData, setOnlineScoreData] = useState({});
   const [starRating, setStarRating] = useState(0);
   const [isStarRatingSet, setIsStarRatingSet] = useState(false);
+  const [mapStats, setMapStats] = useState({});
+  const [areMapStatsSet, setAreMapsStatsSet] = useState(false);
   const [isOpenedBefore, setIsOpenedBefore] = useState(false);
 
   useEffect(() => {
@@ -17,6 +28,10 @@ export default function ScoreDetailsModal({ opened, close, scoreData }) {
       setIsOpenedBefore(true);
     }
   }, [opened]);
+
+  useEffect(() => {
+    if (Object.keys(beatmapData).length !== 0) console.log(beatmapData);
+  }, [beatmapData]);
 
   useEffect(() => {
     const fetchBeatmapData = async (beatmapID) => {
@@ -55,20 +70,6 @@ export default function ScoreDetailsModal({ opened, close, scoreData }) {
     }
   }, [isOpenedBefore, opened]);
 
-//   useEffect(() => {
-//     if (Object.keys(beatmapData).length !== 0) {
-//       console.log("logging beatmap data");
-//       console.log(beatmapData);
-//     }
-//   }, [beatmapData]);
-
-//   useEffect(() => {
-//     if (Object.keys(onlineScoreData).length !== 0) {
-//       console.log("logging score data");
-//       console.log(onlineScoreData);
-//     }
-//   }, [onlineScoreData]);
-
   useEffect(() => {
     if (
       Object.keys(beatmapData).length !== 0 &&
@@ -81,6 +82,21 @@ export default function ScoreDetailsModal({ opened, close, scoreData }) {
           : beatmapData.difficulty_rating
       );
       setIsStarRatingSet(true);
+      setMapStats(
+        calculateMapStats(
+          {
+            baseAR: beatmapData.ar,
+            baseOD: beatmapData.accuracy,
+            baseHP: beatmapData.drain,
+            baseCS: beatmapData.cs,
+            baseTotalLength: beatmapData.total_length,
+            baseDrainLength: beatmapData.hit_length,
+            baseBPM: beatmapData.bpm,
+          },
+          calculateModValue(scoreData.mods)
+        )
+      );
+      setAreMapsStatsSet(true);
     }
   }, [beatmapData, onlineScoreData, beatmapFileData]);
 
@@ -112,6 +128,18 @@ export default function ScoreDetailsModal({ opened, close, scoreData }) {
             {<IconStarFilled />})
           </Title>
           <Title order={4}>mapset by {scoreData.mapper}</Title>
+          <Flex direction="row">
+            {scoreData.mods.map((mod) => (
+              <Image
+                key={mod}
+                src={`/mods/${mod}.png`}
+                width={44}
+                height={31}
+                mt={2}
+                mb={3}
+              />
+            ))}
+          </Flex>
           <Title order={2}>
             {scoreData.max_combo}/{beatmapData.max_combo}x{" "}
             {scoreData.max_combo === beatmapData.max_combo ? "(PFC)" : ""} (
@@ -126,14 +154,52 @@ export default function ScoreDetailsModal({ opened, close, scoreData }) {
             {scoreData.rank}
           </Title>
           <Title order={2}>
-            CS{beatmapData.cs} AR{beatmapData.ar} OD{beatmapData.accuracy} HP
-            {beatmapData.drain}
+            CS{" "}
+            {areMapStatsSet ? (
+              mapStats.newCS
+            ) : (
+              <Loader size={20} color="white" />
+            )}{" "}
+            AR{" "}
+            {areMapStatsSet ? (
+              mapStats.newAR
+            ) : (
+              <Loader size={20} color="white" />
+            )}{" "}
+            OD{" "}
+            {areMapStatsSet ? (
+              mapStats.newOD
+            ) : (
+              <Loader size={20} color="white" />
+            )}{" "}
+            HP{" "}
+            {areMapStatsSet ? (
+              mapStats.newHP
+            ) : (
+              <Loader size={20} color="white" />
+            )}
           </Title>
           <Title order={2}>
-            {`0${Math.floor(beatmapData.total_length / 60)}`.slice(-2)}:
-            {`0${beatmapData.total_length % 60}`.slice(-2)}(
-            {`0${Math.floor(beatmapData.hit_length / 60)}`.slice(-2)}:
-            {`0${beatmapData.hit_length % 60}`.slice(-2)}) {beatmapData.bpm}BPM
+            {areMapStatsSet ? (
+              `0${Math.floor(mapStats.newTotalLength / 60)}:`.slice(-3)
+            ) : (
+              <Loader size={20} color="white" />
+            )}
+            {areMapStatsSet ? `0${mapStats.newTotalLength % 60}`.slice(-2) : ""}
+            (
+            {areMapStatsSet ? (
+              `0${Math.floor(mapStats.newDrainLength / 60)}:`.slice(-3)
+            ) : (
+              <Loader size={20} color="white" />
+            )}
+            {areMapStatsSet ? `0${mapStats.newDrainLength % 60}`.slice(-2) : ""}
+            ){" "}
+            {areMapStatsSet ? (
+              mapStats.newBPM
+            ) : (
+              <Loader size={20} color="white" />
+            )}
+            BPM
           </Title>
         </Flex>
       </BackgroundImage>
