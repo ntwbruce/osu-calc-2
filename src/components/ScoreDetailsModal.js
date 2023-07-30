@@ -6,6 +6,7 @@ import {
   Flex,
   Image,
   Loader,
+  LoadingOverlay,
   Modal,
   Title,
 } from "@mantine/core";
@@ -28,10 +29,6 @@ export default function ScoreDetailsModal({ opened, close, scoreData }) {
       setIsOpenedBefore(true);
     }
   }, [opened]);
-
-  useEffect(() => {
-    if (Object.keys(beatmapData).length !== 0) console.log(beatmapData);
-  }, [beatmapData]);
 
   useEffect(() => {
     const fetchBeatmapData = async (beatmapID) => {
@@ -69,6 +66,12 @@ export default function ScoreDetailsModal({ opened, close, scoreData }) {
       fetchBeatmapFileData(scoreData.beatmap_id);
     }
   }, [isOpenedBefore, opened]);
+
+  useEffect(() => {
+    setIsOpenedBefore(false);
+    setIsStarRatingSet(false);
+    setAreMapsStatsSet(false);
+  }, [scoreData]);
 
   useEffect(() => {
     if (
@@ -117,6 +120,7 @@ export default function ScoreDetailsModal({ opened, close, scoreData }) {
         }}
         h={400}
       >
+        <LoadingOverlay visible={!isStarRatingSet || !areMapStatsSet} overlayBlur={10}/>
         <Flex direction="column" bg="rgba(0, 0, 0, .75)" p={20} h="100%">
           <Title>
             {scoreData.artist} - {scoreData.title} [{scoreData.difficulty}] (

@@ -115,7 +115,6 @@ export const calculateMapStats = (
   mods
 ) => {
   const { EZ, HR, DT, HT, NC } = deconstructMods(mods);
-  console.log(baseTotalLength, baseDrainLength);
   return {
     newAR: calculateAR(baseAR, { EZ, HR, DT, HT, NC }),
     newOD: calculateOD(baseOD, { EZ, HR, DT, HT, NC }),
