@@ -57,6 +57,8 @@ export default function UserDetails({ userData, statChangeData, isVertical }) {
             </Title>
           </Flex>
 
+          {!userData.statistics.is_ranked && <Title>(INACTIVE)</Title>}
+
           <Flex
             w="60%"
             h="60%"
