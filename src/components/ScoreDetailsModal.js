@@ -13,6 +13,8 @@ import {
 import { IconStarFilled } from "@tabler/icons-react";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import ImageWithPopover from "./ImageWithPopover";
+import { ModFullNames } from "@/lib/ModFullNames";
 
 export default function ScoreDetailsModal({ opened, close, scoreData }) {
   const [beatmapData, setBeatmapData] = useState({});
@@ -165,12 +167,14 @@ export default function ScoreDetailsModal({ opened, close, scoreData }) {
               <Title order={4}>MODS</Title>
               <Flex direction="row">
                 {scoreData.mods.map((mod) => (
-                  <Image
+                  <ImageWithPopover
                     key={mod}
-                    src={`/mods/${mod}.png`}
+                    imageSrc={`/mods/${mod}.png`}
+                    popoverText={ModFullNames[mod]}
+                    popoverWidth={120}
                     width={44}
                     height={31}
-                    mt={7}
+                    margin={7}
                   />
                 ))}
               </Flex>

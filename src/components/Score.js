@@ -9,16 +9,14 @@ import {
 import { IconStarFilled } from "@tabler/icons-react";
 import ScoreDetailsModal from "./ScoreDetailsModal";
 import { useDisclosure } from "@mantine/hooks";
+import ImageWithPopover from "./ImageWithPopover";
+import { ModFullNames } from "@/lib/ModFullNames";
 
 export default function Score({ scoreData }) {
   const [opened, { open, close }] = useDisclosure(false);
   return (
     <>
-      <ScoreDetailsModal
-        opened={opened}
-        close={close}
-        scoreData={scoreData}
-      />
+      <ScoreDetailsModal opened={opened} close={close} scoreData={scoreData} />
       <Center m={20}>
         <BackgroundImage
           src={scoreData.background}
@@ -57,13 +55,14 @@ export default function Score({ scoreData }) {
               <Flex direction="column" justify="center" align="center">
                 <Flex direction="row">
                   {scoreData.mods.map((mod) => (
-                    <Image
+                    <ImageWithPopover
                       key={mod}
-                      src={`/mods/${mod}.png`}
+                      imageSrc={`/mods/${mod}.png`}
+                      popoverText={ModFullNames[mod]}
+                      popoverWidth={120}
                       width={44}
                       height={31}
-                      mt={2}
-                      mb={3}
+                      margin={3}
                     />
                   ))}
                 </Flex>

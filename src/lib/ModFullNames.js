@@ -1,0 +1,15 @@
+export const ModFullNames = {
+  NM: "No Mod",
+  EZ: "Easy",
+  NF: "No Fail",
+  HT: "Half Time",
+  HR: "Hard Rock",
+  SD: "Sudden Death",
+  PF: "Perfect",
+  DT: "Double Time",
+  NC: "Nightcoree",
+  HD: "Hidden",
+  FL: "Flashlight",
+  SO: "Spun Out",
+  TD: "Touch Device",
+};
