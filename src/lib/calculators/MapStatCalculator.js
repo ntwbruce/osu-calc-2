@@ -93,11 +93,11 @@ export const calculateCS = (baseCS, { EZ, HR }) => {
 // Calculate new beatmap length with given mods.
 export const calculateLength = (baseLength, { HT, DT, NC }) => {
   if (HT) {
-    return Math.round((4 / 3) * baseLength);
+    return Math.round((4 / 3) * baseLength * 10) / 10;
   } else if (DT || NC) {
-    return Math.round((2 / 3) * baseLength);
+    return Math.round((2 / 3) * baseLength * 10) / 10;
   }
-  return baseLength;
+  return Math.round(baseLength * 10) / 10;
 };
 
 // Calculate new BPM with given mods.
@@ -107,7 +107,7 @@ export const calculateBPM = (baseBPM, { HT, DT, NC }) => {
   } else if (DT || NC) {
     return (3 / 2) * baseBPM;
   }
-  return baseBPM;
+  return Math.round(baseBPM * 10) / 10;
 };
 
 export const calculateMapStats = (

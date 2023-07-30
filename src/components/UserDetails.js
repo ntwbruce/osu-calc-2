@@ -70,8 +70,6 @@ export default function UserDetails({ userData, statChangeData, isVertical }) {
             gap="10%"
             justify="center"
             direction={isVertical ? "column" : "row"}
-            mt="5%"
-            mb="5%"
           >
             <Flex
             direction="column"

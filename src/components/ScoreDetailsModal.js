@@ -118,93 +118,210 @@ export default function ScoreDetailsModal({ opened, close, scoreData }) {
           borderRadius: "10px",
           color: "white",
         }}
-        h={400}
+        h={600}
       >
-        <LoadingOverlay visible={!isStarRatingSet || !areMapStatsSet} overlayBlur={10}/>
-        <Flex direction="column" bg="rgba(0, 0, 0, .75)" p={20} h="100%">
-          <Title>
-            {scoreData.artist} - {scoreData.title} [{scoreData.difficulty}] (
-            {isStarRatingSet ? (
-              starRating.toFixed(2)
-            ) : (
-              <Loader size={25} color="white" />
-            )}
-            {<IconStarFilled />})
-          </Title>
-          <Title order={4}>mapset by {scoreData.mapper}</Title>
-          <Flex direction="row">
-            {scoreData.mods.map((mod) => (
-              <Image
-                key={mod}
-                src={`/mods/${mod}.png`}
-                width={44}
-                height={31}
-                mt={2}
-                mb={3}
-              />
-            ))}
+        <LoadingOverlay
+          visible={!isStarRatingSet || !areMapStatsSet}
+          overlayBlur={10}
+        />
+        <Flex
+          direction="column"
+          bg="rgba(0, 0, 0, .75)"
+          p={20}
+          h="100%"
+          gap={20}
+          justify="center"
+        >
+          <Flex direction="column" align="center">
+            <Title>{scoreData.artist}</Title>
+            <Title size={50}>{scoreData.title}</Title>
           </Flex>
-          <Title order={2}>
-            {scoreData.max_combo}/{beatmapData.max_combo}x{" "}
-            {scoreData.max_combo === beatmapData.max_combo ? "(PFC)" : ""} (
-            {scoreData.hit_counts.count_300}/{scoreData.hit_counts.count_100}/
-            {scoreData.hit_counts.count_50}/{scoreData.hit_counts.count_miss})
-          </Title>
-          <Title order={2}>
-            #{onlineScoreData.position} {scoreData.score.toLocaleString()}
-          </Title>
-          <Title order={2}>
-            {scoreData.pp.toFixed(2)}pp {(scoreData.acc * 100).toFixed(2)}%{" "}
-            {scoreData.rank}
-          </Title>
-          <Title order={2}>
-            CS{" "}
-            {areMapStatsSet ? (
-              mapStats.newCS
-            ) : (
-              <Loader size={20} color="white" />
-            )}{" "}
-            AR{" "}
-            {areMapStatsSet ? (
-              mapStats.newAR
-            ) : (
-              <Loader size={20} color="white" />
-            )}{" "}
-            OD{" "}
-            {areMapStatsSet ? (
-              mapStats.newOD
-            ) : (
-              <Loader size={20} color="white" />
-            )}{" "}
-            HP{" "}
-            {areMapStatsSet ? (
-              mapStats.newHP
-            ) : (
-              <Loader size={20} color="white" />
-            )}
-          </Title>
-          <Title order={2}>
-            {areMapStatsSet ? (
-              `0${Math.floor(mapStats.newTotalLength / 60)}:`.slice(-3)
-            ) : (
-              <Loader size={20} color="white" />
-            )}
-            {areMapStatsSet ? `0${mapStats.newTotalLength % 60}`.slice(-2) : ""}
-            (
-            {areMapStatsSet ? (
-              `0${Math.floor(mapStats.newDrainLength / 60)}:`.slice(-3)
-            ) : (
-              <Loader size={20} color="white" />
-            )}
-            {areMapStatsSet ? `0${mapStats.newDrainLength % 60}`.slice(-2) : ""}
-            ){" "}
-            {areMapStatsSet ? (
-              mapStats.newBPM
-            ) : (
-              <Loader size={20} color="white" />
-            )}
-            BPM
-          </Title>
+
+          <Flex direction="row" justify="center" gap="10%">
+            <Flex direction="column">
+              <Title order={4}>MAPSET</Title>
+              <Title>{scoreData.mapper}</Title>
+            </Flex>
+
+            <Flex direction="column" maw="40%">
+              <Title order={4}>DIFFICULTY</Title>
+              <Title>{scoreData.difficulty}</Title>
+            </Flex>
+
+            <Flex direction="column">
+              <Title order={4}>
+                STAR RATING {<IconStarFilled size={15} />}
+              </Title>
+              <Title>
+                {isStarRatingSet ? (
+                  starRating.toFixed(2)
+                ) : (
+                  <Loader size={25} color="white" />
+                )}
+              </Title>
+            </Flex>
+
+            <Flex direction="column">
+              <Title order={4}>MODS</Title>
+              <Flex direction="row">
+                {scoreData.mods.map((mod) => (
+                  <Image
+                    key={mod}
+                    src={`/mods/${mod}.png`}
+                    width={44}
+                    height={31}
+                    mt={7}
+                  />
+                ))}
+              </Flex>
+            </Flex>
+          </Flex>
+
+          <Flex direction="row" justify="center" gap="10%">
+            <Flex direction="column">
+              <Title order={4}>CS</Title>
+              <Title>
+                {areMapStatsSet ? (
+                  mapStats.newCS
+                ) : (
+                  <Loader size={20} color="white" />
+                )}
+              </Title>
+            </Flex>
+
+            <Flex direction="column">
+              <Title order={4}>AR</Title>
+              <Title>
+                {areMapStatsSet ? (
+                  mapStats.newAR
+                ) : (
+                  <Loader size={20} color="white" />
+                )}
+              </Title>
+            </Flex>
+
+            <Flex direction="column">
+              <Title order={4}>OD</Title>
+              <Title>
+                {areMapStatsSet ? (
+                  mapStats.newOD
+                ) : (
+                  <Loader size={20} color="white" />
+                )}
+              </Title>
+            </Flex>
+
+            <Flex direction="column">
+              <Title order={4}>HP</Title>
+              <Title>
+                {areMapStatsSet ? (
+                  mapStats.newHP
+                ) : (
+                  <Loader size={20} color="white" />
+                )}
+              </Title>
+            </Flex>
+
+            <Flex direction="column">
+              <Title order={4}>MAP LENGTH (DRAIN LENGTH)</Title>
+              <Title>
+                {areMapStatsSet ? (
+                  `0${Math.floor(mapStats.newTotalLength / 60)}:`.slice(-3)
+                ) : (
+                  <Loader size={20} color="white" />
+                )}
+                {areMapStatsSet
+                  ? `0${mapStats.newTotalLength % 60}`.slice(-2)
+                  : ""}
+                (
+                {areMapStatsSet ? (
+                  `0${Math.floor(mapStats.newDrainLength / 60)}:`.slice(-3)
+                ) : (
+                  <Loader size={20} color="white" />
+                )}
+                {areMapStatsSet
+                  ? `0${mapStats.newDrainLength % 60}`.slice(-2)
+                  : ""}
+                )
+              </Title>
+            </Flex>
+
+            <Flex direction="column">
+              <Title order={4}>BPM</Title>
+              <Title>
+                {areMapStatsSet ? (
+                  mapStats.newBPM
+                ) : (
+                  <Loader size={20} color="white" />
+                )}
+              </Title>
+            </Flex>
+          </Flex>
+
+          <Flex direction="row" justify="center" gap="10%">
+            <Flex direction="column">
+              <Title order={4}>DATE SET</Title>
+              <Title>
+                {`0${scoreData.date.getDate()}`.slice(-2)}/
+                {`0${scoreData.date.getMonth() + 1}`.slice(-2)}/
+                {scoreData.date.getFullYear()}{" "}
+                {`0${scoreData.date.getHours()}`.slice(-2)}:
+                {`0${scoreData.date.getMinutes()}`.slice(-2)}:
+                {`0${scoreData.date.getSeconds()}`.slice(-2)}
+              </Title>
+            </Flex>
+
+            <Flex direction="column">
+              <Title order={4}>PP</Title>
+              <Title>{scoreData.pp.toFixed(2)}pp</Title>
+            </Flex>
+
+            <Flex direction="column">
+              <Title order={4}>ACCURACY</Title>
+              <Title>{(scoreData.acc * 100).toFixed(2)}%</Title>
+            </Flex>
+
+            <Flex direction="column">
+              <Title order={4}>RANK</Title>
+              <Title>{scoreData.rank}</Title>
+            </Flex>
+          </Flex>
+
+          <Flex direction="row" justify="center" gap="10%">
+            <Flex direction="column">
+              <Title order={4}>COMBO</Title>
+              <Title
+                sx={{
+                  color:
+                    scoreData.max_combo === beatmapData.max_combo
+                      ? "#DA9100"
+                      : "white",
+                }}
+              >
+                {scoreData.max_combo}/{beatmapData.max_combo}x{" "}
+                {scoreData.max_combo === beatmapData.max_combo ? "(PFC)" : ""}
+              </Title>
+            </Flex>
+
+            <Flex direction="column">
+              <Title order={4}>HITS</Title>
+              <Title>
+                {scoreData.hit_counts.count_300}/
+                {scoreData.hit_counts.count_100}/{scoreData.hit_counts.count_50}
+                /{scoreData.hit_counts.count_miss}
+              </Title>
+            </Flex>
+
+            <Flex direction="column">
+              <Title order={4}>GLOBAL RANK</Title>
+              <Title>#{onlineScoreData.position}</Title>
+            </Flex>
+
+            <Flex direction="column">
+              <Title order={4}>SCORE</Title>
+              <Title>{scoreData.score.toLocaleString()}</Title>
+            </Flex>
+          </Flex>
         </Flex>
       </BackgroundImage>
     </Modal>
