@@ -4,7 +4,6 @@ import { useDisclosure } from "@mantine/hooks";
 export default function ImageWithPopover({
   imageSrc,
   popoverText,
-  popoverWidth,
   width,
   height,
   margin,
@@ -12,7 +11,6 @@ export default function ImageWithPopover({
   const [opened, { close, open }] = useDisclosure(false);
   return (
     <Popover
-      width={popoverWidth}
       position="bottom"
       withArrow
       shadow="md"

@@ -146,6 +146,7 @@ function sortData(data, payload) {
 
 export default function SortableTable({
   rawScoresData,
+  playmode,
   setStatChanges,
   toggleStatChanges,
   isStatChangeReady,
@@ -195,6 +196,12 @@ export default function SortableTable({
 
   // Score state
   const [sortedData, setSortedData] = useState(scoresData);
+
+  // Mods
+  const mods_standard = ["NM", "EZ", "NF", "HT", "HR", "SD", "PF", "DT", "NC", "HD", "FL", "SO", "TD"];
+  const mods_mania = ["NM", "EZ", "NF", "HT", "HR", "SD", "PF", "DT", "NC", "FI", "HD", "FL", "MR", "4K", "5K", "6K", "7K", "8K", "9K"];
+  const mods_taiko_fruits = ["NM", "EZ", "NF", "HT", "HR", "SD", "PF", "DT", "NC", "HD", "FL"];
+  const mods_current = playmode === "osu" ? mods_standard : playmode === "mania" ? mods_mania : mods_taiko_fruits;
 
   // ============================================= FILTER BY SEARCH =============================================
 
@@ -424,26 +431,16 @@ export default function SortableTable({
                 mb="md"
                 w="23.92rem"
                 placeholder="Select mods"
-                data={[
-                  "NM",
-                  "EZ",
-                  "NF",
-                  "HT",
-                  "HR",
-                  "SD",
-                  "PF",
-                  "DT",
-                  "NC",
-                  "HD",
-                  "FL",
-                  "SO",
-                  "TD",
-                ].map((mod) => ({
+                data={mods_current.map((mod) => ({
                   value: mod,
                   label: (
-                    <Flex direction="row" gap="md">
-                      <Image src={`/mods/${mod}.png`} width={44} height={31} />
-                      <Title order={3}>{mod}</Title>
+                    <Flex direction="row" gap="xs" align="center">
+                      <Image
+                        src={`/mods/${mod}.png`}
+                        width={22}
+                        height={15.5}
+                      />
+                      <Title order={5}>{mod}</Title>
                     </Flex>
                   ),
                 }))}

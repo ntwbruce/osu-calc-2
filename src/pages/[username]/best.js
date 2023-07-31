@@ -268,6 +268,7 @@ export default function UserBestScoresPage() {
                 </Title>
                 <SortableTable
                   rawScoresData={bestScoresData}
+                  playmode={userData.playmode}
                   setStatChanges={statChangeHandler}
                   toggleStatChanges={toggleStatChangeHandler}
                   isStatChangeReady={areStatChangeValuesSet}

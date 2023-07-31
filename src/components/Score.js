@@ -59,7 +59,6 @@ export default function Score({ scoreData }) {
                       key={mod}
                       imageSrc={`/mods/${mod}.png`}
                       popoverText={ModFullNames[mod]}
-                      popoverWidth={120}
                       width={44}
                       height={31}
                       margin={3}
