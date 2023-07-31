@@ -21,6 +21,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { DateInput } from "@mantine/dates";
 import Score from "./Score";
 import { calculateDate } from "@/lib/calculators/DateCalculator";
+import { mods_mania, mods_standard, mods_taiko_fruits } from "@/lib/ModsByGamemode";
 
 /**
  * Filters data by given search parameters object.
@@ -198,9 +199,6 @@ export default function SortableTable({
   const [sortedData, setSortedData] = useState(scoresData);
 
   // Mods
-  const mods_standard = ["NM", "EZ", "NF", "HT", "HR", "SD", "PF", "DT", "NC", "HD", "FL", "SO", "TD"];
-  const mods_mania = ["NM", "EZ", "NF", "HT", "HR", "SD", "PF", "DT", "NC", "FI", "HD", "FL", "MR", "4K", "5K", "6K", "7K", "8K", "9K"];
-  const mods_taiko_fruits = ["NM", "EZ", "NF", "HT", "HR", "SD", "PF", "DT", "NC", "HD", "FL"];
   const mods_current = playmode === "osu" ? mods_standard : playmode === "mania" ? mods_mania : mods_taiko_fruits;
 
   // ============================================= FILTER BY SEARCH =============================================
