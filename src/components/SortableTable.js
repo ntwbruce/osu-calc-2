@@ -21,7 +21,11 @@ import { useDisclosure } from "@mantine/hooks";
 import { DateInput } from "@mantine/dates";
 import Score from "./Score";
 import { calculateDate } from "@/lib/calculators/DateCalculator";
-import { mods_mania, mods_standard, mods_taiko_fruits } from "@/lib/ModsByGamemode";
+import {
+  mods_mania,
+  mods_standard,
+  mods_taiko_fruits,
+} from "@/lib/ModsByGamemode";
 
 /**
  * Filters data by given search parameters object.
@@ -199,7 +203,12 @@ export default function SortableTable({
   const [sortedData, setSortedData] = useState(scoresData);
 
   // Mods
-  const mods_current = playmode === "osu" ? mods_standard : playmode === "mania" ? mods_mania : mods_taiko_fruits;
+  const currentGamemodeMods =
+    playmode === "osu"
+      ? mods_standard
+      : playmode === "mania"
+      ? mods_mania
+      : mods_taiko_fruits;
 
   // ============================================= FILTER BY SEARCH =============================================
 
@@ -210,16 +219,32 @@ export default function SortableTable({
   const [artistSearch, setArtistSearch] = useState("");
   const [titleSearch, setTitleSearch] = useState("");
   const [mapperSearch, setMapperSearch] = useState("");
-  const [modsSearch, setModsSearch] = useState();
-  const [minSRSearch, setMinSRSearch] = useState();
-  const [maxSRSearch, setMaxSRSearch] = useState();
-  const [minDateSearch, setMinDateSearch] = useState();
-  const [maxDateSearch, setMaxDateSearch] = useState();
-  const [rankSearch, setRankSearch] = useState();
-  const [minAccSearch, setMinAccSearch] = useState();
-  const [maxAccSearch, setMaxAccSearch] = useState();
-  const [minPPSearch, setMinPPSearch] = useState();
-  const [maxPPSearch, setMaxPPSearch] = useState();
+  const [modsSearch, setModsSearch] = useState([]);
+  const [minSRSearch, setMinSRSearch] = useState("");
+  const [maxSRSearch, setMaxSRSearch] = useState("");
+  const [minDateSearch, setMinDateSearch] = useState(null);
+  const [maxDateSearch, setMaxDateSearch] = useState(null);
+  const [rankSearch, setRankSearch] = useState(null);
+  const [minAccSearch, setMinAccSearch] = useState("");
+  const [maxAccSearch, setMaxAccSearch] = useState("");
+  const [minPPSearch, setMinPPSearch] = useState("");
+  const [maxPPSearch, setMaxPPSearch] = useState("");
+
+  const defaultSearchParams = {
+    artist: "",
+    title: "",
+    mapper: "",
+    mods: [],
+    minSR: "",
+    maxSR: "",
+    minDate: null,
+    maxDate: null,
+    rank: null,
+    minAcc: "",
+    maxAcc: "",
+    minPP: "",
+    maxPP: "",
+  };
 
   const currentSearchParams = {
     artist: artistSearch,
@@ -288,6 +313,29 @@ export default function SortableTable({
         sortingParam,
         isReverseSorted,
         search,
+      })
+    );
+  };
+
+  const clearAllFiltersHandler = () => {
+    setArtistSearch("");
+    setTitleSearch("");
+    setMapperSearch("");
+    setModsSearch([]);
+    setMinSRSearch("");
+    setMaxSRSearch("");
+    setMinDateSearch(null);
+    setMaxDateSearch(null);
+    setRankSearch(null);
+    setMinAccSearch("");
+    setMaxAccSearch("");
+    setMinPPSearch("");
+    setMaxPPSearch("");
+    setSortedData(
+      sortData(scoresData, {
+        sortingParam,
+        isReverseSorted,
+        search: defaultSearchParams,
       })
     );
   };
@@ -379,14 +427,18 @@ export default function SortableTable({
           <Drawer
             opened={isFilterOpened}
             onClose={close}
-            title="Filter"
-            sx={{ fontFamily: "Segoe UI" }}
             size={420}
+            withCloseButton={false}
           >
             <Flex
               direction={{ base: "row", sm: "column" }}
               justify={{ sm: "center" }}
             >
+              <Title>Filters</Title>
+              <Button onClick={clearAllFiltersHandler} mb="md" w="25%">
+                Clear All
+              </Button>
+
               <Title order={5}>Artist</Title>
               <TextInput
                 placeholder="Find artist name"
@@ -429,7 +481,7 @@ export default function SortableTable({
                 mb="md"
                 w="23.92rem"
                 placeholder="Select mods"
-                data={mods_current.map((mod) => ({
+                data={currentGamemodeMods.map((mod) => ({
                   value: mod,
                   label: (
                     <Flex direction="row" gap="xs" align="center">
