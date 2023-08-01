@@ -27,7 +27,7 @@ import {
   mods_taiko_fruits,
 } from "@/lib/ModsByGamemode";
 
-const multipliers = {
+const modSortMultipliers = {
   HT: 0.3,
   NF: 0.5,
   EZ: 0.5 + 0.01,
@@ -43,7 +43,7 @@ const multipliers = {
   DT: 1.12 + 0.02,
 };
 
-const ranks = ["SS", "S", "A", "B", "C", "D", "F"];
+const ranks = ["SS", "S", "A", "B", "C", "D"];
 
 /**
  * Filters data by given search parameters object.
@@ -111,16 +111,16 @@ function sortData(data, payload) {
         case "mods":
           const firstMultiplier = Array.isArray(first[sortingParam])
             ? first[sortingParam].reduce(
-                (acc, curr) => acc * multipliers[curr],
+                (acc, curr) => acc * modSortMultipliers[curr],
                 1.0
               )
-            : multipliers[first[sortingParam]];
+            : modSortMultipliers[first[sortingParam]];
           const secondMultiplier = Array.isArray(second[sortingParam])
             ? second[sortingParam].reduce(
-                (accum, curr) => accum * multipliers[curr],
+                (accum, curr) => accum * modSortMultipliers[curr],
                 1.0
               )
-            : multipliers[second[sortingParam]];
+            : modSortMultipliers[second[sortingParam]];
           compValue = secondMultiplier - firstMultiplier;
           break;
 
@@ -157,45 +157,43 @@ export default function SortableTable({
   // ============================================= DATA =============================================
 
   // Manipulates raw score data into a more convenient format
-  const scoresData = rawScoresData.map((score, index) => {
-    return {
-      key: index,
-      index,
-      beatmap_id: score.beatmap.id,
-      user_id: score.user_id,
-      artist: score.beatmapset.artist,
-      title: score.beatmapset.title,
-      difficulty: score.beatmap.version,
-      mapper: score.beatmapset.creator,
-      sr: score.beatmap.difficulty_rating,
-      sr_multiplier:
-        score.mods.includes("DT") ||
-        score.mods.includes("NC") ||
-        score.mods.includes("FL") ||
-        score.mods.includes("HR") ||
-        score.mods.includes("EZ") ||
-        score.mods.includes("HT"),
-      mods: score.mods.length >= 1 ? score.mods : ["NM"],
-      pp: score.pp,
-      acc: score.accuracy,
-      rank:
-        score.rank === "X" || score.rank === "XH"
-          ? "SS"
-          : score.rank === "SH"
-          ? "S"
-          : score.rank,
-      background: score.beatmapset.covers.cover,
-      date: new Date(score.created_at),
-      max_combo: score.max_combo,
-      hit_counts: {
-        count_300: score.statistics.count_300,
-        count_100: score.statistics.count_100,
-        count_50: score.statistics.count_50,
-        count_miss: score.statistics.count_miss,
-      },
-      score: score.score,
-    };
-  });
+  const scoresData = rawScoresData.map((score, index) => ({
+    key: index,
+    index,
+    beatmap_id: score.beatmap.id,
+    user_id: score.user_id,
+    artist: score.beatmapset.artist,
+    title: score.beatmapset.title,
+    difficulty: score.beatmap.version,
+    mapper: score.beatmapset.creator,
+    sr: score.beatmap.difficulty_rating,
+    sr_multiplier:
+      score.mods.includes("DT") ||
+      score.mods.includes("NC") ||
+      score.mods.includes("FL") ||
+      score.mods.includes("HR") ||
+      score.mods.includes("EZ") ||
+      score.mods.includes("HT"),
+    mods: score.mods.length >= 1 ? score.mods : ["NM"],
+    pp: score.pp,
+    acc: score.accuracy,
+    rank:
+      score.rank === "X" || score.rank === "XH"
+        ? "SS"
+        : score.rank === "SH"
+        ? "S"
+        : score.rank,
+    background: score.beatmapset.covers.cover,
+    date: new Date(score.created_at),
+    max_combo: score.max_combo,
+    hit_counts: {
+      count_300: score.statistics.count_300,
+      count_100: score.statistics.count_100,
+      count_50: score.statistics.count_50,
+      count_miss: score.statistics.count_miss,
+    },
+    score: score.score,
+  }));
 
   // Score state
   const [sortedData, setSortedData] = useState(scoresData);
@@ -419,197 +417,206 @@ export default function SortableTable({
           size={420}
           withCloseButton={false}
         >
-          <Flex direction="column">
+          <Flex direction="column" gap="xs">
             <Title>Filters</Title>
-            <Button onClick={clearAllFiltersHandler} mb="md" w="25%">
+            <Button onClick={clearAllFiltersHandler} w="25%">
               Clear All
             </Button>
 
-            <Title order={5}>Artist</Title>
-            <TextInput
-              placeholder="Find artist name"
-              mb="md"
-              w="23.92rem"
-              icon={<IconSearch size="0.9rem" />}
-              value={artistSearch}
-              onChange={(event) =>
-                filterUpdateHandler("artist", event.currentTarget.value)
-              }
-            />
-
-            <Title order={5}>Title</Title>
-            <TextInput
-              placeholder="Find map title"
-              mb="md"
-              w="23.92rem"
-              icon={<IconSearch size="0.9rem" />}
-              value={titleSearch}
-              onChange={(event) =>
-                filterUpdateHandler("title", event.currentTarget.value)
-              }
-            />
-
-            <Title order={5}>Mapper</Title>
-            <TextInput
-              placeholder="Find mapper name"
-              mb="md"
-              w="23.92rem"
-              icon={<IconSearch size="0.9rem" />}
-              value={mapperSearch}
-              onChange={(event) =>
-                filterUpdateHandler("mapper", event.currentTarget.value)
-              }
-            />
-
-            <Title order={5}>Mods</Title>
-            <MultiSelect
-              clearable
-              mb="md"
-              w="23.92rem"
-              icon={<IconSearch size="0.9rem" />}
-              placeholder="Select mods"
-              data={currentGamemodeMods.map((mod) => ({
-                value: mod,
-                label: (
-                  <Flex direction="row" gap="xs" align="center">
-                    <Image src={`/mods/${mod}.png`} width={22} height={15.5} />
-                    <Title order={5}>{mod}</Title>
-                  </Flex>
-                ),
-              }))}
-              value={modsSearch}
-              onChange={(value) => filterUpdateHandler("mods", value)}
-            />
-
-            <Title order={5}>Star rating</Title>
-            <Flex gap={{ base: "sm" }}>
-              <NumberInput
-                hideControls
-                placeholder="Min. star rating"
-                mb="md"
-                w="11rem"
+            <Flex direction="column">
+              <Title order={5}>Artist</Title>
+              <TextInput
+                placeholder="Find artist name"
+                w="23.92rem"
                 icon={<IconSearch size="0.9rem" />}
-                step={0.01}
-                precision={2}
-                value={minSRSearch}
-                onChange={(value) => filterUpdateHandler("minSR", value)}
-              />
-
-              <Title order={3}> - </Title>
-
-              <NumberInput
-                hideControls
-                placeholder="Max. star rating"
-                mb="md"
-                w="11rem"
-                icon={<IconSearch size="0.9rem" />}
-                step={0.01}
-                precision={2}
-                value={maxSRSearch}
-                onChange={(value) => filterUpdateHandler("maxSR", value)}
+                value={artistSearch}
+                onChange={(event) =>
+                  filterUpdateHandler("artist", event.currentTarget.value)
+                }
               />
             </Flex>
 
-            <Title order={5}>Date</Title>
-            <Flex gap={{ base: "sm" }}>
-              <DateInput
+            <Flex direction="column">
+              <Title order={5}>Title</Title>
+              <TextInput
+                placeholder="Find map title"
+                w="23.92rem"
+                icon={<IconSearch size="0.9rem" />}
+                value={titleSearch}
+                onChange={(event) =>
+                  filterUpdateHandler("title", event.currentTarget.value)
+                }
+              />
+            </Flex>
+
+            <Flex direction="column">
+              <Title order={5}>Mapper</Title>
+              <TextInput
+                placeholder="Find mapper name"
+                w="23.92rem"
+                icon={<IconSearch size="0.9rem" />}
+                value={mapperSearch}
+                onChange={(event) =>
+                  filterUpdateHandler("mapper", event.currentTarget.value)
+                }
+              />
+            </Flex>
+
+            <Flex direction="column">
+              <Title order={5}>Mods</Title>
+              <MultiSelect
                 clearable
-                placeholder="Start date"
-                mb="md"
-                w="11rem"
+                w="23.92rem"
                 icon={<IconSearch size="0.9rem" />}
-                value={minDateSearch}
-                onChange={(value) => filterUpdateHandler("minDate", value)}
+                placeholder="Select mods"
+                data={currentGamemodeMods.map((mod) => ({
+                  value: mod,
+                  label: (
+                    <Flex direction="row" gap="xs" align="center">
+                      <Image
+                        src={`/mods/${mod}.png`}
+                        width={22}
+                        height={15.5}
+                      />
+                      <Title order={5}>{mod}</Title>
+                    </Flex>
+                  ),
+                }))}
+                value={modsSearch}
+                onChange={(value) => filterUpdateHandler("mods", value)}
               />
+            </Flex>
 
-              <Title order={3}> - </Title>
+            <Flex direction="column">
+              <Title order={5}>Star rating</Title>
+              <Flex gap="sm">
+                <NumberInput
+                  hideControls
+                  placeholder="Min. star rating"
+                  w="11rem"
+                  icon={<IconSearch size="0.9rem" />}
+                  step={0.01}
+                  precision={2}
+                  value={minSRSearch}
+                  onChange={(value) => filterUpdateHandler("minSR", value)}
+                />
 
-              <DateInput
+                <Title order={3}> - </Title>
+
+                <NumberInput
+                  hideControls
+                  placeholder="Max. star rating"
+                  w="11rem"
+                  icon={<IconSearch size="0.9rem" />}
+                  step={0.01}
+                  precision={2}
+                  value={maxSRSearch}
+                  onChange={(value) => filterUpdateHandler("maxSR", value)}
+                />
+              </Flex>
+            </Flex>
+
+            <Flex direction="column">
+              <Title order={5}>Date</Title>
+              <Flex gap="sm">
+                <DateInput
+                  clearable
+                  placeholder="Start date"
+                  w="11rem"
+                  icon={<IconSearch size="0.9rem" />}
+                  value={minDateSearch}
+                  onChange={(value) => filterUpdateHandler("minDate", value)}
+                />
+
+                <Title order={3}> - </Title>
+
+                <DateInput
+                  clearable
+                  placeholder="End date"
+                  w="11rem"
+                  icon={<IconSearch size="0.9rem" />}
+                  value={maxDateSearch}
+                  onChange={(value) => filterUpdateHandler("maxDate", value)}
+                />
+              </Flex>
+            </Flex>
+
+            <Flex direction="column">
+              <Title order={5}>Rank</Title>
+              <Select
                 clearable
-                placeholder="End date"
-                mb="md"
-                w="11rem"
+                placeholder="Select rank"
+                w="23.92rem"
                 icon={<IconSearch size="0.9rem" />}
-                value={maxDateSearch}
-                onChange={(value) => filterUpdateHandler("maxDate", value)}
+                data={[
+                  { value: "SS", label: "SS" },
+                  { value: "S", label: "S" },
+                  { value: "A", label: "A" },
+                  { value: "B", label: "B" },
+                  { value: "C", label: "C" },
+                  { value: "D", label: "D" },
+                ]}
+                value={rankSearch}
+                onChange={(value) => filterUpdateHandler("rank", value)}
               />
             </Flex>
 
-            <Title order={5}>Rank</Title>
-            <Select
-              clearable
-              placeholder="Select rank"
-              mb="md"
-              w="23.92rem"
-              icon={<IconSearch size="0.9rem" />}
-              data={[
-                { value: "SS", label: "SS" },
-                { value: "S", label: "S" },
-                { value: "A", label: "A" },
-                { value: "B", label: "B" },
-                { value: "C", label: "C" },
-                { value: "D", label: "D" },
-              ]}
-              value={rankSearch}
-              onChange={(value) => filterUpdateHandler("rank", value)}
-            />
+            <Flex direction="column">
+              <Title order={5}>pp</Title>
+              <Flex gap="sm">
+                <NumberInput
+                  hideControls
+                  placeholder="Min. pp"
+                  w="11rem"
+                  icon={<IconSearch size="0.9rem" />}
+                  step={0.01}
+                  precision={2}
+                  value={minPPSearch}
+                  onChange={(value) => filterUpdateHandler("minPP", value)}
+                />
 
-            <Title order={5}>pp</Title>
-            <Flex gap={{ base: "sm" }}>
-              <NumberInput
-                hideControls
-                placeholder="Min. pp"
-                mb="md"
-                w="11rem"
-                icon={<IconSearch size="0.9rem" />}
-                step={0.01}
-                precision={2}
-                value={minPPSearch}
-                onChange={(value) => filterUpdateHandler("minPP", value)}
-              />
+                <Title order={3}> - </Title>
 
-              <Title order={3}> - </Title>
-
-              <NumberInput
-                hideControls
-                placeholder="Max. pp"
-                mb="md"
-                w="11rem"
-                icon={<IconSearch size="0.9rem" />}
-                step={0.01}
-                precision={2}
-                value={maxPPSearch}
-                onChange={(value) => filterUpdateHandler("maxPP", value)}
-              />
+                <NumberInput
+                  hideControls
+                  placeholder="Max. pp"
+                  w="11rem"
+                  icon={<IconSearch size="0.9rem" />}
+                  step={0.01}
+                  precision={2}
+                  value={maxPPSearch}
+                  onChange={(value) => filterUpdateHandler("maxPP", value)}
+                />
+              </Flex>
             </Flex>
 
-            <Title order={5}>Accuracy</Title>
-            <Flex gap={{ base: "sm" }}>
-              <NumberInput
-                hideControls
-                placeholder="Min. accuracy"
-                mb="md"
-                w="11rem"
-                icon={<IconSearch size="0.9rem" />}
-                step={0.01}
-                precision={2}
-                value={minAccSearch}
-                onChange={(value) => filterUpdateHandler("minAcc", value)}
-              />
+            <Flex direction="column">
+              <Title order={5}>Accuracy</Title>
+              <Flex gap="sm">
+                <NumberInput
+                  hideControls
+                  placeholder="Min. accuracy"
+                  w="11rem"
+                  icon={<IconSearch size="0.9rem" />}
+                  step={0.01}
+                  precision={2}
+                  value={minAccSearch}
+                  onChange={(value) => filterUpdateHandler("minAcc", value)}
+                />
 
-              <Title order={3}> - </Title>
+                <Title order={3}> - </Title>
 
-              <NumberInput
-                hideControls
-                placeholder="Max. accuracy"
-                mb="md"
-                w="11rem"
-                icon={<IconSearch size="0.9rem" />}
-                step={0.01}
-                precision={2}
-                value={maxAccSearch}
-                onChange={(value) => filterUpdateHandler("maxAcc", value)}
-              />
+                <NumberInput
+                  hideControls
+                  placeholder="Max. accuracy"
+                  w="11rem"
+                  icon={<IconSearch size="0.9rem" />}
+                  step={0.01}
+                  precision={2}
+                  value={maxAccSearch}
+                  onChange={(value) => filterUpdateHandler("maxAcc", value)}
+                />
+              </Flex>
             </Flex>
           </Flex>
         </Drawer>
