@@ -55,6 +55,7 @@ function filterData(data, search) {
   const {
     artist,
     title,
+    difficulty,
     mapper,
     mods,
     minSR,
@@ -72,6 +73,9 @@ function filterData(data, search) {
     (item) =>
       item["artist"].toLowerCase().includes(artist.toLowerCase().trim()) &&
       item["title"].toLowerCase().includes(title.toLowerCase().trim()) &&
+      item["difficulty"]
+        .toLowerCase()
+        .includes(difficulty.toLowerCase().trim()) &&
       item["mapper"].toLowerCase().includes(mapper.toLowerCase().trim()) &&
       (!mods ||
         mods.length === 0 ||
@@ -214,6 +218,7 @@ export default function SortableTable({
   // Search states
   const [artistSearch, setArtistSearch] = useState("");
   const [titleSearch, setTitleSearch] = useState("");
+  const [difficultySearch, setDifficultySearch] = useState("");
   const [mapperSearch, setMapperSearch] = useState("");
   const [modsSearch, setModsSearch] = useState([]);
   const [minSRSearch, setMinSRSearch] = useState("");
@@ -229,6 +234,7 @@ export default function SortableTable({
   const defaultSearchParams = {
     artist: "",
     title: "",
+    difficulty: "",
     mapper: "",
     mods: [],
     minSR: "",
@@ -245,6 +251,7 @@ export default function SortableTable({
   const currentSearchParams = {
     artist: artistSearch,
     title: titleSearch,
+    difficulty: difficultySearch,
     mapper: mapperSearch,
     mods: modsSearch,
     minSR: minSRSearch,
@@ -266,6 +273,9 @@ export default function SortableTable({
         break;
       case "title":
         setTitleSearch(value);
+        break;
+      case "difficulty":
+        setDifficultySearch(value);
         break;
       case "mapper":
         setMapperSearch(value);
@@ -316,6 +326,7 @@ export default function SortableTable({
   const clearAllFiltersHandler = () => {
     setArtistSearch("");
     setTitleSearch("");
+    setDifficultySearch("");
     setMapperSearch("");
     setModsSearch([]);
     setMinSRSearch("");
@@ -445,6 +456,19 @@ export default function SortableTable({
                 value={titleSearch}
                 onChange={(event) =>
                   filterUpdateHandler("title", event.currentTarget.value)
+                }
+              />
+            </Flex>
+
+            <Flex direction="column">
+              <Title order={5}>Difficulty</Title>
+              <TextInput
+                placeholder="Find difficulty title"
+                w="23.92rem"
+                icon={<IconSearch size="0.9rem" />}
+                value={difficultySearch}
+                onChange={(event) =>
+                  filterUpdateHandler("difficulty", event.currentTarget.value)
                 }
               />
             </Flex>
@@ -637,6 +661,7 @@ export default function SortableTable({
               { value: "pp", label: "Performance Points (pp)" },
               { value: "artist", label: "Artist" },
               { value: "title", label: "Title" },
+              { value: "difficulty", label: "Difficulty" },
               { value: "mapper", label: "Mapper" },
               { value: "mods", label: "Mods" },
               { value: "sr", label: "Star Rating" },
