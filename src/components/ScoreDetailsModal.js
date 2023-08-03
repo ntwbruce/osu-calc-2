@@ -28,12 +28,14 @@ export default function ScoreDetailsModal({ opened, close, scoreData }) {
   const [areMapStatsSet, setAreMapsStatsSet] = useState(false);
   const [isOpenedBefore, setIsOpenedBefore] = useState(false);
 
+  // Set isOpenedBefore upon opening
   useEffect(() => {
     if (!isOpenedBefore && opened) {
       setIsOpenedBefore(true);
     }
   }, [opened]);
 
+  // Fetches data when modal is first opened
   useEffect(() => {
     const fetchBeatmapData = async (beatmapID) => {
       try {
@@ -71,12 +73,7 @@ export default function ScoreDetailsModal({ opened, close, scoreData }) {
     }
   }, [isOpenedBefore, opened]);
 
-  useEffect(() => {
-    setIsOpenedBefore(false);
-    setIsStarRatingSet(false);
-    setAreMapsStatsSet(false);
-  }, [scoreData]);
-
+  // Once data fetched, do some calculations
   useEffect(() => {
     if (
       Object.keys(beatmapData).length !== 0 &&
@@ -106,6 +103,13 @@ export default function ScoreDetailsModal({ opened, close, scoreData }) {
       setAreMapsStatsSet(true);
     }
   }, [beatmapData, onlineScoreData, beatmapFileData]);
+
+  // Upon changing of scoreData, reset everything
+  useEffect(() => {
+    setIsOpenedBefore(false);
+    setIsStarRatingSet(false);
+    setAreMapsStatsSet(false);
+  }, [scoreData]);
 
   return (
     <Modal

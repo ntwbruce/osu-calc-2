@@ -187,7 +187,7 @@ export default function SortableTable({
         : score.rank === "SH"
         ? "S"
         : score.rank,
-    background: score.beatmapset.covers.cover,
+    background: score.beatmapset.covers["cover@2x"],
     date: new Date(score.created_at),
     max_combo: score.max_combo,
     hit_counts: {
