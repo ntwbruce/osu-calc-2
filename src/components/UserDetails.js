@@ -16,8 +16,6 @@ export default function UserDetails({ userData, statChangeData, isVertical }) {
 
   const { ppChange, accChange, rankChange, showChanges } = statChangeData;
 
-  useEffect(() => console.log(userData), []);
-
   return (
     <Center>
       <BackgroundImage
