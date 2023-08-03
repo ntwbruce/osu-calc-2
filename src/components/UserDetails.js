@@ -1,4 +1,5 @@
 import { Title, Flex, Image, BackgroundImage, Center } from "@mantine/core";
+import { useEffect } from "react";
 import Flag from "react-flagkit";
 
 export default function UserDetails({ userData, statChangeData, isVertical }) {
@@ -11,6 +12,7 @@ export default function UserDetails({ userData, statChangeData, isVertical }) {
   const acc = userData.statistics.hit_accuracy;
   const cover_url = userData.cover_url;
   const country_code = userData.country_code;
+  const playmode = userData.playmode;
 
   const { ppChange, accChange, rankChange, showChanges } = statChangeData;
 
@@ -33,6 +35,7 @@ export default function UserDetails({ userData, statChangeData, isVertical }) {
           justify="center"
           align="center"
           direction={isVertical ? "column" : "row"}
+          gap={10}
         >
           <Flex
             direction="column"
@@ -48,7 +51,7 @@ export default function UserDetails({ userData, statChangeData, isVertical }) {
               radius="lg"
               sx={{
                 outline: "solid",
-                borderRadius: "10px",
+                borderRadius: "18px",
                 color: "white",
               }}
             />
@@ -57,14 +60,34 @@ export default function UserDetails({ userData, statChangeData, isVertical }) {
             </Title>
           </Flex>
 
+          
+
           <Flex
             w="60%"
             h="60%"
             gap="10%"
             justify="center"
             direction={isVertical ? "column" : "row"}
-            m="5%"
           >
+            <Flex
+            direction="column"
+            justify="center"
+            align="center"
+            mt={10}
+            mb={10}
+          >
+            <Image src={`/playmodes/${playmode}.png`} width={60}/>
+            <Title>
+              {playmode === "osu"
+                ? "Standard"
+                : playmode === "taiko"
+                ? "Taiko"
+                : playmode === "mania"
+                ? "Mania"
+                : "Catch"}
+            </Title>
+          </Flex>
+          
             <Flex
               direction="column"
               justify="center"

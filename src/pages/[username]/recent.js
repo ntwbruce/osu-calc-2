@@ -85,9 +85,9 @@ export default function UserRecentScoresPage() {
       />
 
       <Flex
-        direction={{ base: "row", sm: "column" }}
-        gap={{ base: "sm", sm: "md" }}
-        justify={{ sm: "center" }}
+        direction="column"
+        gap="md"
+        justify="center"
         ml={25}
         mr={25}
       >

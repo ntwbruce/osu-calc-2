@@ -21,6 +21,29 @@ import { useDisclosure } from "@mantine/hooks";
 import { DateInput } from "@mantine/dates";
 import Score from "./Score";
 import { calculateDate } from "@/lib/calculators/DateCalculator";
+import {
+  mods_mania,
+  mods_standard,
+  mods_taiko_fruits,
+} from "@/lib/ModsByGamemode";
+
+const modSortMultipliers = {
+  HT: 0.3,
+  NF: 0.5,
+  EZ: 0.5 + 0.01,
+  SO: 0.9,
+  TD: 1.0,
+  NM: 1.0 + 0.01,
+  SD: 1.0 + 0.02,
+  PF: 1.0 + 0.03,
+  HD: 1.06,
+  HR: 1.06 + 0.01,
+  FL: 1.12,
+  NC: 1.12 + 0.01,
+  DT: 1.12 + 0.02,
+};
+
+const ranks = ["SS", "S", "A", "B", "C", "D"];
 
 /**
  * Filters data by given search parameters object.
@@ -32,6 +55,7 @@ function filterData(data, search) {
   const {
     artist,
     title,
+    difficulty,
     mapper,
     mods,
     minSR,
@@ -49,6 +73,9 @@ function filterData(data, search) {
     (item) =>
       item["artist"].toLowerCase().includes(artist.toLowerCase().trim()) &&
       item["title"].toLowerCase().includes(title.toLowerCase().trim()) &&
+      item["difficulty"]
+        .toLowerCase()
+        .includes(difficulty.toLowerCase().trim()) &&
       item["mapper"].toLowerCase().includes(mapper.toLowerCase().trim()) &&
       (!mods ||
         mods.length === 0 ||
@@ -76,10 +103,6 @@ function filterData(data, search) {
 function sortData(data, payload) {
   const { sortingParam, isReverseSorted, search } = payload;
 
-  if (!sortingParam) {
-    return filterData(data, search);
-  }
-
   // Sorted differently based on which parameter is being used
   return filterData(
     [...data].sort((first, second) => {
@@ -90,33 +113,18 @@ function sortData(data, payload) {
       let compValue = 0;
       switch (sortingParam) {
         case "mods":
-          const multipliers = {
-            HT: 0.3,
-            NF: 0.5,
-            EZ: 0.5 + 0.01,
-            SO: 0.9,
-            TD: 1.0,
-            NM: 1.0 + 0.01,
-            SD: 1.0 + 0.02,
-            PF: 1.0 + 0.03,
-            HD: 1.06,
-            HR: 1.06 + 0.01,
-            FL: 1.12,
-            NC: 1.12 + 0.01,
-            DT: 1.12 + 0.02,
-          };
           const firstMultiplier = Array.isArray(first[sortingParam])
             ? first[sortingParam].reduce(
-                (acc, curr) => acc * multipliers[curr],
+                (acc, curr) => acc * modSortMultipliers[curr],
                 1.0
               )
-            : multipliers[first[sortingParam]];
+            : modSortMultipliers[first[sortingParam]];
           const secondMultiplier = Array.isArray(second[sortingParam])
             ? second[sortingParam].reduce(
-                (accum, curr) => accum * multipliers[curr],
+                (accum, curr) => accum * modSortMultipliers[curr],
                 1.0
               )
-            : multipliers[second[sortingParam]];
+            : modSortMultipliers[second[sortingParam]];
           compValue = secondMultiplier - firstMultiplier;
           break;
 
@@ -128,7 +136,6 @@ function sortData(data, payload) {
           break;
 
         case "rank":
-          const ranks = ["SS", "S", "A", "B", "C", "D", "F"];
           compValue =
             ranks.findIndex((rank) => rank === first[sortingParam]) -
             ranks.findIndex((rank) => rank === second[sortingParam]);
@@ -146,6 +153,7 @@ function sortData(data, payload) {
 
 export default function SortableTable({
   rawScoresData,
+  playmode,
   setStatChanges,
   toggleStatChanges,
   isStatChangeReady,
@@ -153,41 +161,54 @@ export default function SortableTable({
   // ============================================= DATA =============================================
 
   // Manipulates raw score data into a more convenient format
-  const scoresData = rawScoresData.map((score, index) => {
-    return {
-      key: index,
-      index,
-      beatmap_id: score.beatmap.id,
-      user_id: score.user_id,
-      artist: score.beatmapset.artist,
-      title: score.beatmapset.title,
-      difficulty: score.beatmap.version,
-      mapper: score.beatmapset.creator,
-      sr: score.beatmap.difficulty_rating,
-      sr_multiplier:
-        score.mods.includes("DT") ||
-        score.mods.includes("NC") ||
-        score.mods.includes("FL") ||
-        score.mods.includes("HR") ||
-        score.mods.includes("EZ")
-          ? "*"
-          : "",
-      mods: score.mods.length >= 1 ? score.mods : ["NM"],
-      pp: score.pp,
-      acc: score.accuracy,
-      rank:
-        score.rank === "X" || score.rank === "XH"
-          ? "SS"
-          : score.rank === "SH"
-          ? "S"
-          : score.rank,
-      background: score.beatmapset.covers.cover,
-      date: new Date(score.created_at),
-    };
-  });
+  const scoresData = rawScoresData.map((score, index) => ({
+    key: index,
+    index,
+    beatmap_id: score.beatmap.id,
+    user_id: score.user_id,
+    artist: score.beatmapset.artist,
+    title: score.beatmapset.title,
+    difficulty: score.beatmap.version,
+    mapper: score.beatmapset.creator,
+    sr: score.beatmap.difficulty_rating,
+    sr_multiplier:
+      score.mods.includes("DT") ||
+      score.mods.includes("NC") ||
+      score.mods.includes("FL") ||
+      score.mods.includes("HR") ||
+      score.mods.includes("EZ") ||
+      score.mods.includes("HT"),
+    mods: score.mods.length >= 1 ? score.mods : ["NM"],
+    pp: score.pp,
+    acc: score.accuracy,
+    rank:
+      score.rank === "X" || score.rank === "XH"
+        ? "SS"
+        : score.rank === "SH"
+        ? "S"
+        : score.rank,
+    background: score.beatmapset.covers["cover@2x"],
+    date: new Date(score.created_at),
+    max_combo: score.max_combo,
+    hit_counts: {
+      count_300: score.statistics.count_300,
+      count_100: score.statistics.count_100,
+      count_50: score.statistics.count_50,
+      count_miss: score.statistics.count_miss,
+    },
+    score: score.score,
+  }));
 
   // Score state
   const [sortedData, setSortedData] = useState(scoresData);
+
+  // Mods
+  const currentGamemodeMods =
+    playmode === "osu"
+      ? mods_standard
+      : playmode === "mania"
+      ? mods_mania
+      : mods_taiko_fruits;
 
   // ============================================= FILTER BY SEARCH =============================================
 
@@ -197,21 +218,40 @@ export default function SortableTable({
   // Search states
   const [artistSearch, setArtistSearch] = useState("");
   const [titleSearch, setTitleSearch] = useState("");
+  const [difficultySearch, setDifficultySearch] = useState("");
   const [mapperSearch, setMapperSearch] = useState("");
-  const [modsSearch, setModsSearch] = useState();
-  const [minSRSearch, setMinSRSearch] = useState();
-  const [maxSRSearch, setMaxSRSearch] = useState();
-  const [minDateSearch, setMinDateSearch] = useState();
-  const [maxDateSearch, setMaxDateSearch] = useState();
-  const [rankSearch, setRankSearch] = useState();
-  const [minAccSearch, setMinAccSearch] = useState();
-  const [maxAccSearch, setMaxAccSearch] = useState();
-  const [minPPSearch, setMinPPSearch] = useState();
-  const [maxPPSearch, setMaxPPSearch] = useState();
+  const [modsSearch, setModsSearch] = useState([]);
+  const [minSRSearch, setMinSRSearch] = useState("");
+  const [maxSRSearch, setMaxSRSearch] = useState("");
+  const [minDateSearch, setMinDateSearch] = useState(null);
+  const [maxDateSearch, setMaxDateSearch] = useState(null);
+  const [rankSearch, setRankSearch] = useState(null);
+  const [minAccSearch, setMinAccSearch] = useState("");
+  const [maxAccSearch, setMaxAccSearch] = useState("");
+  const [minPPSearch, setMinPPSearch] = useState("");
+  const [maxPPSearch, setMaxPPSearch] = useState("");
+
+  const defaultSearchParams = {
+    artist: "",
+    title: "",
+    difficulty: "",
+    mapper: "",
+    mods: [],
+    minSR: "",
+    maxSR: "",
+    minDate: null,
+    maxDate: null,
+    rank: null,
+    minAcc: "",
+    maxAcc: "",
+    minPP: "",
+    maxPP: "",
+  };
 
   const currentSearchParams = {
     artist: artistSearch,
     title: titleSearch,
+    difficulty: difficultySearch,
     mapper: mapperSearch,
     mods: modsSearch,
     minSR: minSRSearch,
@@ -233,6 +273,9 @@ export default function SortableTable({
         break;
       case "title":
         setTitleSearch(value);
+        break;
+      case "difficulty":
+        setDifficultySearch(value);
         break;
       case "mapper":
         setMapperSearch(value);
@@ -276,6 +319,30 @@ export default function SortableTable({
         sortingParam,
         isReverseSorted,
         search,
+      })
+    );
+  };
+
+  const clearAllFiltersHandler = () => {
+    setArtistSearch("");
+    setTitleSearch("");
+    setDifficultySearch("");
+    setMapperSearch("");
+    setModsSearch([]);
+    setMinSRSearch("");
+    setMaxSRSearch("");
+    setMinDateSearch(null);
+    setMaxDateSearch(null);
+    setRankSearch(null);
+    setMinAccSearch("");
+    setMaxAccSearch("");
+    setMinPPSearch("");
+    setMaxPPSearch("");
+    setSortedData(
+      sortData(scoresData, {
+        sortingParam,
+        isReverseSorted,
+        search: defaultSearchParams,
       })
     );
   };
@@ -353,104 +420,105 @@ export default function SortableTable({
   // ============================================= OUTPUT =============================================
 
   return (
-    <Flex
-      direction={{ base: "row", sm: "column" }}
-      gap={{ base: "sm", sm: "lg" }}
-      justify={{ sm: "center" }}
-    >
-      <Flex
-        direction="row"
-        gap={{ base: "sm", sm: "lg" }}
-        justify={{ sm: "center" }}
-      >
-        <Flex justify={{ sm: "center" }}>
-          <Drawer
-            opened={isFilterOpened}
-            onClose={close}
-            title="Filter"
-            sx={{ fontFamily: "Segoe UI" }}
-            size={420}
-          >
-            <Flex
-              direction={{ base: "row", sm: "column" }}
-              justify={{ sm: "center" }}
-            >
+    <Flex direction="column" gap="md">
+      <Flex direction="row" gap="lg" justify="center">
+        <Drawer
+          opened={isFilterOpened}
+          onClose={close}
+          size={420}
+          withCloseButton={false}
+        >
+          <Flex direction="column" gap="xs">
+            <Title>Filters</Title>
+            <Button onClick={clearAllFiltersHandler} w="25%">
+              Clear All
+            </Button>
+
+            <Flex direction="column">
               <Title order={5}>Artist</Title>
               <TextInput
                 placeholder="Find artist name"
-                mb="md"
                 w="23.92rem"
-                icon={<IconSearch size="0.9rem" stroke={1.5} />}
+                icon={<IconSearch size="0.9rem" />}
                 value={artistSearch}
                 onChange={(event) =>
                   filterUpdateHandler("artist", event.currentTarget.value)
                 }
               />
+            </Flex>
 
+            <Flex direction="column">
               <Title order={5}>Title</Title>
               <TextInput
                 placeholder="Find map title"
-                mb="md"
                 w="23.92rem"
-                icon={<IconSearch size="0.9rem" stroke={1.5} />}
+                icon={<IconSearch size="0.9rem" />}
                 value={titleSearch}
                 onChange={(event) =>
                   filterUpdateHandler("title", event.currentTarget.value)
                 }
               />
+            </Flex>
 
+            <Flex direction="column">
+              <Title order={5}>Difficulty</Title>
+              <TextInput
+                placeholder="Find difficulty title"
+                w="23.92rem"
+                icon={<IconSearch size="0.9rem" />}
+                value={difficultySearch}
+                onChange={(event) =>
+                  filterUpdateHandler("difficulty", event.currentTarget.value)
+                }
+              />
+            </Flex>
+
+            <Flex direction="column">
               <Title order={5}>Mapper</Title>
               <TextInput
                 placeholder="Find mapper name"
-                mb="md"
                 w="23.92rem"
-                icon={<IconSearch size="0.9rem" stroke={1.5} />}
+                icon={<IconSearch size="0.9rem" />}
                 value={mapperSearch}
                 onChange={(event) =>
                   filterUpdateHandler("mapper", event.currentTarget.value)
                 }
               />
+            </Flex>
 
+            <Flex direction="column">
               <Title order={5}>Mods</Title>
               <MultiSelect
                 clearable
-                mb="md"
                 w="23.92rem"
+                icon={<IconSearch size="0.9rem" />}
                 placeholder="Select mods"
-                data={[
-                  "NM",
-                  "EZ",
-                  "NF",
-                  "HT",
-                  "HR",
-                  "SD",
-                  "PF",
-                  "DT",
-                  "NC",
-                  "HD",
-                  "FL",
-                  "SO",
-                  "TD",
-                ].map((mod) => ({
+                data={currentGamemodeMods.map((mod) => ({
                   value: mod,
                   label: (
-                    <Flex direction="row" gap="md">
-                      <Image src={`/mods/${mod}.png`} width={44} height={31} />
-                      <Title order={3}>{mod}</Title>
+                    <Flex direction="row" gap="xs" align="center">
+                      <Image
+                        src={`/mods/${mod}.png`}
+                        width={22}
+                        height={15.5}
+                      />
+                      <Title order={5}>{mod}</Title>
                     </Flex>
                   ),
                 }))}
                 value={modsSearch}
                 onChange={(value) => filterUpdateHandler("mods", value)}
               />
+            </Flex>
 
+            <Flex direction="column">
               <Title order={5}>Star rating</Title>
-              <Flex gap={{ base: "sm" }}>
+              <Flex gap="sm">
                 <NumberInput
                   hideControls
                   placeholder="Min. star rating"
-                  mb="md"
                   w="11rem"
+                  icon={<IconSearch size="0.9rem" />}
                   step={0.01}
                   precision={2}
                   value={minSRSearch}
@@ -462,22 +530,24 @@ export default function SortableTable({
                 <NumberInput
                   hideControls
                   placeholder="Max. star rating"
-                  mb="md"
                   w="11rem"
+                  icon={<IconSearch size="0.9rem" />}
                   step={0.01}
                   precision={2}
                   value={maxSRSearch}
                   onChange={(value) => filterUpdateHandler("maxSR", value)}
                 />
               </Flex>
+            </Flex>
 
+            <Flex direction="column">
               <Title order={5}>Date</Title>
-              <Flex gap={{ base: "sm" }}>
+              <Flex gap="sm">
                 <DateInput
                   clearable
                   placeholder="Start date"
-                  mb="md"
                   w="11rem"
+                  icon={<IconSearch size="0.9rem" />}
                   value={minDateSearch}
                   onChange={(value) => filterUpdateHandler("minDate", value)}
                 />
@@ -487,19 +557,21 @@ export default function SortableTable({
                 <DateInput
                   clearable
                   placeholder="End date"
-                  mb="md"
                   w="11rem"
+                  icon={<IconSearch size="0.9rem" />}
                   value={maxDateSearch}
                   onChange={(value) => filterUpdateHandler("maxDate", value)}
                 />
               </Flex>
+            </Flex>
 
+            <Flex direction="column">
               <Title order={5}>Rank</Title>
               <Select
                 clearable
                 placeholder="Select rank"
-                mb="md"
                 w="23.92rem"
+                icon={<IconSearch size="0.9rem" />}
                 data={[
                   { value: "SS", label: "SS" },
                   { value: "S", label: "S" },
@@ -511,14 +583,16 @@ export default function SortableTable({
                 value={rankSearch}
                 onChange={(value) => filterUpdateHandler("rank", value)}
               />
+            </Flex>
 
+            <Flex direction="column">
               <Title order={5}>pp</Title>
-              <Flex gap={{ base: "sm" }}>
+              <Flex gap="sm">
                 <NumberInput
                   hideControls
                   placeholder="Min. pp"
-                  mb="md"
                   w="11rem"
+                  icon={<IconSearch size="0.9rem" />}
                   step={0.01}
                   precision={2}
                   value={minPPSearch}
@@ -530,22 +604,24 @@ export default function SortableTable({
                 <NumberInput
                   hideControls
                   placeholder="Max. pp"
-                  mb="md"
                   w="11rem"
+                  icon={<IconSearch size="0.9rem" />}
                   step={0.01}
                   precision={2}
                   value={maxPPSearch}
                   onChange={(value) => filterUpdateHandler("maxPP", value)}
                 />
               </Flex>
+            </Flex>
 
+            <Flex direction="column">
               <Title order={5}>Accuracy</Title>
-              <Flex gap={{ base: "sm" }}>
+              <Flex gap="sm">
                 <NumberInput
                   hideControls
                   placeholder="Min. accuracy"
-                  mb="md"
                   w="11rem"
+                  icon={<IconSearch size="0.9rem" />}
                   step={0.01}
                   precision={2}
                   value={minAccSearch}
@@ -557,8 +633,8 @@ export default function SortableTable({
                 <NumberInput
                   hideControls
                   placeholder="Max. accuracy"
-                  mb="md"
                   w="11rem"
+                  icon={<IconSearch size="0.9rem" />}
                   step={0.01}
                   precision={2}
                   value={maxAccSearch}
@@ -566,30 +642,26 @@ export default function SortableTable({
                 />
               </Flex>
             </Flex>
-          </Drawer>
+          </Flex>
+        </Drawer>
 
-          <Button
-            variant={isFilterOpened ? "outline" : "filled"}
-            onClick={open}
-            leftIcon={<IconFilter size={20} />}
-          >
-            Filter
-          </Button>
-        </Flex>
+        <Button
+          variant={isFilterOpened ? "outline" : "filled"}
+          onClick={open}
+          leftIcon={<IconFilter size={20} />}
+        >
+          Filter
+        </Button>
 
         <Title order={3}>||</Title>
 
-        <Flex
-          direction={{ base: "column", sm: "row" }}
-          gap={{ base: "sm", sm: "lg" }}
-          justify={{ sm: "center" }}
-          align="center"
-        >
+        <Flex direction="row" gap="lg">
           <Select
             data={[
               { value: "pp", label: "Performance Points (pp)" },
               { value: "artist", label: "Artist" },
               { value: "title", label: "Title" },
+              { value: "difficulty", label: "Difficulty" },
               { value: "mapper", label: "Mapper" },
               { value: "mods", label: "Mods" },
               { value: "sr", label: "Star Rating" },
@@ -605,49 +677,9 @@ export default function SortableTable({
             {isReverseSorted ? <IconSortAscending /> : <IconSortDescending />}
           </Button>
         </Flex>
-
-        {/* <Title order={3}>||</Title>
-
-        <Flex
-          direction={{ base: "column", sm: "row" }}
-          gap={{ base: "sm", sm: "lg" }}
-          justify={{ sm: "center" }}
-          align="center"
-        >
-          {isStatChangeReady ? (
-            <Button
-              data-disabled
-              variant={showSelection ? "outline" : "filled"}
-              onClick={showSelectionHandler}
-            >
-              Delete Scores (WIP)
-            </Button>
-          ) : (
-            <Button
-              data-disabled
-              variant="outline"
-              onClick={showSelectionHandler}
-              rightIcon={<Loader size="sm" color="dark" />}
-            >
-              Delete Scores (WIP)
-            </Button>
-          )}
-          <Button
-            data-disabled
-            variant={showSelection ? "outline" : "filled"}
-            onClick={showSelectionHandler}
-          >
-            Delete Scores (WIP)
-          </Button>
-        </Flex> */}
       </Flex>
 
-      <Flex
-        direction={{ base: "column", sm: "row" }}
-        gap={{ base: "sm", sm: "lg" }}
-        justify={{ sm: "center" }}
-        align="center"
-      >
+      <Flex justify="center">
         <Title order={3}>{sortedData.length} score(s) found!</Title>
       </Flex>
 
