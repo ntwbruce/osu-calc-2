@@ -16,6 +16,8 @@ import Head from "next/head";
 import { IconHammer, IconZoomQuestion } from "@tabler/icons-react";
 import { HeaderBar } from "@/components/HeaderBar";
 import {
+  Bar,
+  BarChart,
   CartesianGrid,
   Line,
   LineChart,
@@ -24,6 +26,12 @@ import {
   YAxis,
 } from "recharts";
 import { calculateDate } from "@/lib/calculators/DateCalculator";
+import { groupModsByValue } from "@/lib/calculators/graph/GroupModsByValue";
+import { groupNumbersByInterval } from "@/lib/calculators/graph/GroupNumbersByInterval";
+import {
+  groupDatesByHour,
+  groupDatesByMonth,
+} from "@/lib/calculators/graph/GroupDatesByInterval";
 
 export default function UserProfilePage() {
   const router = useRouter();
@@ -58,6 +66,36 @@ export default function UserProfilePage() {
 
   const [rankHistoryData, setRankHistoryData] = useState({});
   const [isRankHistoryDataSet, setIsRankHistoryDataSet] = useState(false);
+
+  async function fetchUserDataHandler(username) {
+    try {
+      const response = (await axios.get(`/api/users/${username}`)).data;
+
+      setUserData(response.data);
+      setIsUserDataSet(true);
+      setDoesUserExist(true);
+    } catch (error) {
+      if (error.response.status === 401) {
+        // authToken is invalid now, request new authToken (since authToken expires in a day)
+        setAuthTokenPresent(false);
+        fetchAuthToken();
+      } else if (error.response.status === 404) {
+        console.log("user does not exist!");
+      } else {
+        // probably a 500 internal server error
+        console.log("error fetching user data: " + error.response.data);
+      }
+      setDoesUserExist(false);
+    }
+  }
+
+  // * Fetch user data upon user page initialisation
+  useEffect(() => {
+    if (router.isReady && authTokenPresent) {
+      // wait for router to obtain username before querying user data, as well as waiting for a authToken to be present
+      fetchUserDataHandler(router.query.username);
+    }
+  }, [router.isReady, authTokenPresent]);
 
   useEffect(() => {
     if (Object.keys(userData).length !== 0) {
@@ -99,40 +137,13 @@ export default function UserProfilePage() {
 
   useEffect(() => console.log(userData), [userData]);
 
-  async function fetchUserDataHandler(username) {
-    try {
-      const response = (await axios.get(`/api/users/${username}`)).data;
-
-      setUserData(response.data);
-      setIsUserDataSet(true);
-      setDoesUserExist(true);
-    } catch (error) {
-      if (error.response.status === 401) {
-        // authToken is invalid now, request new authToken (since authToken expires in a day)
-        setAuthTokenPresent(false);
-        fetchAuthToken();
-      } else if (error.response.status === 404) {
-        console.log("user does not exist!");
-      } else {
-        // probably a 500 internal server error
-        console.log("error fetching user data: " + error.response.data);
-      }
-      setDoesUserExist(false);
-    }
-  }
-
-  // * Fetch user data upon user page initialisation
-  useEffect(() => {
-    if (router.isReady && authTokenPresent) {
-      // wait for router to obtain username before querying user data, as well as waiting for a authToken to be present
-      fetchUserDataHandler(router.query.username);
-    }
-  }, [router.isReady, authTokenPresent]);
-
   // ============================================= BEST SCORES DATA FETCHING =============================================
 
   const [bestScoresData, setBestScoresData] = useState({});
   const [isBestScoresDataSet, setIsBestScoresDataSet] = useState(false);
+
+  const [scoreGraphData, setScoreGraphData] = useState({});
+  const [isScoreGraphDataSet, setIsScoreGraphDataSet] = useState(false);
 
   async function fetchBestScoresDataHandler() {
     try {
@@ -150,6 +161,40 @@ export default function UserProfilePage() {
     }
   }
 
+  const ppInterval = 10;
+  const accInterval = 0.1;
+
+  useEffect(() => {
+    if (isBestScoresDataSet) {
+      const scoreCount = bestScoresData.length;
+      let mods = new Array(scoreCount);
+      let dates = new Array(scoreCount);
+      let pps = new Array(scoreCount);
+      let accs = new Array(scoreCount);
+      bestScoresData.forEach((score, index) => {
+        mods[index] = score.mods.length === 0 ? ["NM"] : score.mods;
+        dates[index] = new Date(score.created_at);
+        pps[index] = score.pp;
+        accs[index] = score.accuracy * 100;
+      });
+      const { individualModCount, modCombinationCount } =
+        groupModsByValue(mods);
+      const ppByInterval = groupNumbersByInterval(pps, ppInterval);
+      const accByInterval = groupNumbersByInterval(accs, accInterval);
+      const dateByMonth = groupDatesByMonth(dates);
+      const dateByHour = groupDatesByHour(dates);
+      setScoreGraphData({
+        individualModCount,
+        modCombinationCount,
+        ppByInterval,
+        accByInterval,
+        dateByMonth,
+        dateByHour,
+      });
+      setIsScoreGraphDataSet(true);
+    }
+  }, [bestScoresData]);
+
   // * Fetch best score data
   useEffect(() => {
     if (isUserDataSet) {
@@ -157,66 +202,9 @@ export default function UserProfilePage() {
     }
   }, [isUserDataSet]);
 
+  useEffect(() => console.log(bestScoresData), [bestScoresData]);
+
   // ============================================= OUTPUT =============================================
-
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <Paper
-          shadow="sm"
-          p="sm"
-          sx={{ outline: "solid", borderRadius: "10px", color: "white" }}
-          bg="rgba(50, 50, 50, .6)"
-        >
-          <Title order={6}>{`Global Rank #${payload[0].value}`}</Title>
-          <Title order={6}>{`${label} - ${
-            payload[0].payload.index === 89
-              ? "today"
-              : `${89 - payload[0].payload.index} days ago`
-          }`}</Title>
-        </Paper>
-      );
-    }
-
-    return null;
-  };
-
-  const CustomizedDot = ({ cx, cy, payload, value }) => {
-    if (
-      value === rankHistoryData.maxRank &&
-      payload.index === rankHistoryData.maxRankIdx
-    ) {
-      return (
-        <circle
-          cx={cx}
-          cy={cy}
-          r={5}
-          stroke="black"
-          strokeWidth={2}
-          fill="lime"
-        />
-      );
-    }
-    if (
-      (rankHistoryData.minRank !== rankHistoryData.maxRank ||
-        rankHistoryData.minRankIdx !== rankHistoryData.maxRankIdx) &&
-      value === rankHistoryData.minRank &&
-      payload.index === rankHistoryData.minRankIdx
-    ) {
-      {
-        return (
-          <circle
-            cx={cx}
-            cy={cy}
-            r={5}
-            stroke="black"
-            strokeWidth={2}
-            fill="red"
-          />
-        );
-      }
-    }
-  };
 
   return (
     <>
@@ -250,7 +238,7 @@ export default function UserProfilePage() {
         {isUserDataSet && (
           <>
             <Flex direction="column" align="center">
-              <Flex direction="row">
+              <Flex direction="column">
                 {isHitDataSet && (
                   <RingProgress
                     size={260}
@@ -305,6 +293,7 @@ export default function UserProfilePage() {
                     ]}
                   />
                 )}
+
                 {isRankHistoryDataSet && (
                   <LineChart
                     width={730}
@@ -319,21 +308,153 @@ export default function UserProfilePage() {
                       padding={{ left: 10, right: 10 }}
                       hide
                     />
+                    {/* <XAxis
+                      xAxisId="ticks"
+                      stroke="#ffffff"
+                      type="number"
+                      domain={[0, 5]}
+                      tickCount={6}
+                    /> */}
                     <YAxis
                       stroke="#ffffff"
                       domain={["auto", "auto"]}
                       reversed
                       interval="preserveStartEnd"
                     />
-                    <Tooltip content={<CustomTooltip />} />
+                    <Tooltip
+                      content={({ active, payload, label }) => {
+                        if (active && payload && payload.length) {
+                          return (
+                            <Paper
+                              shadow="sm"
+                              p="sm"
+                              sx={{
+                                outline: "solid",
+                                borderRadius: "10px",
+                                color: "white",
+                              }}
+                              bg="rgba(50, 50, 50, .6)"
+                            >
+                              <Title
+                                order={6}
+                              >{`Global Rank #${payload[0].value}`}</Title>
+                              <Title order={6}>{`${label} - ${
+                                payload[0].payload.index === 89
+                                  ? "today"
+                                  : `${89 - payload[0].payload.index} days ago`
+                              }`}</Title>
+                            </Paper>
+                          );
+                        }
+
+                        return null;
+                      }}
+                    />
                     <Line
                       type="monotone"
                       dataKey="rank"
                       stroke="#daa520"
                       strokeWidth={3}
-                      dot={<CustomizedDot />}
+                      dot={({ cx, cy, payload, value }) => {
+                        if (
+                          value === rankHistoryData.maxRank &&
+                          payload.index === rankHistoryData.maxRankIdx
+                        ) {
+                          return (
+                            <circle
+                              cx={cx}
+                              cy={cy}
+                              r={5}
+                              stroke="black"
+                              strokeWidth={2}
+                              fill="lime"
+                            />
+                          );
+                        }
+                        if (
+                          (rankHistoryData.minRank !==
+                            rankHistoryData.maxRank ||
+                            rankHistoryData.minRankIdx !==
+                              rankHistoryData.maxRankIdx) &&
+                          value === rankHistoryData.minRank &&
+                          payload.index === rankHistoryData.minRankIdx
+                        ) {
+                          {
+                            return (
+                              <circle
+                                cx={cx}
+                                cy={cy}
+                                r={5}
+                                stroke="black"
+                                strokeWidth={2}
+                                fill="red"
+                              />
+                            );
+                          }
+                        }
+                      }}
                     />
                   </LineChart>
+                )}
+
+                {isScoreGraphDataSet && (
+                  <BarChart
+                    width={730}
+                    height={250}
+                    data={scoreGraphData.ppByInterval.intervalArray}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis
+                      dataKey="interval"
+                      stroke="#ffffff"
+                      padding={{ left: 10, right: 10 }}
+                      hide
+                    />
+                    <XAxis
+                      xAxisId="values"
+                      stroke="#ffffff"
+                      padding={{ left: 10, right: 10 }}
+                      type="number"
+                      domain={[
+                        scoreGraphData.ppByInterval.ticks.smallestTick,
+                        scoreGraphData.ppByInterval.ticks.largestTick,
+                      ]}
+                      tickCount={scoreGraphData.ppByInterval.ticks.tickCount}
+                      allowDataOverflow
+                    />
+                    <YAxis
+                      stroke="#ffffff"
+                      domain={["auto", "auto"]}
+                      interval="preserveStartEnd"
+                    />
+                    <Tooltip
+                      content={({ active, payload, label }) => {
+                        console.log({ active, payload, label });
+                        if (active && payload && payload.length) {
+                          return (
+                            <Paper
+                              shadow="sm"
+                              p="sm"
+                              sx={{
+                                outline: "solid",
+                                borderRadius: "10px",
+                                color: "white",
+                              }}
+                              bg="rgba(50, 50, 50, .6)"
+                            >
+                              <Title
+                                order={6}
+                              >Number of scores between {label}pp and {label + ppInterval - 1}pp: {payload[0].value}</Title>
+                            </Paper>
+                          );
+                        }
+
+                        return null;
+                      }}
+                    />
+                    <Bar dataKey="count" fill="#daa520" />
+                  </BarChart>
                 )}
 
                 <ScrollArea h="25vh">
