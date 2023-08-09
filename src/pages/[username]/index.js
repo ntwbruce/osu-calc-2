@@ -177,7 +177,7 @@ export default function UserProfilePage() {
   }
 
   const ppInterval = 5;
-  const accInterval = 0.5;
+  const accInterval = 0.1;
 
   useEffect(() => {
     if (isBestScoresDataSet) {
@@ -194,7 +194,6 @@ export default function UserProfilePage() {
       });
 
       setScoreGraphData({
-        modsGraphData: groupModsByValue(mods),
         ppGraphData: {
           mean: calculateMean(pps),
           median: calculateMedian(pps),
@@ -208,6 +207,7 @@ export default function UserProfilePage() {
             accInterval * 10
           ),
         },
+        modsGraphData: groupModsByValue(mods),
         dateGraphData: groupDatesByMonth(dates),
         timeGraphData: groupDatesByHour(dates),
       });
@@ -608,6 +608,71 @@ export default function UserProfilePage() {
                           %
                         </Title>
                       </Flex>
+                    </Flex>
+
+                    <Flex>
+                      <BarChart
+                        width={730}
+                        height={250}
+                        data={scoreGraphData.dateGraphData}
+                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis
+                          dataKey="month"
+                          stroke="#ffffff"
+                          padding={{ left: 10, right: 10 }}
+                          tickFormatter={(tick) =>
+                            "20" + tick.slice(0, 2) + "-" + tick.slice(2, 4)
+                          }
+                        />
+                        <YAxis
+                          stroke="#ffffff"
+                          domain={["auto", "auto"]}
+                          interval="preserveStartEnd"
+                        />
+                        <Tooltip
+                          content={({ active, payload, label }) => {
+                            if (active && payload && payload.length) {
+                              return (
+                                <Paper
+                                  shadow="sm"
+                                  p="sm"
+                                  sx={{
+                                    outline: "solid",
+                                    borderRadius: "10px",
+                                    color: "white",
+                                  }}
+                                  bg="rgba(50, 50, 50, .6)"
+                                >
+                                  <Title order={6}>
+                                    {`${
+                                      [
+                                        "Jan",
+                                        "Feb",
+                                        "Mar",
+                                        "Apr",
+                                        "May",
+                                        "Jun",
+                                        "Jul",
+                                        "Aug",
+                                        "Sep",
+                                        "Oct",
+                                        "Nov",
+                                        "Dec",
+                                      ][parseInt(label.slice(-2)) - 1]
+                                    } 20${label.slice(0, 2)}`}
+                                  </Title>
+                                  <Title order={2}>{payload[0].value}</Title>
+                                </Paper>
+                              );
+                            }
+
+                            return null;
+                          }}
+                        />
+                        <Bar dataKey="count" fill="#daa520" />
+                      </BarChart>
                     </Flex>
                   </>
                 )}
