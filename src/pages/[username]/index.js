@@ -135,8 +135,6 @@ export default function UserProfilePage() {
     }
   }, [userData]);
 
-  useEffect(() => console.log(userData), [userData]);
-
   // ============================================= BEST SCORES DATA FETCHING =============================================
 
   const [bestScoresData, setBestScoresData] = useState({});
@@ -162,34 +160,28 @@ export default function UserProfilePage() {
   }
 
   const ppInterval = 10;
-  const accInterval = 0.1;
+  const accInterval = 1;
 
   useEffect(() => {
     if (isBestScoresDataSet) {
-      const scoreCount = bestScoresData.length;
-      let mods = new Array(scoreCount);
-      let dates = new Array(scoreCount);
-      let pps = new Array(scoreCount);
-      let accs = new Array(scoreCount);
+      let mods = new Array(bestScoresData.length);
+      let dates = new Array(bestScoresData.length);
+      let pps = new Array(bestScoresData.length);
+      let accs = new Array(bestScoresData.length);
+
       bestScoresData.forEach((score, index) => {
         mods[index] = score.mods.length === 0 ? ["NM"] : score.mods;
         dates[index] = new Date(score.created_at);
         pps[index] = score.pp;
-        accs[index] = score.accuracy * 100;
+        accs[index] = Math.round(score.accuracy * 1000);
       });
-      const { individualModCount, modCombinationCount } =
-        groupModsByValue(mods);
-      const ppByInterval = groupNumbersByInterval(pps, ppInterval);
-      const accByInterval = groupNumbersByInterval(accs, accInterval);
-      const dateByMonth = groupDatesByMonth(dates);
-      const dateByHour = groupDatesByHour(dates);
+
       setScoreGraphData({
-        individualModCount,
-        modCombinationCount,
-        ppByInterval,
-        accByInterval,
-        dateByMonth,
-        dateByHour,
+        modsGraphData: groupModsByValue(mods),
+        ppGraphData: groupNumbersByInterval(pps, ppInterval),
+        accGraphData: groupNumbersByInterval(accs, accInterval * 10),
+        dateGraphData: groupDatesByMonth(dates),
+        timeGraphData: groupDatesByHour(dates),
       });
       setIsScoreGraphDataSet(true);
     }
@@ -201,8 +193,6 @@ export default function UserProfilePage() {
       fetchBestScoresDataHandler();
     }
   }, [isUserDataSet]);
-
-  useEffect(() => console.log(bestScoresData), [bestScoresData]);
 
   // ============================================= OUTPUT =============================================
 
@@ -308,13 +298,6 @@ export default function UserProfilePage() {
                       padding={{ left: 10, right: 10 }}
                       hide
                     />
-                    {/* <XAxis
-                      xAxisId="ticks"
-                      stroke="#ffffff"
-                      type="number"
-                      domain={[0, 5]}
-                      tickCount={6}
-                    /> */}
                     <YAxis
                       stroke="#ffffff"
                       domain={["auto", "auto"]}
@@ -398,63 +381,127 @@ export default function UserProfilePage() {
                 )}
 
                 {isScoreGraphDataSet && (
-                  <BarChart
-                    width={730}
-                    height={250}
-                    data={scoreGraphData.ppByInterval.intervalArray}
-                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis
-                      dataKey="interval"
-                      stroke="#ffffff"
-                      padding={{ left: 10, right: 10 }}
-                      hide
-                    />
-                    <XAxis
-                      xAxisId="values"
-                      stroke="#ffffff"
-                      padding={{ left: 10, right: 10 }}
-                      type="number"
-                      domain={[
-                        scoreGraphData.ppByInterval.ticks.smallestTick,
-                        scoreGraphData.ppByInterval.ticks.largestTick,
-                      ]}
-                      tickCount={scoreGraphData.ppByInterval.ticks.tickCount}
-                      allowDataOverflow
-                    />
-                    <YAxis
-                      stroke="#ffffff"
-                      domain={["auto", "auto"]}
-                      interval="preserveStartEnd"
-                    />
-                    <Tooltip
-                      content={({ active, payload, label }) => {
-                        console.log({ active, payload, label });
-                        if (active && payload && payload.length) {
-                          return (
-                            <Paper
-                              shadow="sm"
-                              p="sm"
-                              sx={{
-                                outline: "solid",
-                                borderRadius: "10px",
-                                color: "white",
-                              }}
-                              bg="rgba(50, 50, 50, .6)"
-                            >
-                              <Title
-                                order={6}
-                              >Number of scores between {label}pp and {label + ppInterval - 1}pp: {payload[0].value}</Title>
-                            </Paper>
-                          );
-                        }
+                  <>
+                    <BarChart
+                      width={730}
+                      height={250}
+                      data={scoreGraphData.ppGraphData.intervalArray}
+                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                      <XAxis
+                        dataKey="interval"
+                        stroke="#ffffff"
+                        padding={{ left: 10, right: 10 }}
+                        hide
+                      />
+                      <XAxis
+                        xAxisId="values"
+                        stroke="#ffffff"
+                        padding={{ left: 10, right: 10 }}
+                        type="number"
+                        domain={[
+                          scoreGraphData.ppGraphData.ticks.smallestTick,
+                          scoreGraphData.ppGraphData.ticks.largestTick,
+                        ]}
+                        tickCount={scoreGraphData.ppGraphData.ticks.tickCount}
+                        allowDataOverflow
+                      />
+                      <YAxis
+                        stroke="#ffffff"
+                        domain={["auto", "auto"]}
+                        interval="preserveStartEnd"
+                      />
+                      <Tooltip
+                        content={({ active, payload, label }) => {
+                          console.log({ active, payload, label });
+                          if (active && payload && payload.length) {
+                            return (
+                              <Paper
+                                shadow="sm"
+                                p="sm"
+                                sx={{
+                                  outline: "solid",
+                                  borderRadius: "10px",
+                                  color: "white",
+                                }}
+                                bg="rgba(50, 50, 50, .6)"
+                              >
+                                <Title order={6}>
+                                  {label}pp - {label + ppInterval - 1}pp
+                                </Title>
+                                <Title order={2}>{payload[0].value}</Title>
+                              </Paper>
+                            );
+                          }
 
-                        return null;
-                      }}
-                    />
-                    <Bar dataKey="count" fill="#daa520" />
-                  </BarChart>
+                          return null;
+                        }}
+                      />
+                      <Bar dataKey="count" fill="#daa520" />
+                    </BarChart>
+
+                    <BarChart
+                      width={730}
+                      height={250}
+                      data={scoreGraphData.accGraphData.intervalArray}
+                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                      <XAxis
+                        dataKey="interval"
+                        stroke="#ffffff"
+                        padding={{ left: 10, right: 10 }}
+                        tickFormatter={(tick) => tick / 10}
+                      />
+                      {/* <XAxis
+                        xAxisId="values"
+                        stroke="#ffffff"
+                        padding={{ left: 10, right: 10 }}
+                        type="number"
+                        domain={[
+                          scoreGraphData.accGraphData.ticks.smallestTick,
+                          scoreGraphData.accGraphData.ticks.largestTick,
+                        ]}
+                        tickCount={scoreGraphData.accGraphData.ticks.tickCount}
+                        allowDataOverflow
+                        tickFormatter={(tick) => tick / 10}
+                      /> */}
+                      <YAxis
+                        stroke="#ffffff"
+                        domain={["auto", "auto"]}
+                        interval="preserveStartEnd"
+                      />
+                      <Tooltip
+                        content={({ active, payload, label }) => {
+                          console.log({ active, payload, label });
+                          if (active && payload && payload.length) {
+                            return (
+                              <Paper
+                                shadow="sm"
+                                p="sm"
+                                sx={{
+                                  outline: "solid",
+                                  borderRadius: "10px",
+                                  color: "white",
+                                }}
+                                bg="rgba(50, 50, 50, .6)"
+                              >
+                                <Title order={6}>
+                                  {label / 10}%
+                                  {label !== 1000 ? ` - ${(label / 10 + accInterval - 0.01).toFixed(2)}%` : ""}
+                                </Title>
+                                <Title order={2}>{payload[0].value}</Title>
+                              </Paper>
+                            );
+                          }
+
+                          return null;
+                        }}
+                      />
+                      <Bar dataKey="count" fill="#daa520" />
+                    </BarChart>
+                  </>
                 )}
 
                 <ScrollArea h="25vh">

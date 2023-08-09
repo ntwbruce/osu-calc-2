@@ -19,7 +19,7 @@ export const groupNumbersByInterval = (numbers, interval) => {
   });
 
   for (
-    let currInterval = smallestInterval + interval;
+    let currInterval = (smallestInterval + interval);
     currInterval < largestInterval;
     currInterval += interval
   ) {
@@ -36,9 +36,16 @@ export const groupNumbersByInterval = (numbers, interval) => {
     });
   }
 
-  const tickCount = (largestInterval - smallestInterval) / interval + 2;
+  const tickCount = Math.round((largestInterval - smallestInterval) / interval + 2);
 
-  console.log(intervalArray);
+  console.log({
+    intervalArray,
+    ticks: {
+      smallestTick: smallestInterval,
+      largestTick: largestInterval + interval,
+      tickCount,
+    },
+  });
   return {
     intervalArray,
     ticks: {
