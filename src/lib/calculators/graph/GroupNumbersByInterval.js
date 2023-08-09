@@ -5,8 +5,7 @@ export const groupNumbersByInterval = (numbers, interval) => {
   let largestInterval = -1;
 
   numbers.forEach((number) => {
-    const nearestInterval =
-      Math.round(Math.floor(number / interval) * interval * 100) / 100;
+    const nearestInterval = Math.floor(number / interval) * interval;
     if (nearestInterval < smallestInterval || smallestInterval === -1) {
       smallestInterval = nearestInterval;
     }
@@ -19,7 +18,7 @@ export const groupNumbersByInterval = (numbers, interval) => {
   });
 
   for (
-    let currInterval = (smallestInterval + interval);
+    let currInterval = smallestInterval + interval;
     currInterval < largestInterval;
     currInterval += interval
   ) {
@@ -36,7 +35,7 @@ export const groupNumbersByInterval = (numbers, interval) => {
     });
   }
 
-  const tickCount = Math.round((largestInterval - smallestInterval) / interval + 2);
+  const tickCount = (largestInterval - smallestInterval) / interval + 2;
 
   console.log({
     intervalArray,
@@ -48,7 +47,7 @@ export const groupNumbersByInterval = (numbers, interval) => {
   });
   return {
     intervalArray,
-    ticks: {
+    histogramTicks: {
       smallestTick: smallestInterval,
       largestTick: largestInterval + interval,
       tickCount,
