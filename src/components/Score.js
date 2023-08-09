@@ -5,11 +5,11 @@ import {
   Grid,
   Image,
   Title,
+  Tooltip,
 } from "@mantine/core";
 import { IconStarFilled } from "@tabler/icons-react";
 import ScoreDetailsModal from "./ScoreDetailsModal";
 import { useDisclosure } from "@mantine/hooks";
-import ImageWithPopover from "./ImageWithPopover";
 import { ModFullNames } from "@/lib/ModFullNames";
 
 export default function Score({ scoreData }) {
@@ -55,14 +55,14 @@ export default function Score({ scoreData }) {
               <Flex direction="column" justify="center" align="center">
                 <Flex direction="row">
                   {scoreData.mods.map((mod) => (
-                    <ImageWithPopover
-                      key={mod}
-                      imageSrc={`/mods/${mod}.png`}
-                      popoverText={ModFullNames[mod]}
-                      width={44}
-                      height={31}
-                      margin={3}
-                    />
+                    <Tooltip label={ModFullNames[mod]} key={mod}>
+                      <Image
+                        src={`/mods/${mod}.png`}
+                        width={44}
+                        height={31}
+                        m={3}
+                      />
+                    </Tooltip>
                   ))}
                 </Flex>
                 <Title order={2}>

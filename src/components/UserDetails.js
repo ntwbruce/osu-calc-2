@@ -1,6 +1,14 @@
-import { Title, Flex, Image, BackgroundImage, Center } from "@mantine/core";
-import { useEffect } from "react";
-import Flag from "react-flagkit";
+import {
+  Title,
+  Flex,
+  Image,
+  BackgroundImage,
+  Center,
+  Tooltip,
+  Paper,
+  Container,
+} from "@mantine/core";
+import ReactCountryFlag from "react-country-flag";
 
 export default function UserDetails({ userData, statChangeData, isVertical }) {
   const pfp = userData.avatar_url;
@@ -12,6 +20,7 @@ export default function UserDetails({ userData, statChangeData, isVertical }) {
   const acc = userData.statistics.hit_accuracy;
   const cover_url = userData.cover_url;
   const country_code = userData.country_code;
+  const country_name = userData.country.name;
   const playmode = userData.playmode;
 
   const { ppChange, accChange, rankChange, showChanges } = statChangeData;
@@ -55,12 +64,24 @@ export default function UserDetails({ userData, statChangeData, isVertical }) {
                 color: "white",
               }}
             />
-            <Title order={1} align="center">
-              {username} {<Flag country={country_code} />}
-            </Title>
+            <Flex align="center">
+              <Title order={1} align="center">
+                {username}
+              </Title>
+              <Tooltip label={country_name}>
+                <Container>
+                  <ReactCountryFlag
+                    countryCode={country_code}
+                    svg
+                    style={{
+                      width: "2em",
+                      height: "2em",
+                    }}
+                  />
+                </Container>
+              </Tooltip>
+            </Flex>
           </Flex>
-
-          
 
           <Flex
             w="60%"
@@ -70,24 +91,24 @@ export default function UserDetails({ userData, statChangeData, isVertical }) {
             direction={isVertical ? "column" : "row"}
           >
             <Flex
-            direction="column"
-            justify="center"
-            align="center"
-            mt={10}
-            mb={10}
-          >
-            <Image src={`/playmodes/${playmode}.png`} width={60}/>
-            <Title>
-              {playmode === "osu"
-                ? "Standard"
-                : playmode === "taiko"
-                ? "Taiko"
-                : playmode === "mania"
-                ? "Mania"
-                : "Catch"}
-            </Title>
-          </Flex>
-          
+              direction="column"
+              justify="center"
+              align="center"
+              mt={10}
+              mb={10}
+            >
+              <Image src={`/playmodes/${playmode}.png`} width={60} />
+              <Title>
+                {playmode === "osu"
+                  ? "Standard"
+                  : playmode === "taiko"
+                  ? "Taiko"
+                  : playmode === "mania"
+                  ? "Mania"
+                  : "Catch"}
+              </Title>
+            </Flex>
+
             <Flex
               direction="column"
               justify="center"

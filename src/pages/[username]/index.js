@@ -403,6 +403,7 @@ export default function UserProfilePage() {
                         ) {
                           return (
                             <circle
+                              key={value}
                               cx={cx}
                               cy={cy}
                               r={5}
@@ -423,6 +424,7 @@ export default function UserProfilePage() {
                           {
                             return (
                               <circle
+                                key={value}
                                 cx={cx}
                                 cy={cy}
                                 r={5}

@@ -6,10 +6,12 @@ import {
   Button,
   Flex,
   Grid,
+  Image,
   Loader,
   LoadingOverlay,
   Modal,
   Title,
+  Tooltip,
 } from "@mantine/core";
 import { IconExternalLink, IconStarFilled } from "@tabler/icons-react";
 import axios from "axios";
@@ -200,15 +202,14 @@ export default function ScoreDetailsModal({ opened, close, scoreData }) {
                     <Title order={4}>MODS</Title>
                     <Flex direction="row">
                       {scoreData.mods.map((mod) => (
-                        <ImageWithPopover
-                          key={mod}
-                          imageSrc={`/mods/${mod}.png`}
-                          popoverText={ModFullNames[mod]}
-                          popoverWidth={120}
-                          width={44}
-                          height={31}
-                          margin={7}
-                        />
+                        <Tooltip label={ModFullNames[mod]} key={mod}>
+                          <Image
+                            src={`/mods/${mod}.png`}
+                            width={44}
+                            height={31}
+                            m={7}
+                          />
+                        </Tooltip>
                       ))}
                     </Flex>
                   </Flex>
@@ -391,7 +392,7 @@ export default function ScoreDetailsModal({ opened, close, scoreData }) {
                     <Title>{scoreData.pp.toFixed(2)}pp</Title>
                   </Flex>
                 </Grid.Col>
-                
+
                 <Grid.Col span={7}>
                   <Flex direction="column">
                     <Title order={4}>COMBO</Title>
