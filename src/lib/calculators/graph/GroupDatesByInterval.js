@@ -35,7 +35,7 @@ export const groupDatesByMonth = (dates) => {
   for (const month in dateCountByMonth) {
     monthArray.push({
       month: month.toString(),
-      count: dateCountByMonth[month]
+      count: dateCountByMonth[month],
     });
   }
   console.log(monthArray);
@@ -44,13 +44,9 @@ export const groupDatesByMonth = (dates) => {
 
 // Group dates by hour of day
 export const groupDatesByHour = (dates) => {
-    let dateCountByHour = {};
-    dates.forEach((date) => {
-      const hour = `0${date.getHours()}`.slice(-2);
-      hour in dateCountByHour
-        ? dateCountByHour[hour]++ : dateCountByHour[hour] = 1;
-    });
-    console.log(dateCountByHour);
-    return dateCountByHour;
-  };
-  
+  let dateCountByHour = [];
+  [...Array(24).keys()].forEach((hour) => dateCountByHour[hour] = {hour, count: 0});
+  dates.forEach((date) => dateCountByHour[date.getHours()].count++);
+  console.log(dateCountByHour);
+  return dateCountByHour;
+};

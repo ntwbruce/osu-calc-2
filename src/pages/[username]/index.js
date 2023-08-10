@@ -499,7 +499,7 @@ export default function UserProfilePage() {
                         />
                         <YAxis
                           stroke="#ffffff"
-                          domain={["auto", "auto"]}
+                          domain={[0, "auto"]}
                           interval="preserveStartEnd"
                         />
                         <Tooltip
@@ -576,7 +576,7 @@ export default function UserProfilePage() {
                       /> */}
                         <YAxis
                           stroke="#ffffff"
-                          domain={["auto", "auto"]}
+                          domain={[0, "auto"]}
                           interval="preserveStartEnd"
                         />
                         <Tooltip
@@ -650,7 +650,7 @@ export default function UserProfilePage() {
                         />
                         <YAxis
                           stroke="#ffffff"
-                          domain={["auto", "auto"]}
+                          domain={[0, "auto"]}
                           interval="preserveStartEnd"
                         />
                         <Tooltip
@@ -684,6 +684,63 @@ export default function UserProfilePage() {
                                         "Dec",
                                       ][parseInt(label.slice(-2)) - 1]
                                     } 20${label.slice(0, 2)}`}
+                                  </Title>
+                                  <Title order={2}>{payload[0].value}</Title>
+                                </Paper>
+                              );
+                            }
+
+                            return null;
+                          }}
+                        />
+                        <Bar dataKey="count" fill="#daa520" />
+                      </BarChart>
+                    </Flex>
+
+                    <Flex>
+                      <BarChart
+                        width={730}
+                        height={250}
+                        data={scoreGraphData.timeGraphData}
+                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis
+                          dataKey="hour"
+                          stroke="#ffffff"
+                          padding={{ left: 10, right: 10 }}
+                          tickFormatter={(hour) =>
+                            `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}${
+                              hour < 12 ? "am" : "pm"
+                            }`
+                          }
+                        />
+                        <YAxis
+                          stroke="#ffffff"
+                          domain={[0, "auto"]}
+                          interval="preserveStartEnd"
+                        />
+                        <Tooltip
+                          content={({ active, payload, label }) => {
+                            if (active && payload && payload.length) {
+                              return (
+                                <Paper
+                                  shadow="sm"
+                                  p="sm"
+                                  sx={{
+                                    outline: "solid",
+                                    borderRadius: "10px",
+                                    color: "white",
+                                  }}
+                                  bg="rgba(50, 50, 50, .6)"
+                                >
+                                  <Title order={6}>
+                                    {label === 0 ? 12 : label > 12 ? label - 12 : label}
+                                    {label < 12 ? "am" : "pm"}
+                                    {" - "}
+                                    {label === 0 ? 12 : label > 12 ? label - 12 : label}
+                                    {":59"}
+                                    {label < 12 ? "am" : "pm"}
                                   </Title>
                                   <Title order={2}>{payload[0].value}</Title>
                                 </Paper>
