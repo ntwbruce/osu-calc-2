@@ -11,6 +11,7 @@ import {
   RingProgress,
   Text,
   ScrollArea,
+  Button,
 } from "@mantine/core";
 import Head from "next/head";
 import {
@@ -157,9 +158,6 @@ export default function UserProfilePage() {
   const [bestScoresData, setBestScoresData] = useState({});
   const [isBestScoresDataSet, setIsBestScoresDataSet] = useState(false);
 
-  const [scoreGraphData, setScoreGraphData] = useState({});
-  const [isScoreGraphDataSet, setIsScoreGraphDataSet] = useState(false);
-
   async function fetchBestScoresDataHandler() {
     try {
       const response = (
@@ -176,8 +174,22 @@ export default function UserProfilePage() {
     }
   }
 
-  const ppInterval = 5;
-  const accInterval = 0.1;
+  // * Fetch best score data
+  useEffect(() => {
+    if (isUserDataSet) {
+      fetchBestScoresDataHandler();
+    }
+  }, [isUserDataSet]);
+
+  // ============================================= BEST SCORES DATA PRE-CALCULATION =============================================
+
+  const [scoreGraphData, setScoreGraphData] = useState({});
+  const [isScoreGraphDataSet, setIsScoreGraphDataSet] = useState(false);
+
+  const [ppInterval, setPpInterval] = useState(5);
+  const [accInterval, setAccInterval] = useState(0.1);
+  const [splitScoreData, setSplitScoreData] = useState({});
+  const [isSplitScoreDataSet, setIsSplitScoreDataSet] = useState(false);
 
   useEffect(() => {
     if (isBestScoresDataSet) {
@@ -193,20 +205,19 @@ export default function UserProfilePage() {
         accs[index] = score.accuracy * 100;
       });
 
+      setSplitScoreData({ mods, dates, pps, accs });
+      setIsSplitScoreDataSet(true);
+
       setScoreGraphData({
-        ppGraphData: {
-          mean: calculateMean(pps),
-          median: calculateMedian(pps),
-          graphData: groupNumbersByInterval(pps, ppInterval),
-        },
-        accGraphData: {
-          mean: calculateMean(accs),
-          median: calculateMedian(accs),
-          graphData: groupNumbersByInterval(
-            accs.map((acc) => Math.round(acc * 10)),
-            accInterval * 10
-          ),
-        },
+        ppMean: calculateMean(pps),
+        ppMedian: calculateMedian(pps),
+        ppGraphData: groupNumbersByInterval(pps, ppInterval),
+        accMean: calculateMean(accs),
+        accMedian: calculateMedian(accs),
+        accGraphData: groupNumbersByInterval(
+          accs.map((acc) => Math.round(acc * 10)),
+          accInterval * 10
+        ),
         modsGraphData: groupModsByValue(mods),
         dateGraphData: groupDatesByMonth(dates),
         timeGraphData: groupDatesByHour(dates),
@@ -215,12 +226,26 @@ export default function UserProfilePage() {
     }
   }, [bestScoresData]);
 
-  // * Fetch best score data
   useEffect(() => {
-    if (isUserDataSet) {
-      fetchBestScoresDataHandler();
+    if (isSplitScoreDataSet) {
+      setScoreGraphData({
+        ...scoreGraphData,
+        ppGraphData: groupNumbersByInterval(splitScoreData.pps, ppInterval),
+      });
     }
-  }, [isUserDataSet]);
+  }, [ppInterval]);
+
+  useEffect(() => {
+    if (isSplitScoreDataSet) {
+      setScoreGraphData({
+        ...scoreGraphData,
+        accGraphData: groupNumbersByInterval(
+          splitScoreData.accs.map((acc) => Math.round(acc * 10)),
+          accInterval * 10
+        ),
+      });
+    }
+  }, [accInterval]);
 
   // ============================================= OUTPUT =============================================
 
@@ -446,9 +471,7 @@ export default function UserProfilePage() {
                       <BarChart
                         width={730}
                         height={250}
-                        data={
-                          scoreGraphData.ppGraphData.graphData.intervalArray
-                        }
+                        data={scoreGraphData.ppGraphData.intervalArray}
                         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                       >
                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -464,14 +487,13 @@ export default function UserProfilePage() {
                           padding={{ left: 10, right: 10 }}
                           type="number"
                           domain={[
-                            scoreGraphData.ppGraphData.graphData.histogramTicks
+                            scoreGraphData.ppGraphData.histogramTicks
                               .smallestTick,
-                            scoreGraphData.ppGraphData.graphData.histogramTicks
+                            scoreGraphData.ppGraphData.histogramTicks
                               .largestTick,
                           ]}
                           tickCount={
-                            scoreGraphData.ppGraphData.graphData.histogramTicks
-                              .tickCount
+                            scoreGraphData.ppGraphData.histogramTicks.tickCount
                           }
                           allowDataOverflow
                         />
@@ -510,17 +532,18 @@ export default function UserProfilePage() {
 
                       <Flex direction="column">
                         <Title order={2}>
-                          Mean{" "}
-                          {Math.round(scoreGraphData.ppGraphData.mean * 100) /
-                            100}
+                          Mean {Math.round(scoreGraphData.ppMean * 100) / 100}
                           pp
                         </Title>
                         <Title order={2}>
                           Median{" "}
-                          {Math.round(scoreGraphData.ppGraphData.median * 100) /
-                            100}
+                          {Math.round(scoreGraphData.ppMedian * 100) / 100}
                           pp
                         </Title>
+                        <Button onClick={() => setPpInterval(5)} mb={10}>
+                          5
+                        </Button>
+                        <Button onClick={() => setPpInterval(10)}>10</Button>
                       </Flex>
                     </Flex>
 
@@ -528,9 +551,7 @@ export default function UserProfilePage() {
                       <BarChart
                         width={730}
                         height={250}
-                        data={
-                          scoreGraphData.accGraphData.graphData.intervalArray
-                        }
+                        data={scoreGraphData.accGraphData.intervalArray}
                         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                       >
                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -595,18 +616,19 @@ export default function UserProfilePage() {
 
                       <Flex direction="column">
                         <Title order={2}>
-                          Mean{" "}
-                          {Math.round(scoreGraphData.accGraphData.mean * 100) /
-                            100}
-                          %
+                          Mean {Math.round(scoreGraphData.accMean * 100) / 100}%
                         </Title>
                         <Title order={2}>
                           Median{" "}
-                          {Math.round(
-                            scoreGraphData.accGraphData.median * 100
-                          ) / 100}
-                          %
+                          {Math.round(scoreGraphData.accMedian * 100) / 100}%
                         </Title>
+                        <Button onClick={() => setAccInterval(0.1)} mb={10}>
+                          0.1
+                        </Button>
+                        <Button onClick={() => setAccInterval(0.5)} mb={10}>
+                          0.5
+                        </Button>
+                        <Button onClick={() => setAccInterval(1)}>1</Button>
                       </Flex>
                     </Flex>
 
