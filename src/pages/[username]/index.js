@@ -15,6 +15,7 @@ import {
 } from "@mantine/core";
 import Head from "next/head";
 import {
+  IconCircle,
   IconHammer,
   IconMinus,
   IconTriangle,
@@ -26,8 +27,12 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
+  Label,
   Line,
   LineChart,
+  Pie,
+  PieChart,
   Tooltip,
   XAxis,
   YAxis,
@@ -43,6 +48,17 @@ import {
   calculateMean,
   calculateMedian,
 } from "@/lib/calculators/GeneralCalculator";
+
+const RADIAN = Math.PI / 180;
+const COLORS = [
+  "#c80815",
+  "#ff7900",
+  "#ffbf00",
+  "#228b22",
+  "#007bb8",
+  "#702670",
+  "#bf42f5",
+];
 
 export default function UserProfilePage() {
   const router = useRouter();
@@ -209,15 +225,19 @@ export default function UserProfilePage() {
       setIsSplitScoreDataSet(true);
 
       setScoreGraphData({
-        ppMean: calculateMean(pps),
-        ppMedian: calculateMedian(pps),
-        ppGraphData: groupNumbersByInterval(pps, ppInterval),
-        accMean: calculateMean(accs),
-        accMedian: calculateMedian(accs),
-        accGraphData: groupNumbersByInterval(
-          accs.map((acc) => Math.round(acc * 10)),
-          accInterval * 10
-        ),
+        pp: {
+          mean: calculateMean(pps),
+          median: calculateMedian(pps),
+          graphData: groupNumbersByInterval(pps, ppInterval),
+        },
+        acc: {
+          mean: calculateMean(accs),
+          median: calculateMedian(accs),
+          graphData: groupNumbersByInterval(
+            accs.map((acc) => Math.round(acc * 10)),
+            accInterval * 10
+          ),
+        },
         modsGraphData: groupModsByValue(mods),
         dateGraphData: groupDatesByMonth(dates),
         timeGraphData: groupDatesByHour(dates),
@@ -230,7 +250,10 @@ export default function UserProfilePage() {
     if (isSplitScoreDataSet) {
       setScoreGraphData({
         ...scoreGraphData,
-        ppGraphData: groupNumbersByInterval(splitScoreData.pps, ppInterval),
+        pp: {
+          ...scoreGraphData.pp,
+          graphData: groupNumbersByInterval(splitScoreData.pps, ppInterval),
+        },
       });
     }
   }, [ppInterval]);
@@ -239,10 +262,13 @@ export default function UserProfilePage() {
     if (isSplitScoreDataSet) {
       setScoreGraphData({
         ...scoreGraphData,
-        accGraphData: groupNumbersByInterval(
-          splitScoreData.accs.map((acc) => Math.round(acc * 10)),
-          accInterval * 10
-        ),
+        acc: {
+          ...scoreGraphData.acc,
+          graphData: groupNumbersByInterval(
+            splitScoreData.accs.map((acc) => Math.round(acc * 10)),
+            accInterval * 10
+          ),
+        },
       });
     }
   }, [accInterval]);
@@ -281,7 +307,7 @@ export default function UserProfilePage() {
         {isUserDataSet && (
           <>
             <Flex direction="column" align="center">
-              <Flex direction="column">
+              <Flex direction="column" gap={30}>
                 {isHitDataSet && (
                   <RingProgress
                     size={260}
@@ -356,6 +382,12 @@ export default function UserProfilePage() {
                       domain={["auto", "auto"]}
                       reversed
                       interval="preserveStartEnd"
+                      label={{
+                        value: "Rank",
+                        angle: -90,
+                        position: "left",
+                        offset: 10,
+                      }}
                     />
                     <Tooltip
                       content={({ active, payload, label }) => {
@@ -467,12 +499,13 @@ export default function UserProfilePage() {
 
                 {isScoreGraphDataSet && (
                   <>
+                    {/** PP distribution */}
                     <Flex>
                       <BarChart
                         width={730}
-                        height={250}
-                        data={scoreGraphData.ppGraphData.intervalArray}
-                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                        height={290}
+                        data={scoreGraphData.pp.graphData.intervalArray}
+                        margin={{ top: 5, right: 30, left: 20, bottom: 35 }}
                       >
                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
                         <XAxis
@@ -487,20 +520,32 @@ export default function UserProfilePage() {
                           padding={{ left: 10, right: 10 }}
                           type="number"
                           domain={[
-                            scoreGraphData.ppGraphData.histogramTicks
+                            scoreGraphData.pp.graphData.histogramTicks
                               .smallestTick,
-                            scoreGraphData.ppGraphData.histogramTicks
+                            scoreGraphData.pp.graphData.histogramTicks
                               .largestTick,
                           ]}
                           tickCount={
-                            scoreGraphData.ppGraphData.histogramTicks.tickCount
+                            scoreGraphData.pp.graphData.histogramTicks.tickCount
                           }
                           allowDataOverflow
-                        />
+                        >
+                          <Label
+                            value="PP"
+                            offset={-30}
+                            position="insideBottom"
+                          />
+                        </XAxis>
                         <YAxis
                           stroke="#ffffff"
                           domain={[0, "auto"]}
                           interval="preserveStartEnd"
+                          label={{
+                            value: "Number of plays",
+                            angle: -90,
+                            position: "insideBottomLeft",
+                            offset: 20,
+                          }}
                         />
                         <Tooltip
                           content={({ active, payload, label }) => {
@@ -532,12 +577,12 @@ export default function UserProfilePage() {
 
                       <Flex direction="column">
                         <Title order={2}>
-                          Mean {Math.round(scoreGraphData.ppMean * 100) / 100}
+                          Mean {Math.round(scoreGraphData.pp.mean * 100) / 100}
                           pp
                         </Title>
                         <Title order={2}>
                           Median{" "}
-                          {Math.round(scoreGraphData.ppMedian * 100) / 100}
+                          {Math.round(scoreGraphData.pp.median * 100) / 100}
                           pp
                         </Title>
                         <Button onClick={() => setPpInterval(5)} mb={10}>
@@ -547,12 +592,13 @@ export default function UserProfilePage() {
                       </Flex>
                     </Flex>
 
+                    {/** Acc distribution */}
                     <Flex>
                       <BarChart
                         width={730}
-                        height={250}
-                        data={scoreGraphData.accGraphData.intervalArray}
-                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                        height={290}
+                        data={scoreGraphData.acc.graphData.intervalArray}
+                        margin={{ top: 5, right: 30, left: 20, bottom: 35 }}
                       >
                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
                         <XAxis
@@ -560,24 +606,23 @@ export default function UserProfilePage() {
                           stroke="#ffffff"
                           padding={{ left: 10, right: 10 }}
                           tickFormatter={(tick) => tick / 10}
-                        />
-                        {/* <XAxis
-                        xAxisId="values"
-                        stroke="#ffffff"
-                        padding={{ left: 10, right: 10 }}
-                        type="number"
-                        domain={[
-                          scoreGraphData.accGraphData.ticks.smallestTick,
-                          scoreGraphData.accGraphData.ticks.largestTick,
-                        ]}
-                        tickCount={scoreGraphData.accGraphData.ticks.tickCount}
-                        allowDataOverflow
-                        tickFormatter={(tick) => tick / 10}
-                      /> */}
+                        >
+                          <Label
+                            value="Accuracy"
+                            offset={-30}
+                            position="insideBottom"
+                          />
+                        </XAxis>
                         <YAxis
                           stroke="#ffffff"
                           domain={[0, "auto"]}
                           interval="preserveStartEnd"
+                          label={{
+                            value: "Number of plays",
+                            angle: -90,
+                            position: "insideBottomLeft",
+                            offset: 20,
+                          }}
                         />
                         <Tooltip
                           content={({ active, payload, label }) => {
@@ -616,11 +661,12 @@ export default function UserProfilePage() {
 
                       <Flex direction="column">
                         <Title order={2}>
-                          Mean {Math.round(scoreGraphData.accMean * 100) / 100}%
+                          Mean {Math.round(scoreGraphData.acc.mean * 100) / 100}
+                          %
                         </Title>
                         <Title order={2}>
                           Median{" "}
-                          {Math.round(scoreGraphData.accMedian * 100) / 100}%
+                          {Math.round(scoreGraphData.acc.median * 100) / 100}%
                         </Title>
                         <Button onClick={() => setAccInterval(0.1)} mb={10}>
                           0.1
@@ -632,126 +678,254 @@ export default function UserProfilePage() {
                       </Flex>
                     </Flex>
 
-                    <Flex>
-                      <BarChart
-                        width={730}
-                        height={250}
-                        data={scoreGraphData.dateGraphData}
-                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    {/** Date distribution */}
+                    <BarChart
+                      width={730}
+                      height={290}
+                      data={scoreGraphData.dateGraphData}
+                      margin={{ top: 5, right: 30, left: 20, bottom: 35 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                      <XAxis
+                        dataKey="month"
+                        stroke="#ffffff"
+                        padding={{ left: 10, right: 10 }}
+                        tickFormatter={(tick) =>
+                          "20" + tick.slice(0, 2) + "-" + tick.slice(2, 4)
+                        }
                       >
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                        <XAxis
-                          dataKey="month"
-                          stroke="#ffffff"
-                          padding={{ left: 10, right: 10 }}
-                          tickFormatter={(tick) =>
-                            "20" + tick.slice(0, 2) + "-" + tick.slice(2, 4)
+                        <Label
+                          value="Month"
+                          offset={-30}
+                          position="insideBottom"
+                        />
+                      </XAxis>
+                      <YAxis
+                        stroke="#ffffff"
+                        domain={[0, "auto"]}
+                        interval="preserveStartEnd"
+                        label={{
+                          value: "Number of plays",
+                          angle: -90,
+                          position: "insideBottomLeft",
+                          offset: 20,
+                        }}
+                      />
+                      <Tooltip
+                        content={({ active, payload, label }) => {
+                          if (active && payload && payload.length) {
+                            return (
+                              <Paper
+                                shadow="sm"
+                                p="sm"
+                                sx={{
+                                  outline: "solid",
+                                  borderRadius: "10px",
+                                  color: "white",
+                                }}
+                                bg="rgba(50, 50, 50, .6)"
+                              >
+                                <Title order={6}>
+                                  {`${
+                                    [
+                                      "Jan",
+                                      "Feb",
+                                      "Mar",
+                                      "Apr",
+                                      "May",
+                                      "Jun",
+                                      "Jul",
+                                      "Aug",
+                                      "Sep",
+                                      "Oct",
+                                      "Nov",
+                                      "Dec",
+                                    ][parseInt(label.slice(-2)) - 1]
+                                  } 20${label.slice(0, 2)}`}
+                                </Title>
+                                <Title order={2}>{payload[0].value}</Title>
+                              </Paper>
+                            );
                           }
+
+                          return null;
+                        }}
+                      />
+                      <Bar dataKey="count" fill="#daa520" />
+                    </BarChart>
+
+                    {/** Time distribution */}
+                    <BarChart
+                      width={730}
+                      height={290}
+                      data={scoreGraphData.timeGraphData}
+                      margin={{ top: 5, right: 30, left: 20, bottom: 35 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                      <XAxis
+                        dataKey="hour"
+                        stroke="#ffffff"
+                        padding={{ left: 10, right: 10 }}
+                        tickFormatter={(hour) =>
+                          `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}${
+                            hour < 12 ? "am" : "pm"
+                          }`
+                        }
+                      >
+                        <Label
+                          value="Time"
+                          offset={-30}
+                          position="insideBottom"
                         />
-                        <YAxis
-                          stroke="#ffffff"
-                          domain={[0, "auto"]}
-                          interval="preserveStartEnd"
-                        />
-                        <Tooltip
-                          content={({ active, payload, label }) => {
-                            if (active && payload && payload.length) {
+                      </XAxis>
+                      <YAxis
+                        stroke="#ffffff"
+                        domain={[0, "auto"]}
+                        interval="preserveStartEnd"
+                        label={{
+                          value: "Number of plays",
+                          angle: -90,
+                          position: "insideBottomLeft",
+                          offset: 20,
+                        }}
+                      />
+                      <Tooltip
+                        content={({ active, payload, label }) => {
+                          if (active && payload && payload.length) {
+                            return (
+                              <Paper
+                                shadow="sm"
+                                p="sm"
+                                sx={{
+                                  outline: "solid",
+                                  borderRadius: "10px",
+                                  color: "white",
+                                }}
+                                bg="rgba(50, 50, 50, .6)"
+                              >
+                                <Title order={6}>
+                                  {label === 0
+                                    ? 12
+                                    : label > 12
+                                    ? label - 12
+                                    : label}
+                                  {label < 12 ? "am" : "pm"}
+                                  {" - "}
+                                  {label === 0
+                                    ? 12
+                                    : label > 12
+                                    ? label - 12
+                                    : label}
+                                  {":59"}
+                                  {label < 12 ? "am" : "pm"}
+                                </Title>
+                                <Title order={2}>{payload[0].value}</Title>
+                              </Paper>
+                            );
+                          }
+
+                          return null;
+                        }}
+                      />
+                      <Bar dataKey="count" fill="#daa520" />
+                    </BarChart>
+
+                    {/** Mod distribution */}
+                    <Flex gap={30}>
+                      <PieChart width={600} height={600}>
+                        <Pie
+                          dataKey="count"
+                          data={
+                            scoreGraphData.modsGraphData.modCombinationArray
+                          }
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={200}
+                          innerRadius={100}
+                          fill="#8884d8"
+                          labelLine={false}
+                          label={({
+                            cx,
+                            cy,
+                            midAngle,
+                            outerRadius,
+                            mods,
+                            index,
+                            count,
+                          }) => {
+                            console.log(
+                              scoreGraphData.modsGraphData.modCombinationArray
+                            );
+                            if (count > 1) {
+                              const radius = outerRadius + 50;
+                              const x =
+                                cx + radius * Math.cos(-midAngle * RADIAN);
+                              const y =
+                                cy +
+                                radius * Math.sin(-midAngle * RADIAN) * 0.9;
                               return (
-                                <Paper
-                                  shadow="sm"
-                                  p="sm"
-                                  sx={{
-                                    outline: "solid",
-                                    borderRadius: "10px",
-                                    color: "white",
-                                  }}
-                                  bg="rgba(50, 50, 50, .6)"
+                                <text
+                                  x={x}
+                                  y={y}
+                                  fill={COLORS[index % COLORS.length]}
+                                  textAnchor="middle"
+                                  dominantBaseline="central"
+                                  style={{ fontWeight: "bold" }}
                                 >
-                                  <Title order={6}>
-                                    {`${
-                                      [
-                                        "Jan",
-                                        "Feb",
-                                        "Mar",
-                                        "Apr",
-                                        "May",
-                                        "Jun",
-                                        "Jul",
-                                        "Aug",
-                                        "Sep",
-                                        "Oct",
-                                        "Nov",
-                                        "Dec",
-                                      ][parseInt(label.slice(-2)) - 1]
-                                    } 20${label.slice(0, 2)}`}
-                                  </Title>
-                                  <Title order={2}>{payload[0].value}</Title>
-                                </Paper>
+                                  {mods} ({count})
+                                </text>
                               );
                             }
-
-                            return null;
                           }}
-                        />
-                        <Bar dataKey="count" fill="#daa520" />
-                      </BarChart>
-                    </Flex>
+                        >
+                          {scoreGraphData.modsGraphData.modCombinationArray.map(
+                            (entry, index) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={COLORS[index % COLORS.length]}
+                              />
+                            )
+                          )}
+                        </Pie>
+                      </PieChart>
 
-                    <Flex>
-                      <BarChart
-                        width={730}
-                        height={250}
-                        data={scoreGraphData.timeGraphData}
-                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                      <Flex
+                        direction="column"
+                        gap={10}
+                        h={600}
+                        justify="center"
                       >
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                        <XAxis
-                          dataKey="hour"
-                          stroke="#ffffff"
-                          padding={{ left: 10, right: 10 }}
-                          tickFormatter={(hour) =>
-                            `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}${
-                              hour < 12 ? "am" : "pm"
-                            }`
-                          }
-                        />
-                        <YAxis
-                          stroke="#ffffff"
-                          domain={[0, "auto"]}
-                          interval="preserveStartEnd"
-                        />
-                        <Tooltip
-                          content={({ active, payload, label }) => {
-                            if (active && payload && payload.length) {
-                              return (
-                                <Paper
-                                  shadow="sm"
-                                  p="sm"
-                                  sx={{
-                                    outline: "solid",
-                                    borderRadius: "10px",
-                                    color: "white",
-                                  }}
-                                  bg="rgba(50, 50, 50, .6)"
-                                >
-                                  <Title order={6}>
-                                    {label === 0 ? 12 : label > 12 ? label - 12 : label}
-                                    {label < 12 ? "am" : "pm"}
-                                    {" - "}
-                                    {label === 0 ? 12 : label > 12 ? label - 12 : label}
-                                    {":59"}
-                                    {label < 12 ? "am" : "pm"}
-                                  </Title>
-                                  <Title order={2}>{payload[0].value}</Title>
-                                </Paper>
-                              );
-                            }
+                        {scoreGraphData.modsGraphData.modCombinationArray.map(
+                          (modObj, index) => (
+                            <Flex>
+                              <Flex align="center" gap={5}>
+                                <IconCircle
+                                  fill={COLORS[index % COLORS.length]}
+                                  size={20}
+                                />
+                                <Title order={3}>{modObj.mods}</Title>
+                              </Flex>
+                            </Flex>
+                          )
+                        )}
+                      </Flex>
 
-                            return null;
-                          }}
-                        />
-                        <Bar dataKey="count" fill="#daa520" />
-                      </BarChart>
+                      <Flex
+                        direction="column"
+                        gap={10}
+                        h={600}
+                        justify="center"
+                      >
+                        {scoreGraphData.modsGraphData.modCombinationArray.map(
+                          (modObj) => (
+                            <Flex>
+                              <Flex align="center" gap={5}>
+                                <Title order={3}>{modObj.count}</Title>
+                              </Flex>
+                            </Flex>
+                          )
+                        )}
+                      </Flex>
                     </Flex>
                   </>
                 )}
