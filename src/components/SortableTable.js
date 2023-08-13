@@ -10,6 +10,8 @@ import {
   MultiSelect,
   ScrollArea,
   Image,
+  Overlay,
+  Container,
 } from "@mantine/core";
 import {
   IconSearch,
@@ -680,10 +682,15 @@ export default function SortableTable({
       </Flex>
 
       <Flex justify="center">
-        <Title order={3}>{sortedData.length} score(s) found!</Title>
+        <Title order={4}>{sortedData.length} score(s) found!</Title>
       </Flex>
 
-      <ScrollArea h="70vh" type="auto">
+      <ScrollArea h="71vh">
+        <Overlay
+          h="10%"
+          gradient={`linear-gradient(to top, rgba(0,0,0,0), rgba(0,0,0,1))`}
+        />
+        <Container h={20} w={20} />
         {scores}
       </ScrollArea>
     </Flex>

@@ -136,7 +136,7 @@ export default function ScoreDetailsModal({ opened, close, scoreData }) {
         />
         <Flex
           direction="column"
-          bg="rgba(0, 0, 0, .75)"
+          bg="rgba(0, 0, 0, .9)"
           p={40}
           h="100%"
           gap={20}
@@ -154,7 +154,6 @@ export default function ScoreDetailsModal({ opened, close, scoreData }) {
                 >
                   <Button
                     type="button"
-                    variant="outline"
                     leftIcon={<IconExternalLink size="0.9rem" />}
                   >
                     Beatmap listing
