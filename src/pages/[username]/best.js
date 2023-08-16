@@ -1,15 +1,7 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import UserDetails from "@/components/UserDetails";
 import axios from "axios";
-import {
-  Title,
-  Flex,
-  Loader,
-  Paper,
-  Center,
-  Grid,
-} from "@mantine/core";
+import { Title, Flex, Loader, Paper, Center, Grid } from "@mantine/core";
 import Head from "next/head";
 import SortableTable from "@/components/SortableTable";
 import {
@@ -21,8 +13,9 @@ import {
   calculateOverallAccNoSelection,
 } from "@/lib/calculators/AccCalculator";
 import { calculateRank } from "@/lib/calculators/RankCalculator";
-import { HeaderBar } from "@/components/HeaderBar";
+import { LoggedInHeader } from "@/components/LoggedInHeader";
 import { IconZoomQuestion } from "@tabler/icons-react";
+import PlayerInfo from "@/components/PlayerInfo";
 
 export default function UserBestScoresPage() {
   const router = useRouter();
@@ -218,7 +211,7 @@ export default function UserBestScoresPage() {
         <title>silver wolf cheese slap meme</title>
       </Head>
 
-      <HeaderBar
+      <LoggedInHeader
         pages={[
           { label: "Profile Stats", link: `/${router.query.username}` },
           { label: "Best Scores", link: `/${router.query.username}/best` },
@@ -230,7 +223,7 @@ export default function UserBestScoresPage() {
       <Grid justify="center" align="center" grow ml={10} mr={10} gutter={20}>
         <Grid.Col span={1}>
           {authTokenPresent && isUserDataSet && (
-            <UserDetails
+            <PlayerInfo
               userData={userData}
               statChangeData={statChangeData}
               isVertical={true}

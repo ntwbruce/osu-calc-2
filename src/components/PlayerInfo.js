@@ -5,12 +5,11 @@ import {
   BackgroundImage,
   Center,
   Tooltip,
-  Paper,
   Container,
 } from "@mantine/core";
 import ReactCountryFlag from "react-country-flag";
 
-export default function UserDetails({ userData, statChangeData, isVertical }) {
+export default function PlayerInfo({ userData, statChangeData, isVertical }) {
   const pfp = userData.avatar_url;
   const username = userData.username;
   const global_rank = userData.statistics.is_ranked
@@ -40,7 +39,7 @@ export default function UserDetails({ userData, statChangeData, isVertical }) {
       >
         <Flex
           mih="100%"
-          bg="rgba(0, 0, 0, .6)"
+          bg="rgba(0, 0, 0, .7)"
           justify="center"
           align="center"
           direction={isVertical ? "column" : "row"}
@@ -172,6 +171,69 @@ export default function UserDetails({ userData, statChangeData, isVertical }) {
                 </Title>
               )}
             </Flex>
+          </Flex>
+        </Flex>
+      </BackgroundImage>
+    </Center>
+  );
+}
+
+export function PlayerInfoSimple({ userData, isVertical }) {
+  const pfp = userData.avatar_url;
+  const username = userData.username;
+  const cover_url = userData.cover_url;
+  const country_code = userData.country_code;
+  const country_name = userData.country.name;
+
+  return (
+    <Center>
+      <BackgroundImage
+        src={cover_url}
+        sx={{
+          outline: "solid",
+          borderRadius: "10px",
+          color: "white",
+        }}
+        h={isVertical ? "87vh" : 250}
+        mb={10}
+        mt={10}
+      >
+        <Flex
+          mih="100%"
+          bg="rgba(0, 0, 0, .7)"
+          justify="center"
+          align="center"
+          direction={isVertical ? "column" : "row"}
+          gap={60}
+        >
+          <Image
+            width="12rem"
+            height="12rem"
+            src={pfp}
+            radius="lg"
+            sx={{
+              outline: "solid",
+              borderRadius: "18px",
+              color: "white",
+            }}
+          />
+
+          <Flex align="center" gap={20}>
+            <Title size={70} align="center">
+              {username}
+            </Title>
+            <Tooltip label={country_name}>
+              <Container>
+                <ReactCountryFlag
+                  countryCode={country_code}
+                  svg
+                  style={{
+                    width: "4em",
+                    height: "4em",
+                  }}
+                />
+              </Container>
+            </Tooltip>
           </Flex>
         </Flex>
       </BackgroundImage>

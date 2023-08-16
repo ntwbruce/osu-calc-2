@@ -1,11 +1,11 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import UserDetails from "@/components/UserDetails";
+import UserDetails from "@/components/PlayerInfo";
 import axios from "axios";
 import { Title, Flex, Center, Paper, Loader } from "@mantine/core";
 import Head from "next/head";
 import { IconHammer, IconZoomQuestion } from "@tabler/icons-react";
-import { HeaderBar } from "@/components/HeaderBar";
+import { HeaderBar } from "@/components/LoggedInHeader";
 
 export default function UserRecentScoresPage() {
   const router = useRouter();

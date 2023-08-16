@@ -64,7 +64,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export function HeaderBar({ pages, home, currPage }) {
+export function LoggedInHeader({ pages, home, currPage }) {
   const [opened, { toggle }] = useDisclosure(false);
   const { classes, cx } = useStyles();
 
