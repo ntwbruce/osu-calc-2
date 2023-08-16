@@ -220,9 +220,8 @@ export default function UserBestScoresPage() {
 
       <HeaderBar
         pages={[
-          { label: "Profile", link: `/${router.query.username}` },
+          { label: "Profile Stats", link: `/${router.query.username}` },
           { label: "Best Scores", link: `/${router.query.username}/best` },
-          { label: "Recent Scores", link: `/${router.query.username}/recent` },
         ]}
         home={{ label: "Check another profile", link: "/" }}
         currPage="Best Scores"
