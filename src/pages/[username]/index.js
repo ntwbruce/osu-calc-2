@@ -351,123 +351,104 @@ export default function UserProfilePage() {
             <Grid.Col span={2}>
               <Flex align="center" gap={40} h="60vh">
                 <Button onClick={statToggleHandler}>Toggle Chart</Button>
-                <Flex direction="column" gap={30} w="50vh">
+                <Flex direction="column" gap={30}>
                   {isRankHistoryDataSet && shownStat === 0 && (
-                    <LineChart
-                      width={730}
-                      height={250}
-                      data={rankHistoryData.history}
-                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                      <XAxis
-                        dataKey="date"
-                        stroke="#ffffff"
-                        padding={{ left: 10, right: 10 }}
-                        hide
-                      />
-                      <YAxis
-                        stroke="#ffffff"
-                        domain={["auto", "auto"]}
-                        reversed
-                        interval="preserveStartEnd"
-                        label={{
-                          value: "Rank",
-                          angle: -90,
-                          position: "left",
-                          offset: 10,
-                        }}
-                      />
-                      <Tooltip
-                        content={({ active, payload, label }) => {
-                          if (active && payload && payload.length) {
-                            return (
-                              <Paper
-                                shadow="sm"
-                                p="sm"
-                                sx={{
-                                  outline: "solid",
-                                  borderRadius: "10px",
-                                  color: "white",
-                                }}
-                                bg="rgba(50, 50, 50, .6)"
-                              >
-                                <Flex gap={10}>
-                                  <Title order={6}>
-                                    {`Global Rank #${payload[0].value}`}
-                                  </Title>
-                                  <Flex gap={2}>
-                                    {payload[0].payload.diff === 0 ? (
-                                      <IconMinus
-                                        size={21}
-                                        strokeWidth={2}
-                                        color="#808080"
-                                      />
-                                    ) : payload[0].payload.diff > 0 ? (
-                                      <IconTriangle
-                                        size={21}
-                                        strokeWidth={2}
-                                        color={"#008000"}
-                                      />
-                                    ) : (
-                                      <IconTriangleInverted
-                                        size={21}
-                                        strokeWidth={2}
-                                        color={"#ff0000"}
-                                      />
-                                    )}
+                    <Flex direction="column" gap={30}>
+                      <Title align="center">Rank History</Title>
+                      <LineChart
+                        width={730}
+                        height={250}
+                        data={rankHistoryData.history}
+                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis
+                          dataKey="date"
+                          stroke="#ffffff"
+                          padding={{ left: 10, right: 10 }}
+                          hide
+                        />
+                        <YAxis
+                          stroke="#ffffff"
+                          domain={["auto", "auto"]}
+                          reversed
+                          interval="preserveStartEnd"
+                          label={{
+                            value: "Rank",
+                            angle: -90,
+                            position: "left",
+                            offset: 10,
+                          }}
+                        />
+                        <Tooltip
+                          content={({ active, payload, label }) => {
+                            if (active && payload && payload.length) {
+                              return (
+                                <Paper
+                                  shadow="sm"
+                                  p="sm"
+                                  sx={{
+                                    outline: "solid",
+                                    borderRadius: "10px",
+                                    color: "white",
+                                  }}
+                                  bg="rgba(50, 50, 50, .6)"
+                                >
+                                  <Flex gap={10}>
                                     <Title order={6}>
-                                      {Math.abs(payload[0].payload.diff)}
+                                      {`Global Rank #${payload[0].value}`}
                                     </Title>
+                                    <Flex gap={2}>
+                                      {payload[0].payload.diff === 0 ? (
+                                        <IconMinus
+                                          size={21}
+                                          strokeWidth={2}
+                                          color="#808080"
+                                        />
+                                      ) : payload[0].payload.diff > 0 ? (
+                                        <IconTriangle
+                                          size={21}
+                                          strokeWidth={2}
+                                          color={"#008000"}
+                                        />
+                                      ) : (
+                                        <IconTriangleInverted
+                                          size={21}
+                                          strokeWidth={2}
+                                          color={"#ff0000"}
+                                        />
+                                      )}
+                                      <Title order={6}>
+                                        {Math.abs(payload[0].payload.diff)}
+                                      </Title>
+                                    </Flex>
                                   </Flex>
-                                </Flex>
-                                <Title order={6}>
-                                  {`${label} - ${
-                                    payload[0].payload.index === 89
-                                      ? "today"
-                                      : `${
-                                          89 - payload[0].payload.index
-                                        } days ago`
-                                  }`}
-                                </Title>
-                              </Paper>
-                            );
-                          }
+                                  <Title order={6}>
+                                    {`${label} - ${
+                                      payload[0].payload.index === 89
+                                        ? "today"
+                                        : `${
+                                            89 - payload[0].payload.index
+                                          } days ago`
+                                    }`}
+                                  </Title>
+                                </Paper>
+                              );
+                            }
 
-                          return null;
-                        }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="rank"
-                        stroke="#daa520"
-                        strokeWidth={3}
-                        dot={({ cx, cy, payload, value }) => {
-                          if (
-                            value === rankHistoryData.maxRank &&
-                            payload.index === rankHistoryData.maxRankIdx
-                          ) {
-                            return (
-                              <circle
-                                key={value}
-                                cx={cx}
-                                cy={cy}
-                                r={5}
-                                stroke="black"
-                                strokeWidth={2}
-                                fill="lime"
-                              />
-                            );
-                          }
-                          if (
-                            (rankHistoryData.minRank !==
-                              rankHistoryData.maxRank ||
-                              rankHistoryData.minRankIdx !==
-                                rankHistoryData.maxRankIdx) &&
-                            value === rankHistoryData.minRank &&
-                            payload.index === rankHistoryData.minRankIdx
-                          ) {
-                            {
+                            return null;
+                          }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="rank"
+                          stroke="#daa520"
+                          strokeWidth={3}
+                          dot={({ cx, cy, payload, value }) => {
+                            if (
+                              value === rankHistoryData.maxRank &&
+                              payload.index === rankHistoryData.maxRankIdx
+                            ) {
                               return (
                                 <circle
                                   key={value}
@@ -476,21 +457,45 @@ export default function UserProfilePage() {
                                   r={5}
                                   stroke="black"
                                   strokeWidth={2}
-                                  fill="red"
+                                  fill="lime"
                                 />
                               );
                             }
-                          }
-                        }}
-                      />
-                    </LineChart>
+                            if (
+                              (rankHistoryData.minRank !==
+                                rankHistoryData.maxRank ||
+                                rankHistoryData.minRankIdx !==
+                                  rankHistoryData.maxRankIdx) &&
+                              value === rankHistoryData.minRank &&
+                              payload.index === rankHistoryData.minRankIdx
+                            ) {
+                              {
+                                return (
+                                  <circle
+                                    key={value}
+                                    cx={cx}
+                                    cy={cy}
+                                    r={5}
+                                    stroke="black"
+                                    strokeWidth={2}
+                                    fill="red"
+                                  />
+                                );
+                              }
+                            }
+                          }}
+                        />
+                      </LineChart>
+                    </Flex>
                   )}
 
                   {isScoreGraphDataSet && (
                     <>
                       {/** PP distribution */}
                       {shownStat === 1 && (
-                        <Flex>
+                        <Flex direction="column" gap={30}>
+                          <Title align="center">PP Distribution</Title>
+
                           <BarChart
                             width={730}
                             height={290}
@@ -571,30 +576,45 @@ export default function UserProfilePage() {
                             <Bar dataKey="count" fill="#daa520" />
                           </BarChart>
 
-                          <Flex direction="column">
-                            <Title order={2}>
-                              Mean{" "}
-                              {Math.round(scoreGraphData.pp.mean * 100) / 100}
-                              pp
-                            </Title>
-                            <Title order={2}>
-                              Median{" "}
-                              {Math.round(scoreGraphData.pp.median * 100) / 100}
-                              pp
-                            </Title>
-                            <Button onClick={() => setPpInterval(5)} mb={10}>
-                              5
-                            </Button>
-                            <Button onClick={() => setPpInterval(10)}>
-                              10
-                            </Button>
+                          <Flex justify="center" gap={50}>
+                            <Flex direction="column" justify="center">
+                              <Title order={2}>
+                                Mean{" "}
+                                {Math.round(scoreGraphData.pp.mean * 100) / 100}
+                                pp
+                              </Title>
+                              <Title order={2}>
+                                Median{" "}
+                                {Math.round(scoreGraphData.pp.median * 100) /
+                                  100}
+                                pp
+                              </Title>
+                            </Flex>
+                            <Flex direction="column" gap={10}>
+                              <Title align="center" order={4}>
+                                Change Graph Interval
+                              </Title>
+                              <Flex direction="column" w={200}>
+                                <Button
+                                  onClick={() => setPpInterval(5)}
+                                  mb={10}
+                                >
+                                  5
+                                </Button>
+                                <Button onClick={() => setPpInterval(10)}>
+                                  10
+                                </Button>
+                              </Flex>
+                            </Flex>
                           </Flex>
                         </Flex>
                       )}
 
                       {/** Acc distribution */}
                       {shownStat === 2 && (
-                        <Flex>
+                        <Flex direction="column" gap={30}>
+                          <Title align="center">Accuracy Distribution</Title>
+
                           <BarChart
                             width={730}
                             height={290}
@@ -665,193 +685,226 @@ export default function UserProfilePage() {
                             <Bar dataKey="count" fill="#daa520" />
                           </BarChart>
 
-                          <Flex direction="column">
-                            <Title order={2}>
-                              Mean{" "}
-                              {Math.round(scoreGraphData.acc.mean * 100) / 100}%
-                            </Title>
-                            <Title order={2}>
-                              Median{" "}
-                              {Math.round(scoreGraphData.acc.median * 100) /
-                                100}
-                              %
-                            </Title>
-                            <Button onClick={() => setAccInterval(0.1)} mb={10}>
-                              0.1
-                            </Button>
-                            <Button onClick={() => setAccInterval(0.5)} mb={10}>
-                              0.5
-                            </Button>
-                            <Button onClick={() => setAccInterval(1)}>1</Button>
+                          <Flex justify="center" gap={50}>
+                            <Flex direction="column" justify="center">
+                              <Title order={2}>
+                                Mean{" "}
+                                {Math.round(scoreGraphData.acc.mean * 100) /
+                                  100}
+                                %
+                              </Title>
+                              <Title order={2}>
+                                Median{" "}
+                                {Math.round(scoreGraphData.acc.median * 100) /
+                                  100}
+                                %
+                              </Title>
+                            </Flex>
+                            <Flex direction="column" gap={10}>
+                              <Title align="center" order={4}>
+                                Change Graph Interval
+                              </Title>
+                              <Flex direction="column" w={200}>
+                                <Button
+                                  onClick={() => setAccInterval(0.1)}
+                                  mb={10}
+                                >
+                                  0.1
+                                </Button>
+                                <Button
+                                  onClick={() => setAccInterval(0.5)}
+                                  mb={10}
+                                >
+                                  0.5
+                                </Button>
+                                <Button onClick={() => setAccInterval(1)}>
+                                  1
+                                </Button>
+                              </Flex>
+                            </Flex>
                           </Flex>
                         </Flex>
                       )}
 
                       {/** Date distribution */}
                       {shownStat === 3 && (
-                        <BarChart
-                          width={730}
-                          height={290}
-                          data={scoreGraphData.dateGraphData}
-                          margin={{ top: 5, right: 30, left: 20, bottom: 35 }}
-                        >
-                          <CartesianGrid
-                            strokeDasharray="3 3"
-                            vertical={false}
-                          />
-                          <XAxis
-                            dataKey="month"
-                            stroke="#ffffff"
-                            padding={{ left: 10, right: 10 }}
-                            tickFormatter={(tick) =>
-                              "20" + tick.slice(0, 2) + "-" + tick.slice(2, 4)
-                            }
-                          >
-                            <Label
-                              value="Month"
-                              offset={-30}
-                              position="insideBottom"
-                            />
-                          </XAxis>
-                          <YAxis
-                            stroke="#ffffff"
-                            domain={[0, "auto"]}
-                            interval="preserveStartEnd"
-                            label={{
-                              value: "Number of plays",
-                              angle: -90,
-                              position: "insideBottomLeft",
-                              offset: 20,
-                            }}
-                          />
-                          <Tooltip
-                            content={({ active, payload, label }) => {
-                              if (active && payload && payload.length) {
-                                return (
-                                  <Paper
-                                    shadow="sm"
-                                    p="sm"
-                                    sx={{
-                                      outline: "solid",
-                                      borderRadius: "10px",
-                                      color: "white",
-                                    }}
-                                    bg="rgba(50, 50, 50, .6)"
-                                  >
-                                    <Title order={6}>
-                                      {`${
-                                        [
-                                          "Jan",
-                                          "Feb",
-                                          "Mar",
-                                          "Apr",
-                                          "May",
-                                          "Jun",
-                                          "Jul",
-                                          "Aug",
-                                          "Sep",
-                                          "Oct",
-                                          "Nov",
-                                          "Dec",
-                                        ][parseInt(label.slice(-2)) - 1]
-                                      } 20${label.slice(0, 2)}`}
-                                    </Title>
-                                    <Title order={2}>{payload[0].value}</Title>
-                                  </Paper>
-                                );
-                              }
+                        <Flex direction="column" gap={30}>
+                          <Title align="center">Date Distribution</Title>
 
-                              return null;
-                            }}
-                          />
-                          <Bar dataKey="count" fill="#daa520" />
-                        </BarChart>
+                          <BarChart
+                            width={730}
+                            height={290}
+                            data={scoreGraphData.dateGraphData}
+                            margin={{ top: 5, right: 30, left: 20, bottom: 35 }}
+                          >
+                            <CartesianGrid
+                              strokeDasharray="3 3"
+                              vertical={false}
+                            />
+                            <XAxis
+                              dataKey="month"
+                              stroke="#ffffff"
+                              padding={{ left: 10, right: 10 }}
+                              tickFormatter={(tick) =>
+                                "20" + tick.slice(0, 2) + "-" + tick.slice(2, 4)
+                              }
+                            >
+                              <Label
+                                value="Month"
+                                offset={-30}
+                                position="insideBottom"
+                              />
+                            </XAxis>
+                            <YAxis
+                              stroke="#ffffff"
+                              domain={[0, "auto"]}
+                              interval="preserveStartEnd"
+                              label={{
+                                value: "Number of plays",
+                                angle: -90,
+                                position: "insideBottomLeft",
+                                offset: 20,
+                              }}
+                            />
+                            <Tooltip
+                              content={({ active, payload, label }) => {
+                                if (active && payload && payload.length) {
+                                  return (
+                                    <Paper
+                                      shadow="sm"
+                                      p="sm"
+                                      sx={{
+                                        outline: "solid",
+                                        borderRadius: "10px",
+                                        color: "white",
+                                      }}
+                                      bg="rgba(50, 50, 50, .6)"
+                                    >
+                                      <Title order={6}>
+                                        {`${
+                                          [
+                                            "Jan",
+                                            "Feb",
+                                            "Mar",
+                                            "Apr",
+                                            "May",
+                                            "Jun",
+                                            "Jul",
+                                            "Aug",
+                                            "Sep",
+                                            "Oct",
+                                            "Nov",
+                                            "Dec",
+                                          ][parseInt(label.slice(-2)) - 1]
+                                        } 20${label.slice(0, 2)}`}
+                                      </Title>
+                                      <Title order={2}>
+                                        {payload[0].value}
+                                      </Title>
+                                    </Paper>
+                                  );
+                                }
+
+                                return null;
+                              }}
+                            />
+                            <Bar dataKey="count" fill="#daa520" />
+                          </BarChart>
+                        </Flex>
                       )}
                       {/** Time distribution */}
                       {shownStat === 4 && (
-                        <BarChart
-                          width={730}
-                          height={290}
-                          data={scoreGraphData.timeGraphData}
-                          margin={{ top: 5, right: 30, left: 20, bottom: 35 }}
-                        >
-                          <CartesianGrid
-                            strokeDasharray="3 3"
-                            vertical={false}
-                          />
-                          <XAxis
-                            dataKey="hour"
-                            stroke="#ffffff"
-                            padding={{ left: 10, right: 10 }}
-                            tickFormatter={(hour) =>
-                              `${
-                                hour === 0 ? 12 : hour > 12 ? hour - 12 : hour
-                              }${hour < 12 ? "am" : "pm"}`
-                            }
-                          >
-                            <Label
-                              value="Time"
-                              offset={-30}
-                              position="insideBottom"
-                            />
-                          </XAxis>
-                          <YAxis
-                            stroke="#ffffff"
-                            domain={[0, "auto"]}
-                            interval="preserveStartEnd"
-                            label={{
-                              value: "Number of plays",
-                              angle: -90,
-                              position: "insideBottomLeft",
-                              offset: 20,
-                            }}
-                          />
-                          <Tooltip
-                            content={({ active, payload, label }) => {
-                              if (active && payload && payload.length) {
-                                return (
-                                  <Paper
-                                    shadow="sm"
-                                    p="sm"
-                                    sx={{
-                                      outline: "solid",
-                                      borderRadius: "10px",
-                                      color: "white",
-                                    }}
-                                    bg="rgba(50, 50, 50, .6)"
-                                  >
-                                    <Title order={6}>
-                                      {label === 0
-                                        ? 12
-                                        : label > 12
-                                        ? label - 12
-                                        : label}
-                                      {label < 12 ? "am" : "pm"}
-                                      {" - "}
-                                      {label === 0
-                                        ? 12
-                                        : label > 12
-                                        ? label - 12
-                                        : label}
-                                      {":59"}
-                                      {label < 12 ? "am" : "pm"}
-                                    </Title>
-                                    <Title order={2}>{payload[0].value}</Title>
-                                  </Paper>
-                                );
-                              }
+                        <Flex direction="column" gap={30}>
+                          <Title align="center">Time Distribution</Title>
 
-                              return null;
-                            }}
-                          />
-                          <Bar dataKey="count" fill="#daa520" />
-                        </BarChart>
+                          <BarChart
+                            width={730}
+                            height={290}
+                            data={scoreGraphData.timeGraphData}
+                            margin={{ top: 5, right: 30, left: 20, bottom: 35 }}
+                          >
+                            <CartesianGrid
+                              strokeDasharray="3 3"
+                              vertical={false}
+                            />
+                            <XAxis
+                              dataKey="hour"
+                              stroke="#ffffff"
+                              padding={{ left: 10, right: 10 }}
+                              tickFormatter={(hour) =>
+                                `${
+                                  hour === 0 ? 12 : hour > 12 ? hour - 12 : hour
+                                }${hour < 12 ? "am" : "pm"}`
+                              }
+                            >
+                              <Label
+                                value="Time"
+                                offset={-30}
+                                position="insideBottom"
+                              />
+                            </XAxis>
+                            <YAxis
+                              stroke="#ffffff"
+                              domain={[0, "auto"]}
+                              interval="preserveStartEnd"
+                              label={{
+                                value: "Number of plays",
+                                angle: -90,
+                                position: "insideBottomLeft",
+                                offset: 20,
+                              }}
+                            />
+                            <Tooltip
+                              content={({ active, payload, label }) => {
+                                if (active && payload && payload.length) {
+                                  return (
+                                    <Paper
+                                      shadow="sm"
+                                      p="sm"
+                                      sx={{
+                                        outline: "solid",
+                                        borderRadius: "10px",
+                                        color: "white",
+                                      }}
+                                      bg="rgba(50, 50, 50, .6)"
+                                    >
+                                      <Title order={6}>
+                                        {label === 0
+                                          ? 12
+                                          : label > 12
+                                          ? label - 12
+                                          : label}
+                                        {label < 12 ? "am" : "pm"}
+                                        {" - "}
+                                        {label === 0
+                                          ? 12
+                                          : label > 12
+                                          ? label - 12
+                                          : label}
+                                        {":59"}
+                                        {label < 12 ? "am" : "pm"}
+                                      </Title>
+                                      <Title order={2}>
+                                        {payload[0].value}
+                                      </Title>
+                                    </Paper>
+                                  );
+                                }
+
+                                return null;
+                              }}
+                            />
+                            <Bar dataKey="count" fill="#daa520" />
+                          </BarChart>
+                        </Flex>
                       )}
 
                       {/** Mod distribution */}
                       {shownStat === 5 && (
                         <Flex gap={30}>
-                          <PieChart width={600} height={500}>
+                          <Flex direction="column">
+                          <Title align="center">Mod Distribution</Title>
+                          <PieChart width={600} height={475}>
                             <Pie
                               dataKey="count"
                               data={
@@ -908,6 +961,7 @@ export default function UserProfilePage() {
                               )}
                             </Pie>
                           </PieChart>
+                          </Flex>
 
                           <Flex
                             direction="column"
