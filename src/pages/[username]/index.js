@@ -746,7 +746,22 @@ export default function UserProfilePage() {
                               stroke="#ffffff"
                               padding={{ left: 10, right: 10 }}
                               tickFormatter={(tick) =>
-                                "20" + tick.slice(0, 2) + "-" + tick.slice(2, 4)
+                                [
+                                  "Jan",
+                                  "Feb",
+                                  "Mar",
+                                  "Apr",
+                                  "May",
+                                  "Jun",
+                                  "Jul",
+                                  "Aug",
+                                  "Sep",
+                                  "Oct",
+                                  "Nov",
+                                  "Dec",
+                                ][parseInt(tick.slice(2, 4))] +
+                                "-" +
+                                tick.slice(0, 2)
                               }
                             >
                               <Label
@@ -812,6 +827,7 @@ export default function UserProfilePage() {
                           </BarChart>
                         </Flex>
                       )}
+
                       {/** Time distribution */}
                       {shownStat === 4 && (
                         <Flex direction="column" gap={30}>
@@ -903,64 +919,68 @@ export default function UserProfilePage() {
                       {shownStat === 5 && (
                         <Flex gap={30}>
                           <Flex direction="column">
-                          <Title align="center">Mod Distribution</Title>
-                          <PieChart width={600} height={475}>
-                            <Pie
-                              dataKey="count"
-                              data={
-                                scoreGraphData.modsGraphData.modCombinationArray
-                              }
-                              cx="50%"
-                              cy="50%"
-                              outerRadius={200}
-                              innerRadius={100}
-                              fill="#8884d8"
-                              labelLine={false}
-                              label={({
-                                cx,
-                                cy,
-                                midAngle,
-                                outerRadius,
-                                mods,
-                                index,
-                                count,
-                              }) => {
-                                console.log(
+                            <Title align="center">Mod Distribution</Title>
+                            <PieChart width={600} height={475}>
+                              <Pie
+                                dataKey="count"
+                                data={
                                   scoreGraphData.modsGraphData
                                     .modCombinationArray
-                                );
-                                if (count > 1) {
-                                  const radius = outerRadius + 50;
-                                  const x =
-                                    cx + radius * Math.cos(-midAngle * RADIAN);
-                                  const y =
-                                    cy +
-                                    radius * Math.sin(-midAngle * RADIAN) * 0.9;
-                                  return (
-                                    <text
-                                      x={x}
-                                      y={y}
-                                      fill={COLORS[index % COLORS.length]}
-                                      textAnchor="middle"
-                                      dominantBaseline="central"
-                                      style={{ fontWeight: "bold" }}
-                                    >
-                                      {mods} ({count})
-                                    </text>
-                                  );
                                 }
-                              }}
-                            >
-                              {scoreGraphData.modsGraphData.modCombinationArray.map(
-                                (entry, index) => (
-                                  <Cell
-                                    key={`cell-${index}`}
-                                    fill={COLORS[index % COLORS.length]}
-                                  />
-                                )
-                              )}
-                            </Pie>
-                          </PieChart>
+                                cx="50%"
+                                cy="50%"
+                                outerRadius={200}
+                                innerRadius={100}
+                                fill="#8884d8"
+                                labelLine={false}
+                                label={({
+                                  cx,
+                                  cy,
+                                  midAngle,
+                                  outerRadius,
+                                  mods,
+                                  index,
+                                  count,
+                                }) => {
+                                  console.log(
+                                    scoreGraphData.modsGraphData
+                                      .modCombinationArray
+                                  );
+                                  if (count > 1) {
+                                    const radius = outerRadius + 50;
+                                    const x =
+                                      cx +
+                                      radius * Math.cos(-midAngle * RADIAN);
+                                    const y =
+                                      cy +
+                                      radius *
+                                        Math.sin(-midAngle * RADIAN) *
+                                        0.9;
+                                    return (
+                                      <text
+                                        x={x}
+                                        y={y}
+                                        fill={COLORS[index % COLORS.length]}
+                                        textAnchor="middle"
+                                        dominantBaseline="central"
+                                        style={{ fontWeight: "bold" }}
+                                      >
+                                        {mods} ({count})
+                                      </text>
+                                    );
+                                  }
+                                }}
+                              >
+                                {scoreGraphData.modsGraphData.modCombinationArray.map(
+                                  (entry, index) => (
+                                    <Cell
+                                      key={`cell-${index}`}
+                                      fill={COLORS[index % COLORS.length]}
+                                    />
+                                  )
+                                )}
+                              </Pie>
+                            </PieChart>
                           </Flex>
 
                           <Flex
