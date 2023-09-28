@@ -14,7 +14,7 @@ const useStyles = createStyles((theme) => ({
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    height: rem(56),
+    height: rem(76),
 
     [theme.fn.smallerThan("sm")]: {
       justifyContent: "flex-start",
@@ -34,7 +34,7 @@ const useStyles = createStyles((theme) => ({
   link: {
     display: "block",
     lineHeight: 1,
-    padding: `${rem(8)} ${rem(12)}`,
+    padding: `${rem(12)} ${rem(14)}`,
     borderRadius: theme.radius.sm,
     textDecoration: "none",
     color:

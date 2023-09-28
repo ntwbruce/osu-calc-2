@@ -686,11 +686,11 @@ export default function SortableTable({
       </Flex>
 
       <ScrollArea h="71vh">
-        <Overlay
+        {/* <Overlay
           h="10%"
           gradient={`linear-gradient(to top, rgba(0,0,0,0), rgba(0,0,0,1))`}
         />
-        <Container h={20} w={20} />
+        <Container h={20} w={20} /> */}
         {scores}
       </ScrollArea>
     </Flex>

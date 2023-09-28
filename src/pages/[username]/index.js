@@ -297,7 +297,8 @@ export default function UserProfilePage() {
         home={{ label: "Check another profile", link: "/" }}
         currPage="Profile Stats"
       />
-      <Flex direction="column" gap="md" justify="center" ml={25} mr={25}>
+
+      <Flex direction="column" gap="md" justify="center" ml="10%" mr="10%">
         {authTokenPresent && isUserDataSet && (
           <PlayerInfoSimple userData={userData} isVertical={false} />
         )}

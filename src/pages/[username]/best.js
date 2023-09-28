@@ -220,7 +220,7 @@ export default function UserBestScoresPage() {
         currPage="Best Scores"
       />
 
-      <Grid justify="center" align="center" grow ml={10} mr={10} gutter={20}>
+      <Grid justify="center" align="center" grow ml="10%" mr="10%" gutter={20}>
         <Grid.Col span={1}>
           {authTokenPresent && isUserDataSet && (
             <PlayerInfo
