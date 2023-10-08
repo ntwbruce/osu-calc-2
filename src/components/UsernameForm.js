@@ -1,4 +1,4 @@
-import { TextInput, Checkbox, Button, Group, Box } from "@mantine/core";
+import { TextInput, Button, Box, Flex } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useRef } from "react";
 
@@ -8,35 +8,30 @@ export default function UsernameForm(props) {
   const form = useForm({
     initialValues: {
       username: "",
-      termsOfService: false,
     },
   });
 
   function submitHandler(event) {
     event.preventDefault();
-    props.onSubmit(usernameInputRef.current.value);
+    props.onSubmit(usernameInputRef.current.value + "/best");
   }
 
   return (
     <Box maw={600} mx="auto">
       <form onSubmit={submitHandler}>
-        <TextInput
-          label="Username"
-          placeholder="Username"
-          {...form.getInputProps("username")}
-          ref={usernameInputRef}
-          w="24rem"
-        />
+        <Flex direction="column" gap={20}>
+          <TextInput
+            placeholder="Username"
+            {...form.getInputProps("username")}
+            ref={usernameInputRef}
+            w="40rem"
+            size="xl"
+          />
 
-        <Checkbox
-          mt="md"
-          label="I agree to sell my privacy."
-          {...form.getInputProps("termsOfService", { type: "checkbox" })}
-        />
-
-        <Group position="right" mt="md">
-          <Button type="submit">Submit</Button>
-        </Group>
+          <Button type="submit" size="xl" w="40rem">
+            Go!!!
+          </Button>
+        </Flex>
       </form>
     </Box>
   );

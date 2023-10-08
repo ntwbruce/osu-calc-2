@@ -194,7 +194,7 @@ export function PlayerInfoSimple({ userData, isVertical }) {
           borderRadius: "10px",
           color: "white",
         }}
-        h={isVertical ? "87vh" : 250}
+        h={isVertical ? "87vh" : 200}
         mb={10}
         mt={10}
       >
@@ -207,8 +207,8 @@ export function PlayerInfoSimple({ userData, isVertical }) {
           gap={60}
         >
           <Image
-            width="12rem"
-            height="12rem"
+            width="10rem"
+            height="10rem"
             src={pfp}
             radius="lg"
             sx={{

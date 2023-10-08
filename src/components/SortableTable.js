@@ -10,8 +10,6 @@ import {
   MultiSelect,
   ScrollArea,
   Image,
-  Overlay,
-  Container,
 } from "@mantine/core";
 import {
   IconSearch,

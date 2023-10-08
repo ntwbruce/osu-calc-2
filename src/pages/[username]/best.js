@@ -208,7 +208,7 @@ export default function UserBestScoresPage() {
   return (
     <>
       <Head>
-        <title>silver wolf cheese slap meme</title>
+        <title>osu!calc</title>
       </Head>
 
       <LoggedInHeader
