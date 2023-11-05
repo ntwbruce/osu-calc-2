@@ -1,8 +1,7 @@
 import UsernameForm from "@/components/UsernameForm";
-import { Flex, Title, Button, Text } from "@mantine/core";
+import { Flex, Title, Text } from "@mantine/core";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import Link from "next/link";
 
 export default function HomePage() {
   const router = useRouter();
@@ -23,7 +22,7 @@ export default function HomePage() {
         </Title>
 
         <Text size={44} align="center" pb={60}>
-          View detailed profile stats and scores!
+          View new profile statistics and detailed score data!
         </Text>
 
         <UsernameForm onSubmit={(username) => router.push(`/${username}`)} />
